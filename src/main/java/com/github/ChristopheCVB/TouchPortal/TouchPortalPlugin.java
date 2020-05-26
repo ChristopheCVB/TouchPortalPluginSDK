@@ -15,7 +15,9 @@ public abstract class TouchPortalPlugin {
     private static final String SOCKET_IP = "127.0.0.1";
     private static final int SOCKET_PORT = 12136;
 
-    protected static final String VERSION = "2.0";
+    protected static final String TOUCH_PORTAL_VERSION = "2.0";
+
+    protected static final String COMMAND_START = "start";
 
     protected static final String GENERIC_ID = "id";
     protected static final String GENERIC_NAME = "name";
