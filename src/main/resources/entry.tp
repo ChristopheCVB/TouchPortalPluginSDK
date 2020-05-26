@@ -1,0 +1,27 @@
+{
+  "sdk": 1,
+  "version": @plugin.version@,
+  "name": "@plugin.name@",
+  "id": "@plugin.group@.@plugin.name@",
+  "configuration": {
+    "colorDark": "#203060",
+    "colorLight": "#4070F0"
+  },
+  "plugin_start_cmd": "java -jar %TP_PLUGIN_FOLDER%@plugin.name@\\@plugin.name@.jar start",
+  "categories": [
+    {
+      "id": "@plugin.group@.@plugin.name@.basecategory",
+      "name": "@plugin.name@",
+      "imagepath": "%TP_PLUGIN_FOLDER%@plugin.name@\\images\\icon-24.png",
+      "actions": [
+        {
+          "id": "@plugin.group@.@plugin.name@.basecategory.action.ACTION_NAME",
+          "prefix": "Plugin",
+          "name": "Short Action Name",
+          "type": "communicate",
+          "description": "Full description of your action"
+        }
+      ]
+    }
+  ]
+}
