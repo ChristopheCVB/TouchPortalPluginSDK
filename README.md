@@ -29,3 +29,8 @@ Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 ```
 - Implement the interface methods
 - Start writing the actions code in the `onReceive(JSONObject message)` method
+
+## Build
+
+Use the common `gradlew clean` task to clean your build folder
+Use the `gradlew packagePlugin` task to pack your plugin into a `.tpp` file
