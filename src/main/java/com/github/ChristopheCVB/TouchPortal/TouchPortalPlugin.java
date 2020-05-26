@@ -266,7 +266,7 @@ public abstract class TouchPortalPlugin {
                     .put(Message.ID, id)
                     .put(Message.VALUE, new JSONArray(values));
             sent = this.send(choiceUpdateMessage);
-            System.out.println("Update Choices[" + id + "] sent");
+            System.out.println("Update Choices [" + id + "] sent");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -291,7 +291,7 @@ public abstract class TouchPortalPlugin {
                     .put(Message.INSTANCE_ID, instanceId)
                     .put(Message.VALUE, new JSONArray(values));
             sent = this.send(specificChoiceUpdateMessage);
-            System.out.println("Update Choices[" + id + "] sent");
+            System.out.println("Update Choices [" + id + "] sent");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -314,7 +314,7 @@ public abstract class TouchPortalPlugin {
                     .put(Message.ID, id)
                     .put(Message.VALUE, value);
             sent = this.send(stateUpdateMessage);
-            System.out.println("Update State[" + id + "] sent");
+            System.out.println("Update State [" + id + "] sent");
         } catch (JSONException e) {
             e.printStackTrace();
         }
