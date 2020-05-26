@@ -33,4 +33,5 @@ Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 ## Build
 
 Use the common `gradlew clean` task to clean your build folder
+
 Use the `gradlew packagePlugin` task to pack your plugin into a `.tpp` file
