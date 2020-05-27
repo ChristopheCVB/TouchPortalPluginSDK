@@ -15,25 +15,11 @@ repositories {
 
 dependencies {
     compile group: 'org.json', name: 'org.json', version: 'chargebee-1.0'
-
     compile project(':Annotations')
 
+    annotationProcessor project(':AnnotationsProcessor')
+
     testCompile group: 'junit', name: 'junit', version: '4.12'
-}
-
-task withAnnotations(type: Copy) {
-    group 'Touch Portal - Plugin'
-    description 'Copy the Annotations jar to the lib directory'
-    dependsOn(':Annotations:build')
-    from(file("Annotations/build/libs/Annotations-1.0.0.jar"))
-    into("libs/")
-    doLast {
-        println 'Annotation jar copied in libs directory'
-    }
-}
-
-build {
-    dependsOn(withAnnotations)
 }
 
 import org.apache.tools.ant.filters.*
