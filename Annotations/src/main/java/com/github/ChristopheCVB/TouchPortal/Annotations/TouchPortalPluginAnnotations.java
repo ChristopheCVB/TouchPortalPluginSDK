@@ -10,6 +10,7 @@ public class TouchPortalPluginAnnotations {
     @Target(ElementType.METHOD)
     public @interface Action {
         String name();
+
         String id();
     }
 }

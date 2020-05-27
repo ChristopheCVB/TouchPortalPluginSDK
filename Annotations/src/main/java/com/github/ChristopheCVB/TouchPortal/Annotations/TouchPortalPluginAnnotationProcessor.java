@@ -18,51 +18,50 @@ import java.util.Set;
 
 @AutoService(Processor.class)
 public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
-  private Filer filer;
-  private Messager messager;
+    private Filer filer;
+    private Messager messager;
 
-  @Override
-  public synchronized void init(ProcessingEnvironment processingEnv) {
-    super.init(processingEnv);
-    this.filer = processingEnv.getFiler();
-    this.messager = processingEnv.getMessager();
-  }
+    @Override
+    public synchronized void init(ProcessingEnvironment processingEnv) {
+        super.init(processingEnv);
+        this.filer = processingEnv.getFiler();
+        this.messager = processingEnv.getMessager();
+    }
 
-  @Override
-  public Set<String> getSupportedAnnotationTypes() {
-    Set<String> annotations = new LinkedHashSet<>();
-    annotations.add(TouchPortalPluginAnnotations.Action.class.getCanonicalName());
-    return annotations;
-  }
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        Set<String> annotations = new LinkedHashSet<>();
+        annotations.add(TouchPortalPluginAnnotations.Action.class.getCanonicalName());
+        return annotations;
+    }
 
-  @Override
-  public SourceVersion getSupportedSourceVersion() {
-    return SourceVersion.latestSupported();
-  }
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latestSupported();
+    }
 
-  @Override
-  public boolean process(Set<? extends TypeElement> set, RoundEnvironment env) {
-    this.messager.printMessage(Diagnostic.Kind.NOTE, "process");
-    try {
-      for (TypeElement typeElement : set) {
-        for (Element element : env.getElementsAnnotatedWith(typeElement)) {
-          TouchPortalPluginAnnotations.Action action = (TouchPortalPluginAnnotations.Action) element;
-          this.messager.printMessage(Diagnostic.Kind.NOTE, action.id());
-          String actionFileName = "action_"+action.name()+".tp";
-          FileObject actionFileObject = this.filer.createResource(StandardLocation.SOURCE_OUTPUT, "", actionFileName, element);
-          JSONObject jsonAction = new JSONObject();
-          jsonAction.put("name", action.name());
-          jsonAction.put("id", action.id());
-          Writer writer = actionFileObject.openWriter();
-          writer.write(jsonAction.toString());
-          writer.flush();
-          writer.close();
+    @Override
+    public boolean process(Set<? extends TypeElement> set, RoundEnvironment env) {
+        this.messager.printMessage(Diagnostic.Kind.NOTE, this.getClass().getSimpleName()+".process");
+        try {
+            for (TypeElement typeElement : set) {
+                for (Element element : env.getElementsAnnotatedWith(typeElement)) {
+                    TouchPortalPluginAnnotations.Action action = (TouchPortalPluginAnnotations.Action) element;
+                    this.messager.printMessage(Diagnostic.Kind.NOTE, action.id());
+                    String actionFileName = "action_" + action.name() + ".tp";
+                    FileObject actionFileObject = this.filer.createResource(StandardLocation.SOURCE_OUTPUT, "", actionFileName, element);
+                    JSONObject jsonAction = new JSONObject();
+                    jsonAction.put("name", action.name());
+                    jsonAction.put("id", action.id());
+                    Writer writer = actionFileObject.openWriter();
+                    writer.write(jsonAction.toString());
+                    writer.flush();
+                    writer.close();
+                }
+            }
+        } catch (IOException | JSONException ioException) {
+            ioException.printStackTrace();
         }
-      }
+        return true;
     }
-    catch (IOException | JSONException ioException) {
-      ioException.printStackTrace();
-    }
-    return true;
-  }
 }
