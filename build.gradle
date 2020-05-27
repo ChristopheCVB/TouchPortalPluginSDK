@@ -16,8 +16,7 @@ repositories {
 dependencies {
     compile group: 'org.json', name: 'org.json', version: 'chargebee-1.0'
 
-    compile 'com.google.auto.service:auto-service:1.0-rc4'
-    compile 'com.squareup:javapoet:1.10.0'
+    compile project(':Annotations')
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

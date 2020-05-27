@@ -1,4 +1,4 @@
-package com.github.ChristopheCVB.TouchPortal.annotation;
+package com.github.ChristopheCVB.TouchPortal.Annotations;
 
 import com.google.auto.service.AutoService;
 import org.json.JSONException;
@@ -49,7 +49,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
           TouchPortalPluginAnnotations.Action action = (TouchPortalPluginAnnotations.Action) element;
           this.messager.printMessage(Diagnostic.Kind.NOTE, action.id());
           String actionFileName = "action_"+action.name()+".tp";
-          FileObject actionFileObject = this.filer.createResource(StandardLocation.SOURCE_OUTPUT, element.getEnclosingElement().toString(), actionFileName, element);
+          FileObject actionFileObject = this.filer.createResource(StandardLocation.SOURCE_OUTPUT, "", actionFileName, element);
           JSONObject jsonAction = new JSONObject();
           jsonAction.put("name", action.name());
           jsonAction.put("id", action.id());
@@ -62,8 +62,6 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     }
     catch (IOException | JSONException ioException) {
       ioException.printStackTrace();
-    } catch (Exception exception) {
-      exception.printStackTrace();
     }
     return true;
   }

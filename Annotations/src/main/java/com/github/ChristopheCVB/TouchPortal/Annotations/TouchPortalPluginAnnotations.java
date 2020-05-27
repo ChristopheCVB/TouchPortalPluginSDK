@@ -1,4 +1,4 @@
-package com.github.ChristopheCVB.TouchPortal.annotation;
+package com.github.ChristopheCVB.TouchPortal.Annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
