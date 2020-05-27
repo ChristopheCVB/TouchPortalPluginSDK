@@ -1,4 +1,4 @@
-package com.github.ChristopheCVB.TouchPortal;
+package com.github.ChristopheCVB.TouchPortal.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,5 +10,6 @@ public class TouchPortalPluginAnnotations {
     @Target(ElementType.METHOD)
     public @interface Action {
         String name();
+        String id();
     }
 }

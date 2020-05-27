@@ -1,4 +1,4 @@
-package com.github.ChristopheCVB.TouchPortal;
+package com.github.ChristopheCVB.TouchPortal.annotation;
 
 import com.google.auto.service.AutoService;
 import org.json.JSONException;
@@ -6,9 +6,10 @@ import org.json.JSONObject;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic;
 import javax.tools.FileObject;
-import javax.tools.JavaFileManager;
 import javax.tools.StandardLocation;
 import java.io.IOException;
 import java.io.Writer;
@@ -41,22 +42,29 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
 
   @Override
   public boolean process(Set<? extends TypeElement> set, RoundEnvironment env) {
+    this.messager.printMessage(Diagnostic.Kind.NOTE, "process");
     try {
       for (TypeElement typeElement : set) {
-        TouchPortalPluginAnnotations.Action action = (TouchPortalPluginAnnotations.Action) typeElement;
-        String actionFileName = "action"+action.name()+".json";
-        FileObject actionFileObject = this.filer.createResource(StandardLocation.SOURCE_OUTPUT, "", actionFileName, typeElement);
-        JSONObject jsonAction = new JSONObject();
-        jsonAction.put("name", ((TouchPortalPluginAnnotations.Action)typeElement).name());
-        Writer writer = actionFileObject.openWriter();
-        writer.write(jsonAction.toString());
-        writer.flush();
-        writer.close();
+        for (Element element : env.getElementsAnnotatedWith(typeElement)) {
+          TouchPortalPluginAnnotations.Action action = (TouchPortalPluginAnnotations.Action) element;
+          this.messager.printMessage(Diagnostic.Kind.NOTE, action.id());
+          String actionFileName = "action_"+action.name()+".tp";
+          FileObject actionFileObject = this.filer.createResource(StandardLocation.SOURCE_OUTPUT, element.getEnclosingElement().toString(), actionFileName, element);
+          JSONObject jsonAction = new JSONObject();
+          jsonAction.put("name", action.name());
+          jsonAction.put("id", action.id());
+          Writer writer = actionFileObject.openWriter();
+          writer.write(jsonAction.toString());
+          writer.flush();
+          writer.close();
+        }
       }
     }
     catch (IOException | JSONException ioException) {
       ioException.printStackTrace();
+    } catch (Exception exception) {
+      exception.printStackTrace();
     }
-    return false;
+    return true;
   }
 }
