@@ -8,4 +8,9 @@ public class TouchPortalPluginExample extends TouchPortalPlugin {
     private void dummy(String msg) {
         System.out.println("dummy");
     }
+
+    @TouchPortalPluginAnnotations.Action(name = "dummyName2", id = "dummyId2")
+    private void dummy2(String msg) {
+        System.out.println("dummy2");
+    }
 }

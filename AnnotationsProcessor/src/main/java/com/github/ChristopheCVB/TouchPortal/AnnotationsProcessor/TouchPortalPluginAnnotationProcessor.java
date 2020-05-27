@@ -12,7 +12,6 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
-import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedHashSet;
@@ -47,12 +46,13 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         this.messager.printMessage(Diagnostic.Kind.NOTE, this.getClass().getSimpleName()+".process");
         try {
             for (TypeElement typeElement : set) {
+                this.messager.printMessage(Diagnostic.Kind.NOTE, typeElement.getSimpleName());
                 for (Element element : env.getElementsAnnotatedWith(typeElement)) {
-                    TouchPortalPluginAnnotations.Action action = (TouchPortalPluginAnnotations.Action) element;
+                    this.messager.printMessage(Diagnostic.Kind.NOTE, element.getSimpleName());
+                    TouchPortalPluginAnnotations.Action action = element.getAnnotation(TouchPortalPluginAnnotations.Action.class);
                     this.messager.printMessage(Diagnostic.Kind.NOTE, action.id());
                     String actionFileName = "resources/action_" + action.id() + ".tpa";
                     FileObject actionFileObject = this.filer.createResource(StandardLocation.SOURCE_OUTPUT, "", actionFileName, element);
-                    new File(actionFileObject.toUri()).createNewFile();
                     JSONObject jsonAction = new JSONObject();
                     jsonAction.put("name", action.name());
                     jsonAction.put("id", action.id());
