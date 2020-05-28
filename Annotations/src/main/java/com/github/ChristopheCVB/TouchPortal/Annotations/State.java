@@ -8,7 +8,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.FIELD)
 public @interface State {
-    String description();
-    String defaultValue();
-    String[] valueChoices();
+    String id() default "";
+    String desc() default "";
+    String defaultValue() default "";
+    String[] valueChoices() default {};
 }

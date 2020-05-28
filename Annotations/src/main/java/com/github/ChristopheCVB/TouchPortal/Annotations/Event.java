@@ -6,9 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.SOURCE)
-@Target(ElementType.METHOD)
+@Target(ElementType.FIELD)
 public @interface Event {
-    String name();
+    String id() default "";
+    String name() default "";
     String format();
-    State state();
+    String valueStateId();
+    String[] valueChoices();
 }
