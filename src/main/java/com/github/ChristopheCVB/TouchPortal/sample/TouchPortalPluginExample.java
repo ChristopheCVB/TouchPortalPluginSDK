@@ -25,13 +25,17 @@ import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 
 @Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0")
 public class TouchPortalPluginExample extends TouchPortalPlugin {
-    @State
+    @State(valueChoices = {"1","2"})
     private String[] customState;
 
-    @Event(format = "When $val", valueChoices = {"1", "2"}, valueStateId = "com.github.ChristopheCVB.TouchPortal.sample.TouchPortalPluginExample.basecategory.state.customState")
+    @Event(format = "When $val", stateName = "customState")
     private String[] customEvent;
 
     public TouchPortalPluginExample() {}
+
+    public static void main(String[] args) {
+
+    }
 
     @Action(description = "Long Description of Dummy Action with Data")
     private void dummyWithData(@Data String text, Object object) {

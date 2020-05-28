@@ -31,6 +31,5 @@ public @interface Event {
     String id() default "";
     String name() default "";
     String format();
-    String valueStateId();// FIXME: Replace this by a reference to a State
-    String[] valueChoices();// FIXME: Replace this by a reference to a State
+    String stateName();
 }

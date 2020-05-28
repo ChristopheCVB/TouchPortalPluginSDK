@@ -112,7 +112,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
             JSONArray jsonEvents = new JSONArray();
             Set<? extends Element> eventElements = env.getElementsAnnotatedWith(Event.class);
             for (Element eventElement : eventElements) {
-                jsonEvents.put(this.processEvent(eventElement));
+                jsonEvents.put(this.processEvent(eventElement, env));
             }
             jsonCategory.put("events", jsonEvents);
 
@@ -191,24 +191,30 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         return jsonState;
     }
 
-    private JSONObject processEvent(Element eventElement) throws Exception {
+    private JSONObject processEvent(Element eventElement, RoundEnvironment env) throws Exception {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Event: " + eventElement.getSimpleName());
 
         Event event = eventElement.getAnnotation(Event.class);
         JSONObject jsonEvent = new JSONObject();
         jsonEvent.put("id", this.getEventId(eventElement, event));
-        String tpType = this.getTouchPortalType(eventElement);
         jsonEvent.put("type", "communicate");
         jsonEvent.put("name", this.getEventName(eventElement, event));
         jsonEvent.put("format", event.format());
+        String tpType = this.getTouchPortalType(eventElement);
         jsonEvent.put("valueType", tpType);
         if (tpType.equals("choice")) {
-            jsonEvent.put("valueChoices", event.valueChoices());
+            Set<? extends Element> stateElements = env.getElementsAnnotatedWith(State.class);
+            for (Element stateElement : stateElements) {
+                if (event.stateName().equals(stateElement.getSimpleName().toString())) {
+                    State state = stateElement.getAnnotation(State.class);
+                    jsonEvent.put("valueChoices", state.valueChoices());
+                    jsonEvent.put("valueStateId", this.getStateId(stateElement, state));
+                }
+            }
         }
         else {
             throw new Exception("The type " + tpType + " is not supported for events");
         }
-        jsonEvent.put("valueStateId", event.valueStateId());
 
         return jsonEvent;
     }
