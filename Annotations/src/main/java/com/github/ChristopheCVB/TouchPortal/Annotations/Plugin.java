@@ -5,12 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-public class TouchPortalPluginAnnotations {
-    @Retention(RetentionPolicy.SOURCE)
-    @Target(ElementType.METHOD)
-    public @interface Action {
-        String name();
-
-        String id();
-    }
+@Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.TYPE)
+public @interface Plugin {
+    int version();
+    String colorDark();
+    String colorLight();
 }

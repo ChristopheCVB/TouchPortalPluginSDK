@@ -1,16 +1,18 @@
 package com.github.ChristopheCVB.TouchPortal.sample;
 
+import com.github.ChristopheCVB.TouchPortal.Annotations.Data;
+import com.github.ChristopheCVB.TouchPortal.Annotations.Plugin;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
-import com.github.ChristopheCVB.TouchPortal.Annotations.TouchPortalPluginAnnotations;
 
+@Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0")
 public class TouchPortalPluginExample extends TouchPortalPlugin {
-    @TouchPortalPluginAnnotations.Action(name = "dummyName", id = "dummyId")
-    private void dummy(String msg) {
-        System.out.println("dummy");
+    @com.github.ChristopheCVB.TouchPortal.Annotations.Action(name = "Dummy Action")
+    private void dummyWithData(@Data String msg) {
+        System.out.println("dummyWithData");
     }
 
-    @TouchPortalPluginAnnotations.Action(name = "dummyName2", id = "dummyId2")
-    private void dummy2(String msg) {
-        System.out.println("dummy2");
+    @com.github.ChristopheCVB.TouchPortal.Annotations.Action()
+    private void dummyWithoutData(String msg) {
+        System.out.println("dummyWithoutData");
     }
 }
