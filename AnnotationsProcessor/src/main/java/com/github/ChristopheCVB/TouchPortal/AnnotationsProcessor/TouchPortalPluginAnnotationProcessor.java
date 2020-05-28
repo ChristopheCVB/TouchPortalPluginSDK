@@ -1,7 +1,28 @@
+/*
+ * Touch Portal Plugin SDK
+ *
+ * Copyright 2020 Christophe Carvalho Vilas-Boas
+ * christophe.carvalhovilasboas@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.github.ChristopheCVB.TouchPortal.AnnotationsProcessor;
 
 import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.google.auto.service.AutoService;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,6 +55,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         Set<String> annotations = new LinkedHashSet<>();
         annotations.add(Plugin.class.getCanonicalName());
         annotations.add(Action.class.getCanonicalName());
+        annotations.add(Data.class.getCanonicalName());
         annotations.add(State.class.getCanonicalName());
         annotations.add(Event.class.getCanonicalName());
         return annotations;
@@ -69,22 +91,30 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
             jsonCategory.put("name", selectedPluginElement.getSimpleName());
             jsonCategory.put("imagepath", "images/icon-24.png");
 
-            jsonPlugin.accumulate("categories", jsonCategory);
+            JSONArray jsonCategories = new JSONArray();
+            jsonCategories.put(jsonCategory);
+            jsonPlugin.put("categories", jsonCategories);
 
+            JSONArray jsonActions = new JSONArray();
             Set<? extends Element> actionElements = env.getElementsAnnotatedWith(Action.class);
             for (Element actionElement : actionElements) {
-                jsonCategory.accumulate("actions", this.processAction(actionElement));
+                jsonActions.put(this.processAction(actionElement, env));
             }
+            jsonCategory.put("actions", jsonActions);
 
+            JSONArray jsonStates = new JSONArray();
             Set<? extends Element> stateElements = env.getElementsAnnotatedWith(State.class);
             for (Element stateElement : stateElements) {
-                jsonCategory.accumulate("states", this.processState(stateElement));
+                jsonStates.put(this.processState(stateElement));
             }
+            jsonCategory.put("states", jsonStates);
 
+            JSONArray jsonEvents = new JSONArray();
             Set<? extends Element> eventElements = env.getElementsAnnotatedWith(Event.class);
             for (Element eventElement : eventElements) {
-                jsonCategory.accumulate("events", this.processEvent(eventElement));
+                jsonEvents.put(this.processEvent(eventElement));
             }
+            jsonCategory.put("events", jsonEvents);
 
             String actionFileName = "resources/entry.tp";
             FileObject actionFileObject = this.filer.createResource(StandardLocation.SOURCE_OUTPUT, "", actionFileName, selectedPluginElement);
@@ -112,29 +142,35 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonConfiguration.put("colorDark", plugin.colorDark());
         jsonConfiguration.put("colorLight", plugin.colorLight());
         jsonPlugin.put("configuration", jsonConfiguration);
+        jsonPlugin.put("plugin_start_cmd", "java -jar %TP_PLUGIN_FOLDER%" + pluginElement.getSimpleName() + "\\" + pluginElement.getSimpleName() + ".jar start");
 
         return jsonPlugin;
     }
 
-    private JSONObject processAction(Element actionElement) throws JSONException {
+    private JSONObject processAction(Element actionElement, RoundEnvironment env) throws JSONException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Action: " + actionElement.getSimpleName());
 
         Action action = actionElement.getAnnotation(Action.class);
         JSONObject jsonAction = new JSONObject();
-        jsonAction.put("name", this.getActionName(actionElement, action));
         jsonAction.put("id", this.getActionId(actionElement, action));
+        jsonAction.put("name", this.getActionName(actionElement, action));
+        jsonAction.put("prefix", action.prefix());
+        jsonAction.put("type", "communicate");
+        jsonAction.put("description", action.description());
+        jsonAction.put("tryInline", action.tryInline());
+        jsonAction.put("format", action.format());
 
-        // FIXME : Process Action Data
-        Data[] dataArray = actionElement.getAnnotationsByType(Data.class);
-        this.messager.printMessage(Diagnostic.Kind.NOTE, "dataArray: " + dataArray.length);
-        if (dataArray.length > 0) {
-            for (Data data : dataArray) {
-                JSONObject jsonData = new JSONObject();
-                jsonData.put("id", data.annotationType());
-
-                jsonAction.accumulate("data", jsonData);
+        Set<? extends Element> dataElements = env.getElementsAnnotatedWith(Data.class);
+        for (Element dataElement : dataElements) {
+            Element enclosingElement = dataElement.getEnclosingElement();
+            JSONArray jsonActionDatas = new JSONArray();
+            if (actionElement.equals(enclosingElement)) {
+                JSONObject jsonActionData = this.processActionData(dataElement, action);
+                jsonActionDatas.put(jsonActionData);
             }
+            jsonAction.put("data", jsonActionDatas);
         }
+
         return jsonAction;
     }
 
@@ -175,6 +211,23 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonEvent.put("valueStateId", event.valueStateId());
 
         return jsonEvent;
+    }
+
+    private JSONObject processActionData(Element dataElement, Action action) throws JSONException {
+        this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Action Data: " + dataElement.getSimpleName());
+
+        Data data = dataElement.getAnnotation(Data.class);
+        JSONObject jsonData = new JSONObject();
+        jsonData.put("id", this.getActionDataId(dataElement, data, action));
+        String tpType = this.getTouchPortalType(dataElement);
+        jsonData.put("type", tpType);
+        jsonData.put("label", this.getActionDataLabel(dataElement, data));
+        jsonData.put("default", data.defaultValue());
+        if (tpType.equals("choice")) {
+            jsonData.put("valueChoices", data.valueChoices());
+        }
+
+        return jsonData;
     }
 
     private String getTouchPortalType(Element stateElement) {
@@ -244,5 +297,13 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
 
     private String getEventName(Element element, Event event) {
         return event.name().isEmpty() ? element.getSimpleName().toString() : event.name();
+    }
+
+    private String getActionDataId(Element element, Data data, Action action) {
+        return this.getActionId(element.getEnclosingElement(), action) + ".data." + (data.id().isEmpty() ? element.getSimpleName() : data.id());
+    }
+
+    private String getActionDataLabel(Element dataElement, Data data) {
+        return data.label().isEmpty() ? dataElement.getSimpleName().toString() : data.label();
     }
 }
