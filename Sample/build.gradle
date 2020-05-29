@@ -12,7 +12,6 @@ group mainClassPackage
 version "${versionMajor}.${versionMinor}.${versionPatch}"
 
 dependencies {
-    compile project(':Annotations')
     compile project(':Library')
 
     annotationProcessor project(':AnnotationsProcessor')

@@ -91,8 +91,8 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
 
             JSONObject jsonCategory = new JSONObject();
             Plugin plugin = selectedPluginElement.getAnnotation(Plugin.class);
-            jsonCategory.put("id", this.getCategoryId(selectedPluginElement));
-            jsonCategory.put("name", this.getPluginName(selectedPluginElement, plugin));
+            jsonCategory.put("id", TouchPortalPluginAnnotationProcessor.getCategoryId(selectedPluginElement));
+            jsonCategory.put("name", TouchPortalPluginAnnotationProcessor.getPluginName(selectedPluginElement, plugin));
             jsonCategory.put("imagepath", "%TP_PLUGIN_FOLDER%" + selectedPluginElement.getSimpleName() + "/images/icon-24.png");
 
             JSONArray jsonCategories = new JSONArray();
@@ -148,7 +148,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonPlugin.put("sdk", 2);
         jsonPlugin.put("version", plugin.version());
         jsonPlugin.put("name", getPluginName(pluginElement, plugin));
-        jsonPlugin.put("id", this.getPluginId(pluginElement));
+        jsonPlugin.put("id", TouchPortalPluginAnnotationProcessor.getPluginId(pluginElement));
         JSONObject jsonConfiguration = new JSONObject();
         jsonConfiguration.put("colorDark", plugin.colorDark());
         jsonConfiguration.put("colorLight", plugin.colorLight());
@@ -171,8 +171,8 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
 
         Action action = actionElement.getAnnotation(Action.class);
         JSONObject jsonAction = new JSONObject();
-        jsonAction.put("id", this.getActionId(actionElement, action));
-        jsonAction.put("name", this.getActionName(actionElement, action));
+        jsonAction.put("id", TouchPortalPluginAnnotationProcessor.getActionId(actionElement, action));
+        jsonAction.put("name", TouchPortalPluginAnnotationProcessor.getActionName(actionElement, action));
         jsonAction.put("prefix", action.prefix());
         jsonAction.put("type", "communicate");
         jsonAction.put("description", action.description());
@@ -207,10 +207,10 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
 
         State state = stateElement.getAnnotation(State.class);
         JSONObject jsonState = new JSONObject();
-        jsonState.put("id", this.getStateId(stateElement, state));
-        String tpType = this.getTouchPortalType(stateElement);
+        jsonState.put("id", TouchPortalPluginAnnotationProcessor.getStateId(stateElement, state));
+        String tpType = TouchPortalPluginAnnotationProcessor.getTouchPortalType(stateElement);
         jsonState.put("type", tpType);
-        jsonState.put("desc", this.getStateDesc(stateElement, state));
+        jsonState.put("desc", TouchPortalPluginAnnotationProcessor.getStateDesc(stateElement, state));
         jsonState.put("default", state.defaultValue());
         if (tpType.equals("choice")) {
             jsonState.put("valueChoices", state.valueChoices());
@@ -232,11 +232,11 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
 
         Event event = eventElement.getAnnotation(Event.class);
         JSONObject jsonEvent = new JSONObject();
-        jsonEvent.put("id", this.getEventId(eventElement, event));
+        jsonEvent.put("id", TouchPortalPluginAnnotationProcessor.getEventId(eventElement, event));
         jsonEvent.put("type", "communicate");
-        jsonEvent.put("name", this.getEventName(eventElement, event));
+        jsonEvent.put("name", TouchPortalPluginAnnotationProcessor.getEventName(eventElement, event));
         jsonEvent.put("format", event.format());
-        String tpType = this.getTouchPortalType(eventElement);
+        String tpType = TouchPortalPluginAnnotationProcessor.getTouchPortalType(eventElement);
         jsonEvent.put("valueType", tpType);
         if (tpType.equals("choice")) {
             Set<? extends Element> stateElements = env.getElementsAnnotatedWith(State.class);
@@ -244,7 +244,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 if (event.stateFieldName().equals(stateElement.getSimpleName().toString())) {
                     State state = stateElement.getAnnotation(State.class);
                     jsonEvent.put("valueChoices", state.valueChoices());
-                    jsonEvent.put("valueStateId", this.getStateId(stateElement, state));
+                    jsonEvent.put("valueStateId", TouchPortalPluginAnnotationProcessor.getStateId(stateElement, state));
                 }
             }
         }
@@ -268,10 +268,10 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
 
         Data data = dataElement.getAnnotation(Data.class);
         JSONObject jsonData = new JSONObject();
-        jsonData.put("id", this.getActionDataId(dataElement, data, action));
-        String tpType = this.getTouchPortalType(dataElement);
+        jsonData.put("id", TouchPortalPluginAnnotationProcessor.getActionDataId(dataElement, data, action));
+        String tpType = TouchPortalPluginAnnotationProcessor.getTouchPortalType(dataElement);
         jsonData.put("type", tpType);
-        jsonData.put("label", this.getActionDataLabel(dataElement, data));
+        jsonData.put("label", TouchPortalPluginAnnotationProcessor.getActionDataLabel(dataElement, data));
         jsonData.put("default", data.defaultValue());
         if (tpType.equals("choice")) {
             jsonData.put("valueChoices", data.valueChoices());
@@ -285,7 +285,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param element Element
      * @return String tpType
      */
-    private String getTouchPortalType(Element element) {
+    private static String getTouchPortalType(Element element) {
         String tpType;
         switch (element.asType().toString()) {
             case "byte":
@@ -328,7 +328,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param element Element
      * @return String pluginId
      */
-    private String getPluginId(Element element) {
+    private static String getPluginId(Element element) {
         return ((PackageElement) element.getEnclosingElement()).getQualifiedName() + "." + element.getSimpleName();
     }
 
@@ -339,7 +339,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param plugin {@link Plugin}
      * @return String pluginName
      */
-    private String getPluginName(Element element, Plugin plugin) {
+    private static String getPluginName(Element element, Plugin plugin) {
         return plugin.name().isEmpty() ? element.getSimpleName().toString() : plugin.name();
     }
 
@@ -349,8 +349,8 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param element Element
      * @return String categoryId
      */
-    private String getCategoryId(Element element) {
-        return this.getPluginId(element) + ".basecategory";
+    private static String getCategoryId(Element element) {
+        return TouchPortalPluginAnnotationProcessor.getPluginId(element) + ".basecategory";
     }
 
     /**
@@ -360,8 +360,8 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param action {@link Action}
      * @return String actionId
      */
-    private String getActionId(Element element, Action action) {
-        return this.getCategoryId(element.getEnclosingElement()) + ".action." + (action.id().isEmpty() ? element.getSimpleName() : action.id());
+    private static String getActionId(Element element, Action action) {
+        return TouchPortalPluginAnnotationProcessor.getCategoryId(element.getEnclosingElement()) + ".action." + (action.id().isEmpty() ? element.getSimpleName() : action.id());
     }
 
     /**
@@ -371,7 +371,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param action {@link Action}
      * @return String actionName
      */
-    private String getActionName(Element element, Action action) {
+    private static String getActionName(Element element, Action action) {
         return action.name().isEmpty() ? element.getSimpleName().toString() : action.name();
     }
 
@@ -382,8 +382,8 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param state {@link State}
      * @return String stateId
      */
-    private String getStateId(Element element, State state) {
-        return this.getCategoryId(element.getEnclosingElement()) + ".state." + (state.id().isEmpty() ? element.getSimpleName() : state.id());
+    private static String getStateId(Element element, State state) {
+        return TouchPortalPluginAnnotationProcessor.getCategoryId(element.getEnclosingElement()) + ".state." + (state.id().isEmpty() ? element.getSimpleName() : state.id());
     }
 
     /**
@@ -393,7 +393,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param state {@link State}
      * @return String stateDesc
      */
-    private String getStateDesc(Element element, State state) {
+    private static String getStateDesc(Element element, State state) {
         return state.desc().isEmpty() ? element.getSimpleName().toString() : state.desc();
     }
 
@@ -404,8 +404,8 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param event {@link Event}
      * @return String eventId
      */
-    private String getEventId(Element element, Event event) {
-        return this.getCategoryId(element.getEnclosingElement()) + ".event." + (event.id().isEmpty() ? element.getSimpleName() : event.id());
+    private static String getEventId(Element element, Event event) {
+        return TouchPortalPluginAnnotationProcessor.getCategoryId(element.getEnclosingElement()) + ".event." + (event.id().isEmpty() ? element.getSimpleName() : event.id());
     }
 
     /**
@@ -415,7 +415,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param event {@link Event}
      * @return String eventName
      */
-    private String getEventName(Element element, Event event) {
+    private static String getEventName(Element element, Event event) {
         return event.name().isEmpty() ? element.getSimpleName().toString() : event.name();
     }
 
@@ -427,8 +427,8 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param action {@link Action}
      * @return String dataId
      */
-    private String getActionDataId(Element element, Data data, Action action) {
-        return this.getActionId(element.getEnclosingElement(), action) + ".data." + (data.id().isEmpty() ? element.getSimpleName() : data.id());
+    private static String getActionDataId(Element element, Data data, Action action) {
+        return TouchPortalPluginAnnotationProcessor.getActionId(element.getEnclosingElement(), action) + ".data." + (data.id().isEmpty() ? element.getSimpleName() : data.id());
     }
 
     /**
@@ -438,7 +438,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param data {@link Data}
      * @return String dataLabel
      */
-    private String getActionDataLabel(Element dataElement, Data data) {
+    private static String getActionDataLabel(Element dataElement, Data data) {
         return data.label().isEmpty() ? dataElement.getSimpleName().toString() : data.label();
     }
 }

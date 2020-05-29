@@ -20,6 +20,7 @@
 
 package com.github.ChristopheCVB.TouchPortal;
 
+import com.github.ChristopheCVB.TouchPortal.Annotations.Action;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +29,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -113,6 +115,7 @@ public abstract class TouchPortalPlugin {
      */
     protected TouchPortalPlugin() {
         this.pluginClass = this.getClass();
+        System.out.println("Initialing " + this.pluginClass.getName());
     }
 
     /**
@@ -366,75 +369,88 @@ public abstract class TouchPortalPlugin {
      * Touch Portal Plugin Category Helper
      */
     protected class CategoryHelper {
-        protected static final String ID = TouchPortalPlugin.GENERIC_ID;
-        protected static final String NAME = TouchPortalPlugin.GENERIC_NAME;
-        protected static final String IMAGE_PATH = "imagepath";
-        protected static final String ACTIONS = "actions";
-        protected static final String EVENTS = "events";
-        protected static final String STATES = "states";
+        public static final String ID = TouchPortalPlugin.GENERIC_ID;
+        public static final String NAME = TouchPortalPlugin.GENERIC_NAME;
+        public static final String IMAGE_PATH = "imagepath";
+        public static final String ACTIONS = "actions";
+        public static final String EVENTS = "events";
+        public static final String STATES = "states";
     }
 
     /**
      * Touch Portal Plugin State Helper
      */
     protected class StateHelper {
-        protected static final String ID = TouchPortalPlugin.GENERIC_ID;
-        protected static final String TYPE = TouchPortalPlugin.GENERIC_TYPE;
-        protected static final String TYPE_CHOICE = "choice";
-        protected static final String TYPE_TEXT = "text";
-        protected static final String DESCRIPTION = "desc";
-        protected static final String DEFAULT = TouchPortalPlugin.GENERIC_DEFAULT;
-        protected static final String VALUE_CHOICES = "valueChoices";
+        public static final String ID = TouchPortalPlugin.GENERIC_ID;
+        public static final String TYPE = TouchPortalPlugin.GENERIC_TYPE;
+        public static final String TYPE_CHOICE = "choice";
+        public static final String TYPE_TEXT = "text";
+        public static final String DESCRIPTION = "desc";
+        public static final String DEFAULT = TouchPortalPlugin.GENERIC_DEFAULT;
+        public static final String VALUE_CHOICES = "valueChoices";
     }
 
     /**
      * Touch Portal Plugin Action Helper
      */
-    protected class ActionHelper {
-        protected static final String ID = TouchPortalPlugin.GENERIC_ID;
-        protected static final String NAME = TouchPortalPlugin.GENERIC_NAME;
-        protected static final String PREFIX = "prefix";
-        protected static final String TYPE = TouchPortalPlugin.GENERIC_TYPE;
-        protected static final String TYPE_EXECUTE = "execute";
-        protected static final String TYPE_COMMUNICATE = "communicate";
-        protected static final String EXECUTION_TYPE = "executionType";
-        protected static final String EXECUTION_COMMAND = "execution_cmd";
-        protected static final String DESCRIPTION = TouchPortalPlugin.GENERIC_DESCRIPTION;
-        protected static final String DATA = "data";
-        protected static final String DATA_ID = TouchPortalPlugin.GENERIC_ID;
-        protected static final String DATA_VALUE = TouchPortalPlugin.GENERIC_VALUE;
-        protected static final String TRY_INLINE = "tryInline";
-        protected static final String FORMAT = "format";
+    protected static class ActionHelper {
+        public static final String ID = TouchPortalPlugin.GENERIC_ID;
+        public static final String NAME = TouchPortalPlugin.GENERIC_NAME;
+        public static final String PREFIX = "prefix";
+        public static final String TYPE = TouchPortalPlugin.GENERIC_TYPE;
+        public static final String TYPE_EXECUTE = "execute";
+        public static final String TYPE_COMMUNICATE = "communicate";
+        public static final String EXECUTION_TYPE = "executionType";
+        public static final String EXECUTION_COMMAND = "execution_cmd";
+        public static final String DESCRIPTION = TouchPortalPlugin.GENERIC_DESCRIPTION;
+        public static final String DATA = "data";
+        public static final String DATA_ID = TouchPortalPlugin.GENERIC_ID;
+        public static final String DATA_VALUE = TouchPortalPlugin.GENERIC_VALUE;
+        public static final String TRY_INLINE = "tryInline";
+        public static final String FORMAT = "format";
+
+        public static String getActionId(Class<? extends TouchPortalPlugin> pluginClass, String actionMethodName) {
+            String actionId = "";
+
+            for (Method method : pluginClass.getDeclaredMethods()) {
+                if (method.isAnnotationPresent(Action.class) && method.getName().equals(actionMethodName)) {
+                    Action action = method.getDeclaredAnnotation(Action.class);
+                    actionId = pluginClass.getName() + ".basecategory.action." + (action != null && !action.id().isEmpty() ? action.id() : actionMethodName);
+                }
+            }
+
+            return actionId;
+        }
     }
 
     /**
      * Touch Portal Plugin Event Helper
      */
     protected class EventHelper {
-        protected static final String ID = TouchPortalPlugin.GENERIC_ID;
-        protected static final String NAME = TouchPortalPlugin.GENERIC_NAME;
-        protected static final String FORMAT = "format";
-        protected static final String TYPE = TouchPortalPlugin.GENERIC_TYPE;
-        protected static final String TYPE_COMMUNICATE = "communicate";
-        protected static final String VALUE_TYPE = "valueType";
-        protected static final String VALUE_CHOICES = "valueChoices";
-        protected static final String VALUE_STATE_ID = "valueStateId";
+        public static final String ID = TouchPortalPlugin.GENERIC_ID;
+        public static final String NAME = TouchPortalPlugin.GENERIC_NAME;
+        public static final String FORMAT = "format";
+        public static final String TYPE = TouchPortalPlugin.GENERIC_TYPE;
+        public static final String TYPE_COMMUNICATE = "communicate";
+        public static final String VALUE_TYPE = "valueType";
+        public static final String VALUE_CHOICES = "valueChoices";
+        public static final String VALUE_STATE_ID = "valueStateId";
     }
 
     /**
      * Touch Portal Plugin Message Helper
      */
     protected class MessageHelper {
-        protected static final String TYPE = TouchPortalPlugin.GENERIC_TYPE;
-        protected static final String TYPE_ACTION = "action";
-        protected static final String TYPE_STATE_UPDATE = "stateUpdate";
-        protected static final String TYPE_CHOICE_UPDATE = "choiceUpdate";
-        protected static final String TYPE_LIST_CHANGE = "listChange";
-        protected static final String PLUGIN_ID = "pluginId";
-        protected static final String ACTION_ID = "actionId";
-        protected static final String LIST_ID = "listId";
-        protected static final String INSTANCE_ID = "instanceId";
-        protected static final String ID = TouchPortalPlugin.GENERIC_ID;
-        protected static final String VALUE = TouchPortalPlugin.GENERIC_VALUE;
+        public static final String TYPE = TouchPortalPlugin.GENERIC_TYPE;
+        public static final String TYPE_ACTION = "action";
+        public static final String TYPE_STATE_UPDATE = "stateUpdate";
+        public static final String TYPE_CHOICE_UPDATE = "choiceUpdate";
+        public static final String TYPE_LIST_CHANGE = "listChange";
+        public static final String PLUGIN_ID = "pluginId";
+        public static final String ACTION_ID = "actionId";
+        public static final String LIST_ID = "listId";
+        public static final String INSTANCE_ID = "instanceId";
+        public static final String ID = TouchPortalPlugin.GENERIC_ID;
+        public static final String VALUE = TouchPortalPlugin.GENERIC_VALUE;
     }
 }

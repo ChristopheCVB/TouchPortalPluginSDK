@@ -22,9 +22,11 @@ package com.github.ChristopheCVB.TouchPortal.sample;
 
 import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 @Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
-public class TouchPortalPluginExample extends TouchPortalPlugin {
+public class TouchPortalPluginExample extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
     @State(valueChoices = {"1","2"})
     private String[] customState;
 
@@ -34,18 +36,41 @@ public class TouchPortalPluginExample extends TouchPortalPlugin {
     public TouchPortalPluginExample() {}
 
     public static void main(String[] args) {
-        for (String arg : args) {
-            System.out.println(arg);
+        if (args != null && args.length > 0) {
+            if (COMMAND_START.equals(args[0])) {
+                TouchPortalPluginExample touchPortalPluginExample = new TouchPortalPluginExample();
+                touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample);
+            }
         }
     }
 
     @Action(description = "Long Description of Dummy Action with Data")
-    private void dummyWithData(@Data String text, Object object) {
-        System.out.println("dummyWithData");
+    private void dummyWithData(@Data String text) {
+        System.out.println("Action dummyWithData received :" + text);
     }
 
     @Action(description = "Long Description of Dummy Action without Data")
     private void dummyWithoutData(String msg) {
         System.out.println("dummyWithoutData");
+    }
+
+    @Override
+    public void onDisconnect(Exception exception) {
+
+    }
+
+    @Override
+    public void onReceive(JSONObject message) {
+        if (MessageHelper.TYPE_ACTION.equals(TouchPortalPlugin.getMessageType(message))) {
+            String actionId = ActionHelper.getActionId(TouchPortalPluginExample.class, "dummyWithData");
+            if (actionId.equals(TouchPortalPlugin.getActionId(message))) {
+                try {
+                    this.dummyWithData(message.getJSONArray("data").getJSONObject(0).getString(ActionHelper.DATA_VALUE));
+                }
+                catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

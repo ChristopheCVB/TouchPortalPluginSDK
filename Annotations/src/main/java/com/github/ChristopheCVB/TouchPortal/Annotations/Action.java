@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  *
  * Target is a Method
  */
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Action {
     /**
