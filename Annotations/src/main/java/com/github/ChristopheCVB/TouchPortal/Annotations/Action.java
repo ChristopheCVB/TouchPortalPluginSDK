@@ -25,13 +25,65 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Action Annotation
+ *
+ * Target is a Method
+ */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
 public @interface Action {
+    /**
+     * Action id
+     *
+     * Default is Field Name
+     *
+     * @return String id
+     */
     String id() default "";
+
+    /**
+     * Action name
+     *
+     * Default is Field Name
+     *
+     * @return String name
+     */
     String name() default "";
+
+    /**
+     * Action prefix
+     *
+     * Default is "Plugin"
+     *
+     * @return String prefix
+     */
     String prefix() default "Plugin";
+
+    /**
+     * Action description
+     *
+     * @return String description
+     */
     String description();
+
+    /**
+     * Action tryInline
+     *
+     * Default is false
+     *
+     * @return boolean tryInline
+     */
     boolean tryInline() default false;
+
+    /**
+     * Action format
+     *
+     * This is only added if tryInline is true
+     *
+     * Default is ""
+     *
+     * @return String format
+     */
     String format() default "";
 }

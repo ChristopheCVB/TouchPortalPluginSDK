@@ -28,7 +28,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin {
     @State(valueChoices = {"1","2"})
     private String[] customState;
 
-    @Event(format = "When $val", stateName = "customState")
+    @Event(format = "When $val", stateFieldName = "customState")
     private String[] customEvent;
 
     public TouchPortalPluginExample() {}

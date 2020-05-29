@@ -25,11 +25,45 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Plugin Annotation
+ *
+ * Target is a Class
+ */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 public @interface Plugin {
+    /**
+     * Plugin name
+     *
+     * Default is Class SimpleName
+     *
+     * @return String name
+     */
     String name() default "";
+
+    /**
+     * Plugin version
+     *
+     * @return String version
+     */
     int version();
+
+    /**
+     * Plugin colorDark
+     *
+     * Format is HTML like `#RRGGBB`
+     *
+     * @return String colorDark
+     */
     String colorDark();
+
+    /**
+     * Plugin colorLight
+     *
+     * Format is HTML like `#RRGGBB`
+     *
+     * @return String colorLight
+     */
     String colorLight();
 }

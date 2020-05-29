@@ -25,11 +25,47 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * State Annotation
+ *
+ * Target is a Field
+ */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.FIELD)
 public @interface State {
+    /**
+     * State id
+     *
+     * Default is Field name
+     *
+     * @return String id
+     */
     String id() default "";
+
+    /**
+     * State desc
+     *
+     * Default is Field name
+     *
+     * @return String desc
+     */
     String desc() default "";
+
+    /**
+     * State defaultValue
+     *
+     * Default is ""
+     *
+     * @return String defaultValue
+     */
     String defaultValue() default "";
+
+    /**
+     * State valueChoices
+     *
+     * Default is an empty Array
+     *
+     * @return String[] valueChoices
+     */
     String[] valueChoices() default {};
 }

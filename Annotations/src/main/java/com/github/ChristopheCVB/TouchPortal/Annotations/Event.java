@@ -25,11 +25,45 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Event Annotation
+ *
+ * Target is a Field
+ */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.FIELD)
 public @interface Event {
+    /**
+     * Event id
+     *
+     * Default is Field Name
+     *
+     * @return String id
+     */
     String id() default "";
+
+    /**
+     * Event name
+     *
+     * Default is Field Name
+     *
+     * @return String name
+     */
     String name() default "";
+
+    /**
+     * Event format
+     *
+     * Format should be something like `When $val ...`
+     *
+     * @return String format
+     */
     String format();
-    String stateName();
+
+    /**
+     * Event stateFieldName
+     *
+     * @return String stateFieldName
+     */
+    String stateFieldName();
 }

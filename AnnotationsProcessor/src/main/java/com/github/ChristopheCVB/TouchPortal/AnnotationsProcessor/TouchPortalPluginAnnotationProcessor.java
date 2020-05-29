@@ -158,8 +158,10 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonAction.put("prefix", action.prefix());
         jsonAction.put("type", "communicate");
         jsonAction.put("description", action.description());
-        jsonAction.put("tryInline", action.tryInline());
-        jsonAction.put("format", action.format());
+        if (action.tryInline()) {
+            jsonAction.put("tryInline", action.tryInline());
+            jsonAction.put("format", action.format());
+        }
 
         Set<? extends Element> dataElements = env.getElementsAnnotatedWith(Data.class);
         for (Element dataElement : dataElements) {
@@ -206,7 +208,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         if (tpType.equals("choice")) {
             Set<? extends Element> stateElements = env.getElementsAnnotatedWith(State.class);
             for (Element stateElement : stateElements) {
-                if (event.stateName().equals(stateElement.getSimpleName().toString())) {
+                if (event.stateFieldName().equals(stateElement.getSimpleName().toString())) {
                     State state = stateElement.getAnnotation(State.class);
                     jsonEvent.put("valueChoices", state.valueChoices());
                     jsonEvent.put("valueStateId", this.getStateId(stateElement, state));

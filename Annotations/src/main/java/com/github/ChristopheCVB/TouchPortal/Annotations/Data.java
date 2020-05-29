@@ -25,11 +25,47 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Data Annotation
+ *
+ * Target is a Parameter
+ */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.PARAMETER)
 public @interface Data {
+    /**
+     * Data id
+     *
+     * Default is Field Name
+     *
+     * @return String id
+     */
     String id() default "";
+
+    /**
+     * Data label
+     *
+     * Default is Field Name
+     *
+     * @return String label
+     */
     String label() default "";
+
+    /**
+     * Data defaultValue
+     *
+     * Default is ""
+     *
+     * @return String defaultValue
+     */
     String defaultValue() default "";
+
+    /**
+     * Data valueChoices
+     *
+     * Default is empty Array
+     *
+     * @return String[] valueChoices
+     */
     String[] valueChoices() default {};
 }
