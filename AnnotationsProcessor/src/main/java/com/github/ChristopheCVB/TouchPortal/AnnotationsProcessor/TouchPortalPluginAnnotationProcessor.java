@@ -174,22 +174,22 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonAction.put("id", TouchPortalPluginAnnotationProcessor.getActionId(actionElement, action));
         jsonAction.put("name", TouchPortalPluginAnnotationProcessor.getActionName(actionElement, action));
         jsonAction.put("prefix", action.prefix());
-        jsonAction.put("type", "communicate");
+        jsonAction.put("type", action.type());
         jsonAction.put("description", action.description());
-        if (action.tryInline()) {
-            jsonAction.put("tryInline", action.tryInline());
+        if (!action.format().isEmpty()) {
+            jsonAction.put("tryInline", true);
             jsonAction.put("format", action.format());
         }
 
         Set<? extends Element> dataElements = env.getElementsAnnotatedWith(Data.class);
         for (Element dataElement : dataElements) {
             Element enclosingElement = dataElement.getEnclosingElement();
-            JSONArray jsonActionDatas = new JSONArray();
+            JSONArray jsonActionData = new JSONArray();
             if (actionElement.equals(enclosingElement)) {
-                JSONObject jsonActionData = this.processActionData(dataElement, action);
-                jsonActionDatas.put(jsonActionData);
+                JSONObject jsonActionDataItem = this.processActionData(jsonAction, dataElement, action);
+                jsonActionData.put(jsonActionDataItem);
             }
-            jsonAction.put("data", jsonActionDatas);
+            jsonAction.put("data", jsonActionData);
         }
 
         return jsonAction;
@@ -263,18 +263,23 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @return JSONObject jsonData
      * @throws JSONException jsonException
      */
-    private JSONObject processActionData(Element dataElement, Action action) throws JSONException {
+    private JSONObject processActionData(JSONObject jsonAction, Element dataElement, Action action) throws JSONException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Action Data: " + dataElement.getSimpleName());
 
         Data data = dataElement.getAnnotation(Data.class);
         JSONObject jsonData = new JSONObject();
-        jsonData.put("id", TouchPortalPluginAnnotationProcessor.getActionDataId(dataElement, data, action));
+        String dataId = TouchPortalPluginAnnotationProcessor.getActionDataId(dataElement, data, action);
+        jsonData.put("id", dataId);
         String tpType = TouchPortalPluginAnnotationProcessor.getTouchPortalType(dataElement);
         jsonData.put("type", tpType);
         jsonData.put("label", TouchPortalPluginAnnotationProcessor.getActionDataLabel(dataElement, data));
         jsonData.put("default", data.defaultValue());
         if (tpType.equals("choice")) {
             jsonData.put("valueChoices", data.valueChoices());
+        }
+        if (!action.format().isEmpty()) {
+            String rawFormat = jsonAction.getString("format");
+            jsonAction.put("format", rawFormat.replace("{$" + (data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id()) + "$}", "{$" + dataId + "$}"));
         }
 
         return jsonData;

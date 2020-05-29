@@ -68,13 +68,13 @@ public @interface Action {
     String description();
 
     /**
-     * Action tryInline
+     * Action type
      *
-     * Default is false
+     * Default is "communicate"
      *
-     * @return boolean tryInline
+     * @return String type
      */
-    boolean tryInline() default false;
+    String type() default "communicate";
 
     /**
      * Action format

@@ -22,7 +22,6 @@ package com.github.ChristopheCVB.TouchPortal.sample;
 
 import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 @Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
@@ -44,32 +43,30 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
         }
     }
 
-    @Action(description = "Long Description of Dummy Action with Data")
+    @Action(description = "Long Description of Dummy Action with Data", format = "Set text to {$text$}")
     private void dummyWithData(@Data String text) {
-        System.out.println("Action dummyWithData received :" + text);
+        System.out.println("Action dummyWithData received: " + text);
     }
 
     @Action(description = "Long Description of Dummy Action without Data")
-    private void dummyWithoutData(String msg) {
-        System.out.println("dummyWithoutData");
+    private void dummyWithoutData(JSONObject jsonAction) {
+        System.out.println("Action dummyWithoutData received [" + jsonAction + "]");
     }
 
     @Override
     public void onDisconnect(Exception exception) {
-
+        // Socket connection is lost or closed
     }
 
     @Override
-    public void onReceive(JSONObject message) {
-        if (MessageHelper.TYPE_ACTION.equals(TouchPortalPlugin.getMessageType(message))) {
-            String actionId = ActionHelper.getActionId(TouchPortalPluginExample.class, "dummyWithData");
-            if (actionId.equals(TouchPortalPlugin.getActionId(message))) {
-                try {
-                    this.dummyWithData(message.getJSONArray("data").getJSONObject(0).getString(ActionHelper.DATA_VALUE));
-                }
-                catch (JSONException e) {
-                    e.printStackTrace();
-                }
+    public void onReceive(JSONObject jsonMessage) {
+        if (ReceivedMessageHelper.isAnAction(jsonMessage)) {
+            String receivedActionId = ReceivedMessageHelper.getActionId(jsonMessage);
+            if (ActionHelper.getActionId(TouchPortalPluginExample.class, "dummyWithData").equals(receivedActionId)) {
+                this.dummyWithData(ReceivedMessageHelper.getActionDataValue(receivedActionId, jsonMessage, "text"));
+            }
+            else if (ActionHelper.getActionId(TouchPortalPluginExample.class, "dummyWithoutData").equals(receivedActionId)) {
+                this.dummyWithoutData(jsonMessage);
             }
         }
     }
