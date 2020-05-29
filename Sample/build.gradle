@@ -2,18 +2,77 @@ plugins {
     id 'java'
 }
 
-group 'com.github.ChristopheCVB.TouchPortal.Sample'
-version '1.0.0'
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
 
-repositories {
-    mavenCentral()
-}
+def mainClassSimpleName = 'TouchPortalPluginExample'
+def mainClassPackage = 'com.github.ChristopheCVB.TouchPortal.sample'
+group mainClassPackage
+version "${versionMajor}.${versionMinor}.${versionPatch}"
 
 dependencies {
     compile project(':Annotations')
-    compile project(':')
+    compile project(':Library')
 
     annotationProcessor project(':AnnotationsProcessor')
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': "${mainClassSimpleName}",
+                'Implementation-Version': "${project.version}",
+                'Main-Class': "${mainClassPackage}.${mainClassSimpleName}"
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+task copyResources(type: Copy) {
+    from(file("$buildDir/resources/main/"))
+    into("$buildDir/plugin/${mainClassSimpleName}/")
+
+    doLast {
+        println 'Resources Copied in plugin directory'
+    }
+}
+
+task copyJar(type: Copy) {
+    dependsOn jar
+    from(file("$buildDir/libs/"))
+    into("$buildDir/plugin/${mainClassSimpleName}/")
+    rename {
+        "${mainClassSimpleName}.jar"
+    }
+
+    doLast {
+        println 'Jar Copied in plugin directory'
+    }
+}
+
+task copyGeneratedResources(type: Copy) {
+    dependsOn copyJar
+    from(file("$buildDir/generated/sources/annotationProcessor/java/main/resources/"))
+    into("$buildDir/plugin/${mainClassSimpleName}/")
+
+    doLast {
+        println 'Generated Resources Copied in plugin directory'
+    }
+}
+
+task packagePlugin(type: Zip) {
+    dependsOn copyResources, copyGeneratedResources, copyJar
+    group 'Touch Portal - Plugin'
+    description 'Package the Project into a TPP'
+
+    archiveFileName = "${mainClassSimpleName}.tpp"
+    destinationDirectory = file("$buildDir/plugin")
+    from "$buildDir/plugin/"
+    exclude "*.tpp"
+    includeEmptyDirs = false
+
+    doLast {
+        println 'Plugin Packaged'
+    }
 }
