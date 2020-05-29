@@ -178,12 +178,12 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
-     * Connect to the Touch Portal Plugin System Socket Server
-     * Then, Send the Pairing message
-     * And start listening for incoming messages
+     * Connect to the Touch Portal Plugin System Socket Server.
+     * Then, Send the Pairing message.
+     * And start listening for incoming messages.
      *
-     * @param touchPortalPluginListener TouchPortalPluginListener
-     * @return boolean Is the Plugin connected, paired and started listening
+     * @param touchPortalPluginListener {@link TouchPortalPluginListener}
+     * @return boolean Is the Plugin connected, paired and listening
      */
     public boolean connectThenPairAndListen(TouchPortalPluginListener touchPortalPluginListener) {
         boolean connected = false;
