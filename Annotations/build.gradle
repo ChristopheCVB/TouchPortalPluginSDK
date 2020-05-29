@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+
+group 'com.github.ChristopheCVB.TouchPortal.Annotations'
+version "${versionMajor}.${versionMinor}.${versionPatch}"
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

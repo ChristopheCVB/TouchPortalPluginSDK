@@ -88,7 +88,7 @@ public abstract class TouchPortalPlugin {
             try {
                 String socketMessage = TouchPortalPlugin.this.bufferedReader.readLine();
                 JSONObject jsonMessage = new JSONObject(socketMessage);
-                if (jsonMessage.getString(Message.PLUGIN_ID).equals(TouchPortalPlugin.this.pluginClass.getName())) {
+                if (jsonMessage.getString(MessageHelper.PLUGIN_ID).equals(TouchPortalPlugin.this.pluginClass.getName())) {
                     if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
                         TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage);
                     }
@@ -125,7 +125,7 @@ public abstract class TouchPortalPlugin {
         String actionId = null;
 
         try {
-            actionId = jsonAction.getString(Message.ACTION_ID);
+            actionId = jsonAction.getString(MessageHelper.ACTION_ID);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -143,7 +143,7 @@ public abstract class TouchPortalPlugin {
         String messageType = null;
 
         try {
-            messageType = jsonMessage.getString(Message.TYPE);
+            messageType = jsonMessage.getString(MessageHelper.TYPE);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -194,8 +194,8 @@ public abstract class TouchPortalPlugin {
 
             // Send Pairing Message
             JSONObject pairingMessage = new JSONObject();
-            pairingMessage.put(Message.TYPE, "pair");
-            pairingMessage.put(Message.ID, this.pluginClass.getName());
+            pairingMessage.put(MessageHelper.TYPE, "pair");
+            pairingMessage.put(MessageHelper.ID, this.pluginClass.getName());
 
             paired = this.send(pairingMessage);
             System.out.println("Pairing Message sent");
@@ -262,9 +262,9 @@ public abstract class TouchPortalPlugin {
         boolean sent = false;
         try {
             JSONObject choiceUpdateMessage = new JSONObject()
-                    .put(Message.TYPE, Message.TYPE_CHOICE_UPDATE)
-                    .put(Message.ID, id)
-                    .put(Message.VALUE, new JSONArray(values));
+                    .put(MessageHelper.TYPE, MessageHelper.TYPE_CHOICE_UPDATE)
+                    .put(MessageHelper.ID, id)
+                    .put(MessageHelper.VALUE, new JSONArray(values));
             sent = this.send(choiceUpdateMessage);
             System.out.println("Update Choices [" + id + "] sent");
         } catch (JSONException e) {
@@ -286,10 +286,10 @@ public abstract class TouchPortalPlugin {
         boolean sent = false;
         try {
             JSONObject specificChoiceUpdateMessage = new JSONObject()
-                    .put(Message.TYPE, Message.TYPE_CHOICE_UPDATE)
-                    .put(Message.ID, id)
-                    .put(Message.INSTANCE_ID, instanceId)
-                    .put(Message.VALUE, new JSONArray(values));
+                    .put(MessageHelper.TYPE, MessageHelper.TYPE_CHOICE_UPDATE)
+                    .put(MessageHelper.ID, id)
+                    .put(MessageHelper.INSTANCE_ID, instanceId)
+                    .put(MessageHelper.VALUE, new JSONArray(values));
             sent = this.send(specificChoiceUpdateMessage);
             System.out.println("Update Choices [" + id + "] sent");
         } catch (JSONException e) {
@@ -310,9 +310,9 @@ public abstract class TouchPortalPlugin {
         boolean sent = false;
         try {
             JSONObject stateUpdateMessage = new JSONObject()
-                    .put(Message.TYPE, Message.TYPE_STATE_UPDATE)
-                    .put(Message.ID, id)
-                    .put(Message.VALUE, value);
+                    .put(MessageHelper.TYPE, MessageHelper.TYPE_STATE_UPDATE)
+                    .put(MessageHelper.ID, id)
+                    .put(MessageHelper.VALUE, value);
             sent = this.send(stateUpdateMessage);
             System.out.println("Update State [" + id + "] sent");
         } catch (JSONException e) {
@@ -365,7 +365,7 @@ public abstract class TouchPortalPlugin {
     /**
      * Touch Portal Plugin Category Helper
      */
-    protected class Category {
+    protected class CategoryHelper {
         protected static final String ID = TouchPortalPlugin.GENERIC_ID;
         protected static final String NAME = TouchPortalPlugin.GENERIC_NAME;
         protected static final String IMAGE_PATH = "imagepath";
@@ -377,7 +377,7 @@ public abstract class TouchPortalPlugin {
     /**
      * Touch Portal Plugin State Helper
      */
-    protected class State {
+    protected class StateHelper {
         protected static final String ID = TouchPortalPlugin.GENERIC_ID;
         protected static final String TYPE = TouchPortalPlugin.GENERIC_TYPE;
         protected static final String TYPE_CHOICE = "choice";
@@ -390,7 +390,7 @@ public abstract class TouchPortalPlugin {
     /**
      * Touch Portal Plugin Action Helper
      */
-    protected class Action {
+    protected class ActionHelper {
         protected static final String ID = TouchPortalPlugin.GENERIC_ID;
         protected static final String NAME = TouchPortalPlugin.GENERIC_NAME;
         protected static final String PREFIX = "prefix";
@@ -410,7 +410,7 @@ public abstract class TouchPortalPlugin {
     /**
      * Touch Portal Plugin Event Helper
      */
-    protected class Event {
+    protected class EventHelper {
         protected static final String ID = TouchPortalPlugin.GENERIC_ID;
         protected static final String NAME = TouchPortalPlugin.GENERIC_NAME;
         protected static final String FORMAT = "format";
@@ -424,7 +424,7 @@ public abstract class TouchPortalPlugin {
     /**
      * Touch Portal Plugin Message Helper
      */
-    protected class Message {
+    protected class MessageHelper {
         protected static final String TYPE = TouchPortalPlugin.GENERIC_TYPE;
         protected static final String TYPE_ACTION = "action";
         protected static final String TYPE_STATE_UPDATE = "stateUpdate";
