@@ -1,0 +1,75 @@
+plugins {
+    id 'java'
+}
+
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+
+group 'com.github.ChristopheCVB.TouchPortal'
+version "${versionMajor}.${versionMinor}.${versionPatch}"
+
+dependencies {
+    compile group: 'org.json', name: 'org.json', version: 'chargebee-1.0'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+import org.apache.tools.ant.filters.*
+
+processResources {
+    eachFile { details ->
+        if (details.name.endsWith('.tp')) {
+            details.filter(ReplaceTokens, tokens: [
+                    'plugin.version': (versionMajor*1000 + versionMinor*100+versionPatch)+'',
+                    'plugin.name': project.name.toString(),
+                    'plugin.group': project.group.toString()
+            ])
+        }
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': "${project.name}",
+                'Implementation-Version': "${project.version}",
+                'Main-Class': "${project.group}.${project.name}"
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+task copyResources(type: Copy) {
+    from(file("$buildDir/resources/main/"))
+    into("$buildDir/plugin/${project.name}/")
+    doLast {
+        println 'Resources Copied in plugin directory'
+    }
+}
+
+task copyJar(type: Copy) {
+    dependsOn jar
+    from(file("$buildDir/libs/"))
+    into("$buildDir/plugin/${project.name}/")
+    rename {
+        "${project.name}.jar"
+    }
+    doLast {
+        println 'Jar Copied in plugin directory'
+    }
+}
+
+task packagePlugin(type: Zip) {
+    dependsOn copyResources, copyJar
+    group 'Touch Portal - Plugin'
+    description 'Package the Project into a TPP'
+
+    archiveFileName = "${project.name}.tpp"
+    destinationDirectory = file("$buildDir/plugin")
+    from "$buildDir/plugin/"
+    exclude "*.tpp"
+    includeEmptyDirs = false
+
+    doLast {
+        println 'Plugin Packaged'
+    }
+}

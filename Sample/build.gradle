@@ -5,13 +5,9 @@ plugins {
 group 'com.github.ChristopheCVB.TouchPortal.Sample'
 version '1.0.0'
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     compile project(':Annotations')
-    compile project(':')
+    compile project(':Library')
 
     annotationProcessor project(':AnnotationsProcessor')
 

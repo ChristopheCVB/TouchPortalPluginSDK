@@ -9,10 +9,6 @@ def versionPatch = 0
 group 'com.github.ChristopheCVB.TouchPortal.Annotations'
 version "${versionMajor}.${versionMinor}.${versionPatch}"
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
