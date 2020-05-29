@@ -159,7 +159,7 @@ public abstract class TouchPortalPlugin {
     /**
      * Start listening for incoming messages from the Touch Portal Plugin System
      *
-     * @return Boolean Started listening
+     * @return boolean Started listening
      */
     private boolean listen() {
         if (this.bufferedReader == null) {
@@ -183,7 +183,7 @@ public abstract class TouchPortalPlugin {
      * And start listening for incoming messages
      *
      * @param touchPortalPluginListener TouchPortalPluginListener
-     * @return Boolean Is the Plugin connected, paired and started listening
+     * @return boolean Is the Plugin connected, paired and started listening
      */
     public boolean connectThenPairAndListen(TouchPortalPluginListener touchPortalPluginListener) {
         boolean connected = false;
@@ -212,7 +212,7 @@ public abstract class TouchPortalPlugin {
      * Send a Message to the Touch Portal Plugin System
      *
      * @param message {@link JSONObject}
-     * @return Boolean Message sent
+     * @return boolean Message sent
      */
     public boolean send(JSONObject message) {
         if (this.bufferedOutputStream == null) {
@@ -243,7 +243,7 @@ public abstract class TouchPortalPlugin {
      *
      * @param id     String
      * @param values String[]
-     * @return Boolean Choice Update Message sent
+     * @return boolean Choice Update Message sent
      */
     public boolean sendChoiceUpdate(String id, String[] values) {
         boolean sent = false;
@@ -267,7 +267,7 @@ public abstract class TouchPortalPlugin {
      * @param id         String
      * @param instanceId String
      * @param values     String[]
-     * @return Boolean Specific Choice Update Message sent
+     * @return boolean Specific Choice Update Message sent
      */
     public boolean sendSpecificChoiceUpdate(String id, String instanceId, String[] values) {
         boolean sent = false;
@@ -291,7 +291,7 @@ public abstract class TouchPortalPlugin {
      *
      * @param id    String
      * @param value String
-     * @return Boolean State Update Message sent
+     * @return boolean State Update Message sent
      */
     public boolean sendStateUpdate(String id, String value) {
         boolean sent = false;
@@ -392,6 +392,13 @@ public abstract class TouchPortalPlugin {
             return actionId;
         }
 
+        /**
+         * Retrieve the Action Data Id
+         *
+         * @param receivedActionId String
+         * @param actionFieldName String
+         * @return String actionDataId
+         */
         public static String getActionDataId(String receivedActionId, String actionFieldName) {
             return receivedActionId + ".data." + actionFieldName;
         }
@@ -411,6 +418,9 @@ public abstract class TouchPortalPlugin {
         public static final String VALUE_STATE_ID = "valueStateId";
     }
 
+    /**
+     * Touch Portal Plugin Received Message Helper
+     */
     protected static class ReceivedMessageHelper {
         public static final String TYPE = TouchPortalPlugin.GENERIC_TYPE;
         public static final String TYPE_ACTION = "action";
