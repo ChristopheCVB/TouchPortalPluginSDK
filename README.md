@@ -4,17 +4,16 @@ This Project is a base SDK to create a Touch Portal Plugin using Java and Gradle
 
 ## Releases
 
-Last version is 1.0.0
+Last version is 2.0.0
 
 Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 
 ## Get Started
 
 - Clone/Download this project
-- Rename the property in `settings.gradle`
-- Edit the `src/main/resources/entry.tp` to add your actions
-- Replace the Plugin icon in `src/main/resources/images/icon-24.png`
-- Create a class that extends `TouchPortalPlugin` containing
+- Create a new Gradle Java Module
+- Copy the `build.gradle` from the Sample module
+- Create a class extending `TouchPortalPlugin` containing
 ```
     public static void main(String[] args) {
         if (args.length >= 1) {
@@ -28,7 +27,10 @@ Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
     }
 ```
 - Implement the interface methods
-- Start writing the actions code in the `onReceive(JSONObject message)` method
+- Use the Annotations or edit the `src/main/resources/entry.tp` to add your actions, states and events
+- Rename the properties `mainClassPackage` and `mainClassSimpleName` in your `build.gradle`
+- Add the Plugin icon with the following path and name `src/main/resources/images/icon-24.png`
+- Start calling the actions in the `onReceive(JSONObject message)` method
 
 ## Build
 
