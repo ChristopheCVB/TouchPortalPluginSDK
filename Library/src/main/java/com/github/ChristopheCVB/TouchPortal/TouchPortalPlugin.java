@@ -497,7 +497,7 @@ public abstract class TouchPortalPlugin {
         }
 
         /**
-         * Does received Message concerns the Plugin Class
+         * Whether the received Message concerns the Plugin Class
          *
          * @param jsonMessage JSONObject
          * @param pluginClass Class
