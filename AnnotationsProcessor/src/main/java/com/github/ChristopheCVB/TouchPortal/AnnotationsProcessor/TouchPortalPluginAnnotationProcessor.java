@@ -38,6 +38,9 @@ import java.io.Writer;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * Touch Portal Plugin Annotation Processor
+ */
 @AutoService(Processor.class)
 public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     private Filer filer;
@@ -131,6 +134,13 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         return true;
     }
 
+    /**
+     * Generates a JSONObject representing the {@link Plugin}
+     *
+     * @param pluginElement Element
+     * @return JSONObject jsonPlugin
+     * @throws JSONException jsonException
+     */
     private JSONObject processPlugin(Element pluginElement) throws JSONException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Plugin: " + pluginElement.getSimpleName());
         Plugin plugin = pluginElement.getAnnotation(Plugin.class);
@@ -148,6 +158,14 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         return jsonPlugin;
     }
 
+    /**
+     * Generates a JSONObject representing the {@link Action}
+     *
+     * @param actionElement Element
+     * @param env RoundEnvironment
+     * @return JSONObject jsonAction
+     * @throws JSONException jsonException
+     */
     private JSONObject processAction(Element actionElement, RoundEnvironment env) throws JSONException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Action: " + actionElement.getSimpleName());
 
@@ -177,6 +195,13 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         return jsonAction;
     }
 
+    /**
+     * Generates a JSONObject representing the {@link State}
+     *
+     * @param stateElement Element
+     * @return JSONObject jsonState
+     * @throws JSONException jsonException
+     */
     private JSONObject processState(Element stateElement) throws JSONException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process State: " + stateElement.getSimpleName());
 
@@ -194,6 +219,14 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         return jsonState;
     }
 
+    /**
+     * Generates a JSONObject representing the {@link Event}
+     *
+     * @param eventElement Element
+     * @param env RoundEnvironment
+     * @return JSONObject jsonEvent
+     * @throws JSONException jsonException
+     */
     private JSONObject processEvent(Element eventElement, RoundEnvironment env) throws Exception {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Event: " + eventElement.getSimpleName());
 
@@ -222,6 +255,14 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         return jsonEvent;
     }
 
+    /**
+     * Generates a JSONObject representing the {@link Data}
+     *
+     * @param dataElement Element
+     * @param action Action
+     * @return JSONObject jsonData
+     * @throws JSONException jsonException
+     */
     private JSONObject processActionData(Element dataElement, Action action) throws JSONException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Action Data: " + dataElement.getSimpleName());
 
@@ -239,9 +280,14 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         return jsonData;
     }
 
-    private String getTouchPortalType(Element stateElement) {
+    /**
+     * Retrieve the internal Touch Portal type according to the Java's element type
+     * @param element Element
+     * @return String tpType
+     */
+    private String getTouchPortalType(Element element) {
         String tpType;
-        switch (stateElement.asType().toString()) {
+        switch (element.asType().toString()) {
             case "byte":
             case "char":
             case "short":
@@ -265,7 +311,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 break;
 
             default:
-                if (stateElement.asType().toString().endsWith("[]")) {
+                if (element.asType().toString().endsWith("[]")) {
                     tpType = "choice";
                 }
                 else {
@@ -276,46 +322,122 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         return tpType;
     }
 
+    /**
+     * Get the formatted Plugin ID
+     *
+     * @param element Element
+     * @return String pluginId
+     */
     private String getPluginId(Element element) {
         return ((PackageElement) element.getEnclosingElement()).getQualifiedName() + "." + element.getSimpleName();
     }
 
-    private String getPluginName(Element selectedPluginElement, Plugin plugin) {
-        return plugin.name().isEmpty() ? selectedPluginElement.getSimpleName().toString() : plugin.name();
+    /**
+     * Get the formatted Plugin Name
+     *
+     * @param element Element
+     * @param plugin {@link Plugin}
+     * @return String pluginName
+     */
+    private String getPluginName(Element element, Plugin plugin) {
+        return plugin.name().isEmpty() ? element.getSimpleName().toString() : plugin.name();
     }
 
+    /**
+     * Get the formatted Category ID
+     *
+     * @param element Element
+     * @return String categoryId
+     */
     private String getCategoryId(Element element) {
         return this.getPluginId(element) + ".basecategory";
     }
 
+    /**
+     * Get the formatted Action ID
+     *
+     * @param element Element
+     * @param action {@link Action}
+     * @return String actionId
+     */
     private String getActionId(Element element, Action action) {
         return this.getCategoryId(element.getEnclosingElement()) + ".action." + (action.id().isEmpty() ? element.getSimpleName() : action.id());
     }
 
+    /**
+     * Get the formatted Action Name
+     *
+     * @param element Element
+     * @param action {@link Action}
+     * @return String actionName
+     */
     private String getActionName(Element element, Action action) {
         return action.name().isEmpty() ? element.getSimpleName().toString() : action.name();
     }
 
+    /**
+     * Get the formatted State ID
+     *
+     * @param element Element
+     * @param state {@link State}
+     * @return String stateId
+     */
     private String getStateId(Element element, State state) {
         return this.getCategoryId(element.getEnclosingElement()) + ".state." + (state.id().isEmpty() ? element.getSimpleName() : state.id());
     }
 
+    /**
+     * Get the formatted State Desc
+     *
+     * @param element Element
+     * @param state {@link State}
+     * @return String stateDesc
+     */
     private String getStateDesc(Element element, State state) {
         return state.desc().isEmpty() ? element.getSimpleName().toString() : state.desc();
     }
 
+    /**
+     * Get the formatted Event ID
+     *
+     * @param element Element
+     * @param event {@link Event}
+     * @return String eventId
+     */
     private String getEventId(Element element, Event event) {
         return this.getCategoryId(element.getEnclosingElement()) + ".event." + (event.id().isEmpty() ? element.getSimpleName() : event.id());
     }
 
+    /**
+     * Get the formatted Event Name
+     *
+     * @param element Element
+     * @param event {@link Event}
+     * @return String eventName
+     */
     private String getEventName(Element element, Event event) {
         return event.name().isEmpty() ? element.getSimpleName().toString() : event.name();
     }
 
+    /**
+     * Get the formatted Data Id
+     *
+     * @param element Element
+     * @param data {@link Data}
+     * @param action {@link Action}
+     * @return String dataId
+     */
     private String getActionDataId(Element element, Data data, Action action) {
         return this.getActionId(element.getEnclosingElement(), action) + ".data." + (data.id().isEmpty() ? element.getSimpleName() : data.id());
     }
 
+    /**
+     * Get the formatted Data Label
+     *
+     * @param dataElement Element
+     * @param data {@link Data}
+     * @return String dataLabel
+     */
     private String getActionDataLabel(Element dataElement, Data data) {
         return data.label().isEmpty() ? dataElement.getSimpleName().toString() : data.label();
     }
