@@ -15,9 +15,6 @@ repositories {
 
 dependencies {
     compile group: 'org.json', name: 'org.json', version: 'chargebee-1.0'
-    compile project(':Annotations')
-
-    annotationProcessor project(':AnnotationsProcessor')
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

@@ -1,4 +1,5 @@
 rootProject.name = 'TouchPortalPluginSDK'
 include 'Annotations'
 include 'AnnotationsProcessor'
+include 'Sample'
 
