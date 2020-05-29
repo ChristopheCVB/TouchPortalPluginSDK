@@ -23,7 +23,7 @@ package com.github.ChristopheCVB.TouchPortal.sample;
 import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 
-@Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0")
+@Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
 public class TouchPortalPluginExample extends TouchPortalPlugin {
     @State(valueChoices = {"1","2"})
     private String[] customState;
@@ -34,7 +34,9 @@ public class TouchPortalPluginExample extends TouchPortalPlugin {
     public TouchPortalPluginExample() {}
 
     public static void main(String[] args) {
-
+        for (String arg : args) {
+            System.out.println(arg);
+        }
     }
 
     @Action(description = "Long Description of Dummy Action with Data")

@@ -87,9 +87,10 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
             }
 
             JSONObject jsonCategory = new JSONObject();
+            Plugin plugin = selectedPluginElement.getAnnotation(Plugin.class);
             jsonCategory.put("id", this.getCategoryId(selectedPluginElement));
-            jsonCategory.put("name", selectedPluginElement.getSimpleName());
-            jsonCategory.put("imagepath", "images/icon-24.png");
+            jsonCategory.put("name", this.getPluginName(selectedPluginElement, plugin));
+            jsonCategory.put("imagepath", "%TP_PLUGIN_FOLDER%" + selectedPluginElement.getSimpleName() + "/images/icon-24.png");
 
             JSONArray jsonCategories = new JSONArray();
             jsonCategories.put(jsonCategory);
@@ -136,7 +137,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         JSONObject jsonPlugin = new JSONObject();
         jsonPlugin.put("sdk", 2);
         jsonPlugin.put("version", plugin.version());
-        jsonPlugin.put("name", pluginElement.getSimpleName());
+        jsonPlugin.put("name", getPluginName(pluginElement, plugin));
         jsonPlugin.put("id", this.getPluginId(pluginElement));
         JSONObject jsonConfiguration = new JSONObject();
         jsonConfiguration.put("colorDark", plugin.colorDark());
@@ -275,6 +276,10 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
 
     private String getPluginId(Element element) {
         return ((PackageElement) element.getEnclosingElement()).getQualifiedName() + "." + element.getSimpleName();
+    }
+
+    private String getPluginName(Element selectedPluginElement, Plugin plugin) {
+        return plugin.name().isEmpty() ? selectedPluginElement.getSimpleName().toString() : plugin.name();
     }
 
     private String getCategoryId(Element element) {

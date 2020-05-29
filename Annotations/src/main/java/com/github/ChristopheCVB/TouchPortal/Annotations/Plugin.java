@@ -28,6 +28,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 public @interface Plugin {
+    String name() default "";
     int version();
     String colorDark();
     String colorLight();
