@@ -7,6 +7,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.lang.model.element.Element;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 /**
  * Touch Portal Plugin Data Helper
@@ -47,12 +49,24 @@ public class DataHelper {
     /**
      * Retrieve the Action Data Id
      *
-     * @param receivedActionId String
-     * @param actionFieldName String
+     * @param pluginClass Class
+     * @param actionMethodName String
+     * @param actionParameterName String
      * @return String actionDataId
      */
-    public static String getActionDataId(String receivedActionId, String actionFieldName) {
-        return DataHelper._getActionDataId(receivedActionId, actionFieldName);
+    public static String getActionDataId(Class pluginClass, String actionMethodName, String actionParameterName) {
+        String actionDataId = "";
+        for (Method declaredMethod : pluginClass.getDeclaredMethods()) {
+            if (declaredMethod.getName().equals(actionMethodName)) {
+                for (Parameter parameter : declaredMethod.getParameters()) {
+                    Data data = parameter.getAnnotation(Data.class);
+                    if (data != null && parameter.getName().equals(actionParameterName)) {
+                        actionDataId = DataHelper._getActionDataId(ActionHelper.getActionId(pluginClass, actionMethodName), data.id().isEmpty() ? actionParameterName : data.id());
+                    }
+                }
+            }
+        }
+        return actionDataId;
     }
 
     private static String _getActionDataId(String actionId, String dataId) {

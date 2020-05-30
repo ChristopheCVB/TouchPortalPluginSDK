@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  *
  * Target is a Parameter
  */
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface Data {
     /**

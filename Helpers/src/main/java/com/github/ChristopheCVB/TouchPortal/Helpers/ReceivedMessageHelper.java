@@ -70,12 +70,13 @@ public class ReceivedMessageHelper {
     /**
      * Retrieve an Action Data Value from a received Message
      *
-     * @param receivedActionId String
+     * @param pluginClass Class
      * @param jsonMessage      JSONObject
-     * @param actionFieldName  String
+     * @param actionMethodName  String
+     * @param actionParameterName  String
      * @return String dataValue
      */
-    public static String getActionDataValue(String receivedActionId, JSONObject jsonMessage, String actionFieldName) {
+    public static String getActionDataValue(Class pluginClass, JSONObject jsonMessage, String actionMethodName, String actionParameterName) {
         String dataValue = "";
 
         try {
@@ -83,7 +84,7 @@ public class ReceivedMessageHelper {
             for (int actionDataIndex = 0; actionDataIndex < actionData.length(); actionDataIndex++) {
                 JSONObject jsonData = actionData.getJSONObject(actionDataIndex);
                 String receivedJsonDataId = jsonData.getString(ReceivedMessageHelper.ACTION_DATA_ID);
-                if (receivedJsonDataId.equals(DataHelper.getActionDataId(receivedActionId, actionFieldName))) {
+                if (receivedJsonDataId.equals(DataHelper.getActionDataId(pluginClass, actionMethodName, actionParameterName))) {
                     dataValue = jsonData.getString(ReceivedMessageHelper.ACTION_DATA_VALUE);
                     break;
                 }

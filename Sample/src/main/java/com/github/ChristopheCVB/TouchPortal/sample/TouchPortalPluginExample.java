@@ -66,7 +66,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
         if (ReceivedMessageHelper.isAnAction(jsonMessage)) {
             String receivedActionId = ReceivedMessageHelper.getActionId(jsonMessage);
             if (ActionHelper.getActionId(TouchPortalPluginExample.class, "dummyWithData").equals(receivedActionId)) {
-                this.dummyWithData(ReceivedMessageHelper.getActionDataValue(receivedActionId, jsonMessage, "text"));
+                this.dummyWithData(ReceivedMessageHelper.getActionDataValue(TouchPortalPluginExample.class, jsonMessage, "dummyWithData", "text"));
             }
             else if (ActionHelper.getActionId(TouchPortalPluginExample.class, "dummyWithoutData").equals(receivedActionId)) {
                 this.dummyWithoutData(jsonMessage);
