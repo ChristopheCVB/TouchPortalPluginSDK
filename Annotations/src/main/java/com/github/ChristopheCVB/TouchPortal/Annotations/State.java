@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  *
  * Target is a Field
  */
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface State {
     /**

@@ -21,6 +21,9 @@
 package com.github.ChristopheCVB.TouchPortal.sample;
 
 import com.github.ChristopheCVB.TouchPortal.Annotations.*;
+import com.github.ChristopheCVB.TouchPortal.Helpers.ActionHelper;
+import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper;
+import com.github.ChristopheCVB.TouchPortal.Helpers.ReceivedMessageHelper;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import org.json.JSONObject;
 
@@ -36,7 +39,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
 
     public static void main(String[] args) {
         if (args != null && args.length > 0) {
-            if (COMMAND_START.equals(args[0])) {
+            if (PluginHelper.COMMAND_START.equals(args[0])) {
                 TouchPortalPluginExample touchPortalPluginExample = new TouchPortalPluginExample();
                 touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample);
             }

@@ -3,4 +3,5 @@ include 'Annotations'
 include 'AnnotationsProcessor'
 include 'Sample'
 include 'Library'
+include 'Helpers'
 
