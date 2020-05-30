@@ -20,8 +20,10 @@
 
 package com.github.ChristopheCVB.TouchPortal;
 
+import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.ReceivedMessageHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.SentMessageHelper;
+import com.github.ChristopheCVB.TouchPortal.Helpers.StateHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -81,10 +83,9 @@ public abstract class TouchPortalPlugin {
                 JSONObject jsonMessage = new JSONObject(socketMessage);
                 if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, TouchPortalPlugin.this.pluginClass)) {
                     if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
+                        // TODO: Automatically Call Actions Methods (This require to Annotate an Interface that would be passed to the SDK)
                         TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage);
                     }
-                } else {
-                    Thread.sleep(100);
                 }
             }
             catch (IOException ioException) {
@@ -119,7 +120,7 @@ public abstract class TouchPortalPlugin {
             // Send Pairing Message
             JSONObject pairingMessage = new JSONObject();
             pairingMessage.put(SentMessageHelper.TYPE, "pair");
-            pairingMessage.put(SentMessageHelper.ID, this.pluginClass.getName());
+            pairingMessage.put(SentMessageHelper.ID, PluginHelper.getPluginId(this.pluginClass));
 
             paired = this.send(pairingMessage);
             System.out.println("Pairing Message sent");
@@ -198,12 +199,12 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
-     * Send a Message to the Touch Portal Plugin System
+     * Internal Send a Message to the Touch Portal Plugin System
      *
      * @param message {@link JSONObject}
      * @return boolean Message sent
      */
-    public boolean send(JSONObject message) {
+    private boolean send(JSONObject message) {
         if (this.bufferedOutputStream == null) {
             try {
                 this.bufferedOutputStream = new BufferedOutputStream(this.touchPortalSocket.getOutputStream());
@@ -230,20 +231,22 @@ public abstract class TouchPortalPlugin {
     /**
      * Send a Choice Update Message to the Touch Portal Plugin System
      *
-     * @param id     String
+     * @param stateFieldName String
      * @param values String[]
      * @return boolean Choice Update Message sent
      */
-    public boolean sendChoiceUpdate(String id, String[] values) {
+    public boolean sendChoiceUpdate(String stateFieldName, String[] values) {
         boolean sent = false;
         try {
+            String stateId = StateHelper.getStateId(this.pluginClass, stateFieldName);
             JSONObject choiceUpdateMessage = new JSONObject()
                     .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE)
-                    .put(SentMessageHelper.ID, id)
+                    .put(SentMessageHelper.ID, stateId)
                     .put(SentMessageHelper.VALUE, new JSONArray(values));
             sent = this.send(choiceUpdateMessage);
-            System.out.println("Update Choices [" + id + "] sent");
-        } catch (JSONException e) {
+            System.out.println("Update Choices [" + stateId + "] sent");
+        }
+        catch (JSONException e) {
             e.printStackTrace();
         }
 
@@ -253,22 +256,24 @@ public abstract class TouchPortalPlugin {
     /**
      * Send a Specific Choice Update Message to the Touch Portal Plugin System
      *
-     * @param id         String
+     * @param stateFieldName String
      * @param instanceId String
      * @param values     String[]
      * @return boolean Specific Choice Update Message sent
      */
-    public boolean sendSpecificChoiceUpdate(String id, String instanceId, String[] values) {
+    public boolean sendSpecificChoiceUpdate(String stateFieldName, String instanceId, String[] values) {
         boolean sent = false;
         try {
+            String stateId = StateHelper.getStateId(this.pluginClass, stateFieldName);
             JSONObject specificChoiceUpdateMessage = new JSONObject()
                     .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE)
-                    .put(SentMessageHelper.ID, id)
+                    .put(SentMessageHelper.ID, stateId)
                     .put(SentMessageHelper.INSTANCE_ID, instanceId)
                     .put(SentMessageHelper.VALUE, new JSONArray(values));
             sent = this.send(specificChoiceUpdateMessage);
-            System.out.println("Update Choices [" + id + "] sent");
-        } catch (JSONException e) {
+            System.out.println("Update Choices [" + stateId + "] sent");
+        }
+        catch (JSONException e) {
             e.printStackTrace();
         }
 
@@ -278,24 +283,30 @@ public abstract class TouchPortalPlugin {
     /**
      * Send a State Update Message to the Touch Portal Plugin System
      *
-     * @param id    String
+     * @param stateFieldName String
      * @param value String
      * @return boolean State Update Message sent
      */
-    public boolean sendStateUpdate(String id, String value) {
+    public boolean sendStateUpdate(String stateFieldName, String value) {
         boolean sent = false;
         try {
+            String stateId = StateHelper.getStateId(this.pluginClass, stateFieldName);
             JSONObject stateUpdateMessage = new JSONObject()
                     .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE)
-                    .put(SentMessageHelper.ID, id)
+                    .put(SentMessageHelper.ID, stateId)
                     .put(SentMessageHelper.VALUE, value);
             sent = this.send(stateUpdateMessage);
-            System.out.println("Update State [" + id + "] sent");
-        } catch (JSONException e) {
+            System.out.println("Update State [" + stateId + "] sent");
+        }
+        catch (JSONException e) {
             e.printStackTrace();
         }
 
         return sent;
+    }
+
+    public boolean isConnected() {
+        return this.touchPortalSocket.isConnected();
     }
 
     /**

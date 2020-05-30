@@ -25,6 +25,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+// FIXME: Event annotation has to be bound to the state field
 /**
  * Event Annotation
  *

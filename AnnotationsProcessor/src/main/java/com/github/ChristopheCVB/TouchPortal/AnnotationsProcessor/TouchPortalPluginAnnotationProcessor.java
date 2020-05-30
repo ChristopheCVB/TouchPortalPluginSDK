@@ -61,6 +61,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         annotations.add(Data.class.getCanonicalName());
         annotations.add(State.class.getCanonicalName());
         annotations.add(Event.class.getCanonicalName());
+        // TODO: Add Category Annotation
         return annotations;
     }
 
@@ -74,6 +75,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         if (env.processingOver()) {
             return false;
         }
+        // TODO: Generate Constants Classes for Annotations
         this.messager.printMessage(Diagnostic.Kind.NOTE, this.getClass().getSimpleName() + ".process");
 
         try {

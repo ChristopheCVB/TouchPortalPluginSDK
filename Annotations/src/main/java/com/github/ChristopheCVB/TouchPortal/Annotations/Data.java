@@ -36,7 +36,7 @@ public @interface Data {
     /**
      * Data id
      *
-     * Default is Field Name
+     * Default is Parameter Name
      *
      * @return String id
      */
@@ -45,7 +45,7 @@ public @interface Data {
     /**
      * Data label
      *
-     * Default is Field Name
+     * Default is Parameter Name
      *
      * @return String label
      */

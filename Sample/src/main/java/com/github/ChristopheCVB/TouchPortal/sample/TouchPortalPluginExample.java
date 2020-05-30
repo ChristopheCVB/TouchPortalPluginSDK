@@ -24,12 +24,13 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.Helpers.ActionHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.ReceivedMessageHelper;
+import com.github.ChristopheCVB.TouchPortal.Helpers.StateHelper;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import org.json.JSONObject;
 
 @Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
 public class TouchPortalPluginExample extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
-    @State(valueChoices = {"1","2"})
+    @State(valueChoices = {"1","2"}, defaultValue = "1")
     private String[] customState;
 
     @Event(format = "When $val", stateFieldName = "customState")
@@ -41,7 +42,11 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
         if (args != null && args.length > 0) {
             if (PluginHelper.COMMAND_START.equals(args[0])) {
                 TouchPortalPluginExample touchPortalPluginExample = new TouchPortalPluginExample();
-                touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample);
+                boolean connectedPairedAndListening = touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample);
+
+                if (connectedPairedAndListening) {
+                    touchPortalPluginExample.sendStateUpdate("customState", "2");
+                }
             }
         }
     }

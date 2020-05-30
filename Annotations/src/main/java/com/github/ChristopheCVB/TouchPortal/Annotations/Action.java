@@ -36,7 +36,7 @@ public @interface Action {
     /**
      * Action id
      *
-     * Default is Field Name
+     * Default is Method Name
      *
      * @return String id
      */
@@ -45,7 +45,7 @@ public @interface Action {
     /**
      * Action name
      *
-     * Default is Field Name
+     * Default is Method Name
      *
      * @return String name
      */
