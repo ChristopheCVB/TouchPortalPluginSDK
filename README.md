@@ -38,5 +38,16 @@ Use the `gradlew packagePlugin` task to pack your plugin into a `.tpp` file. Out
 
 ## TODO
 
+- [x] README
+- [x] LICENCE
+- [x] Gradle Base and Modules
+- [x] Annotations
+- [x] Helpers
+- [x] Annotations Processor for `entry.tp`
+- [x] Java Documentation
+- [x] Core Library
+- [x] Sample
+- [ ] Annotations Processor to Generate Constants Classes
+- [ ] Provide a simple way to handle a Config file
 - [ ] Create a gradle plugin for the `packagePlugin` task
 - [ ] Automatically call actions
