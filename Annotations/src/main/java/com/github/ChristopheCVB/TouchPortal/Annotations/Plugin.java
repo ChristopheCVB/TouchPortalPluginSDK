@@ -27,16 +27,18 @@ import java.lang.annotation.Target;
 
 /**
  * Plugin Annotation
- *
+ * <p>
  * Target is a Class
+ * </p>
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 public @interface Plugin {
     /**
      * Plugin name
-     *
+     * <p>
      * Default is Class SimpleName
+     * </p>
      *
      * @return String name
      */
@@ -51,8 +53,9 @@ public @interface Plugin {
 
     /**
      * Plugin colorDark
-     *
+     * <p>
      * Format is HTML like `#RRGGBB`
+     * </p>
      *
      * @return String colorDark
      */
@@ -60,8 +63,9 @@ public @interface Plugin {
 
     /**
      * Plugin colorLight
-     *
+     * <p>
      * Format is HTML like `#RRGGBB`
+     * </p>
      *
      * @return String colorLight
      */

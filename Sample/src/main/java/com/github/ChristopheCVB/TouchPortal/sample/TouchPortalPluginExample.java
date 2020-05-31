@@ -24,17 +24,19 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.Helpers.ActionHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.ReceivedMessageHelper;
-import com.github.ChristopheCVB.TouchPortal.Helpers.StateHelper;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import org.json.JSONObject;
 
 @Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
 public class TouchPortalPluginExample extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
     @State(valueChoices = {"1","2"}, defaultValue = "1")
+    @Event(format = "When customState becomes $val")
     private String[] customState;
 
-    @Event(format = "When $val", stateFieldName = "customState")
-    private String[] customEvent;
+    private enum Categories {
+        @Category(name = "Touch Portal Plugin Example", imagePath = "images/icon-24.png")
+        BaseCategory
+    }
 
     public TouchPortalPluginExample() {}
 
@@ -45,18 +47,18 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
                 boolean connectedPairedAndListening = touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample);
 
                 if (connectedPairedAndListening) {
-                    touchPortalPluginExample.sendStateUpdate("customState", "2");
+                    touchPortalPluginExample.sendStateUpdate(Categories.BaseCategory.name(), "customState", "2");
                 }
             }
         }
     }
 
-    @Action(description = "Long Description of Dummy Action with Data", format = "Set text to {$text$}")
+    @Action(description = "Long Description of Dummy Action with Data", format = "Set text to {$text$}", categoryId = "BaseCategory")
     private void dummyWithData(@Data String text) {
         System.out.println("Action dummyWithData received: " + text);
     }
 
-    @Action(description = "Long Description of Dummy Action without Data")
+    @Action(description = "Long Description of Dummy Action without Data", categoryId = "BaseCategory")
     private void dummyWithoutData(JSONObject jsonAction) {
         System.out.println("Action dummyWithoutData received [" + jsonAction + "]");
     }

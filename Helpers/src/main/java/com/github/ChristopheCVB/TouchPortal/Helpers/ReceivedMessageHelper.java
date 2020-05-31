@@ -1,3 +1,23 @@
+/*
+ * Touch Portal Plugin SDK
+ *
+ * Copyright 2020 Christophe Carvalho Vilas-Boas
+ * christophe.carvalhovilasboas@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.github.ChristopheCVB.TouchPortal.Helpers;
 
 import org.json.JSONArray;
@@ -20,7 +40,7 @@ public class ReceivedMessageHelper {
     public static final String ACTION_DATA_ID = GenericHelper.ID;
 
     /**
-     * Helper Method to retrieve the Type of a ReceivedMessage
+     * Retrieve the Type of a ReceivedMessage
      *
      * @param jsonMessage {@link JSONObject}
      * @return String Message Type
@@ -49,7 +69,7 @@ public class ReceivedMessageHelper {
     }
 
     /**
-     * Helper Method to retrieve the Action ID of a received Message
+     * Retrieve the Action ID of a received Message
      *
      * @param jsonMessage {@link JSONObject}
      * @return String Action ID
@@ -70,10 +90,10 @@ public class ReceivedMessageHelper {
     /**
      * Retrieve an Action Data Value from a received Message
      *
-     * @param pluginClass Class
-     * @param jsonMessage      JSONObject
-     * @param actionMethodName  String
-     * @param actionParameterName  String
+     * @param pluginClass         Class
+     * @param jsonMessage         JSONObject
+     * @param actionMethodName    String
+     * @param actionParameterName String
      * @return String dataValue
      */
     public static String getActionDataValue(Class pluginClass, JSONObject jsonMessage, String actionMethodName, String actionParameterName) {

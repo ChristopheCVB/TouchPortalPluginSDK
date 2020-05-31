@@ -27,16 +27,18 @@ import java.lang.annotation.Target;
 
 /**
  * Action Annotation
- *
+ * <p>
  * Target is a Method
+ * </p>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Action {
     /**
      * Action id
-     *
+     * <p>
      * Default is Method Name
+     * </p>
      *
      * @return String id
      */
@@ -44,8 +46,9 @@ public @interface Action {
 
     /**
      * Action name
-     *
+     * <p>
      * Default is Method Name
+     * </p>
      *
      * @return String name
      */
@@ -53,8 +56,9 @@ public @interface Action {
 
     /**
      * Action prefix
-     *
+     * <p>
      * Default is "Plugin"
+     * </p>
      *
      * @return String prefix
      */
@@ -69,8 +73,9 @@ public @interface Action {
 
     /**
      * Action type
-     *
+     * <p>
      * Default is "communicate"
+     * </p>
      *
      * @return String type
      */
@@ -78,12 +83,21 @@ public @interface Action {
 
     /**
      * Action format
-     *
+     * <p>
      * This is only added if tryInline is true
-     *
+     * </p>
+     * <p>
      * Default is ""
+     * </p>
      *
      * @return String format
      */
     String format() default "";
+
+    /**
+     * Action categoryId
+     *
+     * @return String categoryId
+     */
+    String categoryId();
 }
