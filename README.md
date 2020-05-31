@@ -4,7 +4,7 @@ This Project is an SDK to create a Touch Portal Plugin using Java and Gradle
 
 ## Releases
 
-Last version is 2.1.0
+Last version is 2.2.0
 
 Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 
