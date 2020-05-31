@@ -26,18 +26,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Data Annotation
+ * Category Annotation
  * <p>
- * Target is a Parameter
+ * Target is a Method
  * </p>
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
-public @interface Data {
+@Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.FIELD)
+public @interface Category {
     /**
-     * Data id
+     * Category id
      * <p>
-     * Default is Parameter Name
+     * Default is enum Name
      * </p>
      *
      * @return String id
@@ -45,32 +45,22 @@ public @interface Data {
     String id() default "";
 
     /**
-     * Data label
+     * Category name
      * <p>
-     * Default is Parameter Name
+     * Default is enum Name
      * </p>
      *
-     * @return String label
+     * @return String name
      */
-    String label() default "";
+    String name() default "";
 
     /**
-     * Data defaultValue
+     * Category imagePath
      * <p>
-     * Default is ""
+     * Default is empty String
      * </p>
      *
-     * @return String defaultValue
+     * @return String imagePath
      */
-    String defaultValue() default "";
-
-    /**
-     * Data valueChoices
-     * <p>
-     * Default is empty Array
-     * </p>
-     *
-     * @return String[] valueChoices
-     */
-    String[] valueChoices() default {};
+    String imagePath() default "";
 }

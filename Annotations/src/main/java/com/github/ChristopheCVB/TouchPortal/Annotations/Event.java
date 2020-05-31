@@ -25,19 +25,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-// FIXME: Event annotation has to be bound to the state field
 /**
  * Event Annotation
- *
+ * <p>
  * Target is a Field
+ * </p>
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.FIELD)
 public @interface Event {
     /**
      * Event id
-     *
+     * <p>
      * Default is Field Name
+     * </p>
      *
      * @return String id
      */
@@ -45,8 +46,9 @@ public @interface Event {
 
     /**
      * Event name
-     *
+     * <p>
      * Default is Field Name
+     * </p>
      *
      * @return String name
      */
@@ -54,17 +56,11 @@ public @interface Event {
 
     /**
      * Event format
-     *
-     * Format should be something like `When $val ...`
+     * <p>
+     * Format should be something like `When my Custom State becomes $val`
+     * </p>
      *
      * @return String format
      */
     String format();
-
-    /**
-     * Event stateFieldName
-     *
-     * @return String stateFieldName
-     */
-    String stateFieldName();
 }

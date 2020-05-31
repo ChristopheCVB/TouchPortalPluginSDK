@@ -27,16 +27,18 @@ import java.lang.annotation.Target;
 
 /**
  * State Annotation
- *
+ * <p>
  * Target is a Field
+ * </p>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface State {
     /**
      * State id
-     *
+     * <p>
      * Default is Field name
+     * </p>
      *
      * @return String id
      */
@@ -44,8 +46,9 @@ public @interface State {
 
     /**
      * State desc
-     *
+     * <p>
      * Default is Field name
+     * </p>
      *
      * @return String desc
      */
@@ -54,16 +57,15 @@ public @interface State {
     /**
      * State defaultValue
      *
-     * Default is ""
-     *
      * @return String defaultValue
      */
-    String defaultValue() default "";
+    String defaultValue();
 
     /**
      * State valueChoices
-     *
+     * <p>
      * Default is an empty Array
+     * </p>
      *
      * @return String[] valueChoices
      */

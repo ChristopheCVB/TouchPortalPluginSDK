@@ -1,6 +1,27 @@
+/*
+ * Touch Portal Plugin SDK
+ *
+ * Copyright 2020 Christophe Carvalho Vilas-Boas
+ * christophe.carvalhovilasboas@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.github.ChristopheCVB.TouchPortal.Helpers;
 
 import com.github.ChristopheCVB.TouchPortal.Annotations.Action;
+import com.github.ChristopheCVB.TouchPortal.Annotations.Category;
 
 import javax.lang.model.element.Element;
 import java.lang.reflect.Method;
@@ -27,19 +48,22 @@ public class ActionHelper {
     /**
      * Get the formatted Action ID
      *
-     * @param element Element
-     * @param action {@link Action}
+     * @param pluginElement   Element
+     * @param categoryElement Element
+     * @param category        {@link Category}
+     * @param actionElement   Element
+     * @param action          {@link Action}
      * @return String actionId
      */
-    public static String getActionId(Element element, Action action) {
-        return ActionHelper._getActionId(CategoryHelper.getCategoryId(element.getEnclosingElement()), action.id().isEmpty() ? element.getSimpleName().toString() : action.id());
+    public static String getActionId(Element pluginElement, Element categoryElement, Category category, Element actionElement, Action action) {
+        return ActionHelper._getActionId(CategoryHelper.getCategoryId(pluginElement, categoryElement, category), action.id().isEmpty() ? actionElement.getSimpleName().toString() : action.id());
     }
 
     /**
      * Get the formatted Action Name
      *
      * @param element Element
-     * @param action {@link Action}
+     * @param action  {@link Action}
      * @return String actionName
      */
     public static String getActionName(Element element, Action action) {
@@ -49,7 +73,7 @@ public class ActionHelper {
     /**
      * Get the formatted Action ID
      *
-     * @param pluginClass Class
+     * @param pluginClass      Class
      * @param actionMethodName String
      * @return String actionId
      */
@@ -59,7 +83,7 @@ public class ActionHelper {
         for (Method method : pluginClass.getDeclaredMethods()) {
             if (method.isAnnotationPresent(Action.class) && method.getName().equals(actionMethodName)) {
                 Action action = method.getDeclaredAnnotation(Action.class);
-                actionId = ActionHelper._getActionId(CategoryHelper.getCategoryId(pluginClass), (action != null && !action.id().isEmpty() ? action.id() : actionMethodName));
+                actionId = ActionHelper._getActionId(CategoryHelper.getCategoryId(pluginClass, action.categoryId()), (!action.id().isEmpty() ? action.id() : actionMethodName));
             }
         }
 
@@ -68,7 +92,8 @@ public class ActionHelper {
 
     /**
      * Internal Get the formatted Action ID
-     * @param categoryId String
+     *
+     * @param categoryId  String
      * @param rawActionId String
      * @return String actionId
      */

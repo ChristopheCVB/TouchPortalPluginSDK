@@ -1,11 +1,30 @@
+/*
+ * Touch Portal Plugin SDK
+ *
+ * Copyright 2020 Christophe Carvalho Vilas-Boas
+ * christophe.carvalhovilasboas@gmail.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.github.ChristopheCVB.TouchPortal.Helpers;
 
-import com.github.ChristopheCVB.TouchPortal.Annotations.Action;
+import com.github.ChristopheCVB.TouchPortal.Annotations.Category;
 import com.github.ChristopheCVB.TouchPortal.Annotations.State;
 
 import javax.lang.model.element.Element;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 /**
  * Touch Portal Plugin State Helper
@@ -24,19 +43,22 @@ public class StateHelper {
     /**
      * Get the formatted State ID
      *
-     * @param element Element
-     * @param state {@link State}
+     * @param pluginElement   Element
+     * @param categoryElement Element
+     * @param category        {@link Category}
+     * @param stateElement    Element
+     * @param state           {@link State}
      * @return String stateId
      */
-    public static String getStateId(Element element, State state) {
-        return StateHelper._getStateId(CategoryHelper.getCategoryId(element.getEnclosingElement()), state.id().isEmpty() ? element.getSimpleName().toString() : state.id());
+    public static String getStateId(Element pluginElement, Element categoryElement, Category category, Element stateElement, State state) {
+        return StateHelper._getStateId(CategoryHelper.getCategoryId(pluginElement, categoryElement, category), state.id().isEmpty() ? stateElement.getSimpleName().toString() : state.id());
     }
 
     /**
      * Get the formatted State Desc
      *
      * @param element Element
-     * @param state {@link State}
+     * @param state   {@link State}
      * @return String stateDesc
      */
     public static String getStateDesc(Element element, State state) {
@@ -46,18 +68,19 @@ public class StateHelper {
     /**
      * Get the formatted State ID
      *
-     * @param pluginClass Class
+     * @param pluginClass    Class
+     * @param categoryId     String
      * @param stateFieldName String
      * @return String stateId
      */
-    public static String getStateId(Class pluginClass, String stateFieldName) {
+    public static String getStateId(Class pluginClass, String categoryId, String stateFieldName) {
         String stateId = "";
 
         try {
             Field stateField = pluginClass.getDeclaredField(stateFieldName);
             if (stateField.isAnnotationPresent(State.class)) {
                 State state = stateField.getAnnotation(State.class);
-                stateId = StateHelper._getStateId(CategoryHelper.getCategoryId(pluginClass), state.id().isEmpty() ? stateFieldName : state.id());
+                stateId = StateHelper._getStateId(CategoryHelper.getCategoryId(pluginClass, categoryId), state.id().isEmpty() ? stateFieldName : state.id());
             }
         }
         catch (NoSuchFieldException e) {
