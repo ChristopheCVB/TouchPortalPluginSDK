@@ -1,9 +1,17 @@
-plugins {
-    id 'java'
-}
-
 allprojects {
     repositories {
         jcenter()
     }
+}
+
+Properties properties = new Properties()
+properties.load(file('local.properties').newDataInputStream())
+ext{
+    bintrayUser = properties.getProperty('bintray.user')
+    bintrayKey = properties.getProperty('bintray.key')
+}
+
+subprojects {
+    ext.bintrayUSer = bintrayUser
+    ext.bintrayKey = bintrayKey
 }
