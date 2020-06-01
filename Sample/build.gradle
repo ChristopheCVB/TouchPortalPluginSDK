@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'java'
 }
 
 def versionMajor = 1
@@ -39,7 +39,7 @@ task copyResources(type: Copy) {
     into("$buildDir/plugin/${mainClassSimpleName}/")
 
     doLast {
-        println 'Resources Copied in plugin directory'
+        println 'Resources Copied into plugin directory'
     }
 }
 
@@ -52,7 +52,7 @@ task copyJar(type: Copy) {
     }
 
     doLast {
-        println 'Jar Copied in plugin directory'
+        println 'Jar Copied into plugin directory'
     }
 }
 
@@ -62,7 +62,7 @@ task copyGeneratedResources(type: Copy) {
     into("$buildDir/plugin/${mainClassSimpleName}/")
 
     doLast {
-        println 'Generated Resources Copied in plugin directory'
+        println 'Generated Resources Copied into plugin directory'
     }
 }
 
