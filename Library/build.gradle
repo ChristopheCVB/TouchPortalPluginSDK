@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
 def versionMajor = 2
@@ -10,9 +10,9 @@ group 'com.github.ChristopheCVB.TouchPortal'
 version "${versionMajor}.${versionMinor}.${versionPatch}"
 
 dependencies {
-    compile group: 'org.json', name: 'org.json', version: 'chargebee-1.0'
-    compile project(':Annotations')
-    compile project(':Helpers')
+    api group: 'org.json', name: 'org.json', version: 'chargebee-1.0'
+    implementation project(':Annotations')
+    implementation project(':Helpers')
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }

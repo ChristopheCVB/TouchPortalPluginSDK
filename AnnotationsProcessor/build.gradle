@@ -1,15 +1,15 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
 group 'com.github.ChristopheCVB.TouchPortal.AnnotationsProcessor'
 version '1.0.0'
 
 dependencies {
-    compile group: 'org.json', name: 'org.json', version: 'chargebee-1.0'
-    compile 'com.google.auto.service:auto-service:1.0-rc4'
-    compile project(':Annotations')
-    compile project(':Helpers')
+    implementation group: 'org.json', name: 'org.json', version: 'chargebee-1.0'
+    implementation 'com.google.auto.service:auto-service:1.0-rc4'
+    implementation project(':Annotations')
+    implementation project(':Helpers')
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }

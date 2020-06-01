@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
 def versionMajor = 1
@@ -13,10 +13,12 @@ version "${versionMajor}.${versionMinor}.${versionPatch}"
 
 dependencies {
     compile project(':Library')
+    compile project(':Annotations')
+    compile project(':Helpers')
 
     annotationProcessor project(':AnnotationsProcessor')
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
 compileJava {
