@@ -62,12 +62,12 @@ public class ActionHelper {
     /**
      * Get the formatted Action Name
      *
-     * @param element Element
-     * @param action  {@link Action}
+     * @param actionElement Element
+     * @param action        {@link Action}
      * @return String actionName
      */
-    public static String getActionName(Element element, Action action) {
-        return action.name().isEmpty() ? element.getSimpleName().toString() : action.name();
+    public static String getActionName(Element actionElement, Action action) {
+        return action.name().isEmpty() ? actionElement.getSimpleName().toString() : action.name();
     }
 
     /**

@@ -237,6 +237,7 @@ public abstract class TouchPortalPlugin {
     /**
      * Send a Choice Update Message to the Touch Portal Plugin System
      *
+     * @param categoryId     String
      * @param stateFieldName String
      * @param values         String[]
      * @return boolean choiceUpdateMessageSent
@@ -260,8 +261,33 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Send a Choice Update Message to the Touch Portal Plugin System
+     *
+     * @param listId String
+     * @param values String[]
+     * @return boolean choiceUpdateMessageSent
+     */
+    public boolean sendChoiceUpdate(String listId, String[] values) {
+        boolean sent = false;
+        try {
+            JSONObject choiceUpdateMessage = new JSONObject()
+                    .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE)
+                    .put(SentMessageHelper.ID, listId)
+                    .put(SentMessageHelper.VALUE, new JSONArray(values));
+            sent = this.send(choiceUpdateMessage);
+            System.out.println("Update Choices [" + listId + "] sent");
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return sent;
+    }
+
+    /**
      * Send a Specific Choice Update Message to the Touch Portal Plugin System
      *
+     * @param categoryId     String
      * @param stateFieldName String
      * @param instanceId     String
      * @param values         String[]
@@ -287,8 +313,35 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Send a Specific Choice Update Message to the Touch Portal Plugin System
+     *
+     * @param choiceId   String
+     * @param instanceId String
+     * @param values     String[]
+     * @return boolean specificChoiceUpdateMessageSent
+     */
+    public boolean sendSpecificChoiceUpdate(String choiceId, String instanceId, String[] values) {
+        boolean sent = false;
+        try {
+            JSONObject specificChoiceUpdateMessage = new JSONObject()
+                    .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE)
+                    .put(SentMessageHelper.ID, choiceId)
+                    .put(SentMessageHelper.INSTANCE_ID, instanceId)
+                    .put(SentMessageHelper.VALUE, new JSONArray(values));
+            sent = this.send(specificChoiceUpdateMessage);
+            System.out.println("Update Specific Choices [" + choiceId + "] sent");
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return sent;
+    }
+
+    /**
      * Send a State Update Message to the Touch Portal Plugin System
      *
+     * @param categoryId     String
      * @param stateFieldName String
      * @param value          String
      * @return boolean stateUpdateMessageSent
@@ -297,6 +350,30 @@ public abstract class TouchPortalPlugin {
         boolean sent = false;
         try {
             String stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateFieldName);
+            JSONObject stateUpdateMessage = new JSONObject()
+                    .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE)
+                    .put(SentMessageHelper.ID, stateId)
+                    .put(SentMessageHelper.VALUE, value);
+            sent = this.send(stateUpdateMessage);
+            System.out.println("Update State [" + stateId + "] sent");
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return sent;
+    }
+
+    /**
+     * Send a State Update Message to the Touch Portal Plugin System
+     *
+     * @param stateId String
+     * @param value   String
+     * @return boolean stateUpdateMessageSent
+     */
+    public boolean sendStateUpdate(String stateId, String value) {
+        boolean sent = false;
+        try {
             JSONObject stateUpdateMessage = new JSONObject()
                     .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE)
                     .put(SentMessageHelper.ID, stateId)

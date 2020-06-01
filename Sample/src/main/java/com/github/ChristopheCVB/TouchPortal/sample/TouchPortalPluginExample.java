@@ -29,16 +29,12 @@ import org.json.JSONObject;
 
 @Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
 public class TouchPortalPluginExample extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
-    @State(valueChoices = {"1","2"}, defaultValue = "1")
+    @State(valueChoices = {"1", "2"}, defaultValue = "1")
     @Event(format = "When customState becomes $val")
     private String[] customState;
 
-    private enum Categories {
-        @Category(name = "Touch Portal Plugin Example", imagePath = "images/icon-24.png")
-        BaseCategory
+    public TouchPortalPluginExample() {
     }
-
-    public TouchPortalPluginExample() {}
 
     public static void main(String[] args) {
         if (args != null && args.length > 0) {
@@ -47,7 +43,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
                 boolean connectedPairedAndListening = touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample);
 
                 if (connectedPairedAndListening) {
-                    touchPortalPluginExample.sendStateUpdate(Categories.BaseCategory.name(), "customState", "2");
+                    touchPortalPluginExample.sendStateUpdate(com.github.ChristopheCVB.TouchPortal.sample.TouchPortalPluginExampleBaseCategorycustomStateEventConstants.ID, "2");
                 }
             }
         }
@@ -72,12 +68,17 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
     public void onReceive(JSONObject jsonMessage) {
         if (ReceivedMessageHelper.isAnAction(jsonMessage)) {
             String receivedActionId = ReceivedMessageHelper.getActionId(jsonMessage);
-            if (ActionHelper.getActionId(TouchPortalPluginExample.class, "dummyWithData").equals(receivedActionId)) {
-                this.dummyWithData(ReceivedMessageHelper.getActionDataValue(TouchPortalPluginExample.class, jsonMessage, "dummyWithData", "text"));
+            if (com.github.ChristopheCVB.TouchPortal.sample.TouchPortalPluginExampleBaseCategorydummyWithDataConstants.ID.equals(receivedActionId)) {
+                this.dummyWithData(ReceivedMessageHelper.getActionDataValue(jsonMessage, com.github.ChristopheCVB.TouchPortal.sample.TouchPortalPluginExampleBaseCategorydummyWithDatatextConstants.ID));
             }
             else if (ActionHelper.getActionId(TouchPortalPluginExample.class, "dummyWithoutData").equals(receivedActionId)) {
                 this.dummyWithoutData(jsonMessage);
             }
         }
+    }
+
+    private enum Categories {
+        @Category(name = "Touch Portal Plugin Example", imagePath = "images/icon-24.png")
+        BaseCategory
     }
 }

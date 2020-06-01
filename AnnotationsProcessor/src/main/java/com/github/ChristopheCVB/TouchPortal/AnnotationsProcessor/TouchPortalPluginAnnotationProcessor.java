@@ -30,10 +30,14 @@ import org.json.JSONObject;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
+import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -61,7 +65,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         annotations.add(Data.class.getCanonicalName());
         annotations.add(State.class.getCanonicalName());
         annotations.add(Event.class.getCanonicalName());
-        // TODO: Add Category Annotation
+        annotations.add(Category.class.getCanonicalName());
         return annotations;
     }
 
@@ -71,24 +75,23 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     }
 
     @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-        if (env.processingOver()) {
+    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        if (roundEnv.processingOver()) {
             return false;
         }
-        // TODO: Generate Constants Classes for Annotations
         this.messager.printMessage(Diagnostic.Kind.NOTE, this.getClass().getSimpleName() + ".process");
 
         try {
             Element selectedPluginElement = null;
             JSONObject jsonPlugin = null;
 
-            Set<? extends Element> plugins = env.getElementsAnnotatedWith(Plugin.class);
+            Set<? extends Element> plugins = roundEnv.getElementsAnnotatedWith(Plugin.class);
             if (plugins.size() != 1) {
                 throw new Exception("You need 1(one) @Plugin Annotation, you have " + plugins.size());
             }
             for (Element pluginElement : plugins) {
                 selectedPluginElement = pluginElement;
-                jsonPlugin = this.processPlugin(env, pluginElement);
+                jsonPlugin = this.processPlugin(roundEnv, pluginElement);
             }
 
             String actionFileName = "resources/" + PluginHelper.ENTRY_TP;
@@ -112,9 +115,16 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @return JSONObject jsonPlugin
      * @throws JSONException jsonException
      */
-    private JSONObject processPlugin(RoundEnvironment env, Element pluginElement) throws JSONException, TPTypeException {
+    private JSONObject processPlugin(RoundEnvironment roundEnv, Element pluginElement) throws JSONException, TPTypeException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Plugin: " + pluginElement.getSimpleName());
         Plugin plugin = pluginElement.getAnnotation(Plugin.class);
+
+        try {
+            this.writePluginConstantsFile(pluginElement, plugin);
+        }
+        catch (IOException ignored) {
+        }
+
         JSONObject jsonPlugin = new JSONObject();
         jsonPlugin.put(PluginHelper.SDK, 2);
         jsonPlugin.put(PluginHelper.VERSION, plugin.version());
@@ -127,9 +137,9 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonPlugin.put(PluginHelper.PLUGIN_START_COMMAND, "java -jar %TP_PLUGIN_FOLDER%" + pluginElement.getSimpleName() + "\\" + pluginElement.getSimpleName() + ".jar " + PluginHelper.COMMAND_START);
 
         JSONArray jsonCategories = new JSONArray();
-        Set<? extends Element> categoryElements = env.getElementsAnnotatedWith(Category.class);
+        Set<? extends Element> categoryElements = roundEnv.getElementsAnnotatedWith(Category.class);
         for (Element categoryElement : categoryElements) {
-            jsonCategories.put(this.processCategory(env, pluginElement, plugin, categoryElement));
+            jsonCategories.put(this.processCategory(roundEnv, pluginElement, plugin, categoryElement));
         }
         jsonPlugin.put(PluginHelper.CATEGORIES, jsonCategories);
 
@@ -139,7 +149,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     /**
      * Generates a JSONObject representing the {@link Category}
      *
-     * @param env             RoundEnvironment
+     * @param roundEnv        RoundEnvironment
      * @param pluginElement   Element
      * @param plugin          {@link Plugin}
      * @param categoryElement Element
@@ -147,37 +157,43 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @throws JSONException   If JSONObject is malformed
      * @throws TPTypeException If a used type is not Supported
      */
-    private JSONObject processCategory(RoundEnvironment env, Element pluginElement, Plugin plugin, Element categoryElement) throws JSONException, TPTypeException {
+    private JSONObject processCategory(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement) throws JSONException, TPTypeException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Category: " + categoryElement.getSimpleName());
         Category category = categoryElement.getAnnotation(Category.class);
-        JSONObject jsonCategory = new JSONObject();
 
+        try {
+            this.writeCategoryConstantsFile(pluginElement, categoryElement, category);
+        }
+        catch (IOException ignored) {
+        }
+
+        JSONObject jsonCategory = new JSONObject();
         jsonCategory.put(CategoryHelper.ID, CategoryHelper.getCategoryId(pluginElement, categoryElement, category));
         jsonCategory.put(CategoryHelper.NAME, CategoryHelper.getCategoryName(categoryElement, category));
         jsonCategory.put(CategoryHelper.IMAGE_PATH, "%TP_PLUGIN_FOLDER%" + pluginElement.getSimpleName() + "/" + category.imagePath());
 
         JSONArray jsonActions = new JSONArray();
-        Set<? extends Element> actionElements = env.getElementsAnnotatedWith(Action.class);
+        Set<? extends Element> actionElements = roundEnv.getElementsAnnotatedWith(Action.class);
         for (Element actionElement : actionElements) {
             Action action = actionElement.getAnnotation(Action.class);
             String categoryId = category.id().isEmpty() ? categoryElement.getSimpleName().toString() : category.id();
             if (categoryId.equals(action.categoryId())) {
-                jsonActions.put(this.processAction(env, pluginElement, plugin, categoryElement, category, actionElement));
+                jsonActions.put(this.processAction(roundEnv, pluginElement, plugin, categoryElement, category, actionElement));
             }
         }
         jsonCategory.put(CategoryHelper.ACTIONS, jsonActions);
 
         JSONArray jsonStates = new JSONArray();
-        Set<? extends Element> stateElements = env.getElementsAnnotatedWith(State.class);
+        Set<? extends Element> stateElements = roundEnv.getElementsAnnotatedWith(State.class);
         for (Element stateElement : stateElements) {
-            jsonStates.put(this.processState(env, pluginElement, plugin, categoryElement, category, stateElement));
+            jsonStates.put(this.processState(roundEnv, pluginElement, plugin, categoryElement, category, stateElement));
         }
         jsonCategory.put(CategoryHelper.STATES, jsonStates);
 
         JSONArray jsonEvents = new JSONArray();
-        Set<? extends Element> eventElements = env.getElementsAnnotatedWith(Event.class);
+        Set<? extends Element> eventElements = roundEnv.getElementsAnnotatedWith(Event.class);
         for (Element eventElement : eventElements) {
-            jsonEvents.put(this.processEvent(env, pluginElement, plugin, categoryElement, category, eventElement));
+            jsonEvents.put(this.processEvent(roundEnv, pluginElement, plugin, categoryElement, category, eventElement));
         }
         jsonCategory.put(CategoryHelper.EVENTS, jsonEvents);
 
@@ -187,7 +203,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     /**
      * Generates a JSONObject representing the {@link Action}
      *
-     * @param env             RoundEnvironment
+     * @param roundEnv        RoundEnvironment
      * @param pluginElement   Element
      * @param plugin          {@link Plugin}
      * @param categoryElement Element
@@ -196,10 +212,16 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @return JSONObject jsonAction
      * @throws JSONException If JSONObject is malformed
      */
-    private JSONObject processAction(RoundEnvironment env, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement) throws JSONException {
+    private JSONObject processAction(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement) throws JSONException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Action: " + actionElement.getSimpleName());
-
         Action action = actionElement.getAnnotation(Action.class);
+
+        try {
+            this.writeActionConstantsFile(pluginElement, categoryElement, category, actionElement, action);
+        }
+        catch (IOException ignored) {
+        }
+
         JSONObject jsonAction = new JSONObject();
         jsonAction.put(ActionHelper.ID, ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action));
         jsonAction.put(ActionHelper.NAME, ActionHelper.getActionName(actionElement, action));
@@ -211,12 +233,12 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
             jsonAction.put(ActionHelper.FORMAT, action.format());
         }
 
-        Set<? extends Element> dataElements = env.getElementsAnnotatedWith(Data.class);
+        Set<? extends Element> dataElements = roundEnv.getElementsAnnotatedWith(Data.class);
         for (Element dataElement : dataElements) {
             Element enclosingElement = dataElement.getEnclosingElement();
             JSONArray jsonActionData = new JSONArray();
             if (actionElement.equals(enclosingElement)) {
-                JSONObject jsonActionDataItem = this.processActionData(env, pluginElement, plugin, categoryElement, category, actionElement, action, jsonAction, dataElement);
+                JSONObject jsonActionDataItem = this.processActionData(roundEnv, pluginElement, plugin, categoryElement, category, actionElement, action, jsonAction, dataElement);
                 jsonActionData.put(jsonActionDataItem);
             }
             jsonAction.put(ActionHelper.DATA, jsonActionData);
@@ -228,7 +250,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     /**
      * Generates a JSONObject representing the {@link State}
      *
-     * @param env             RoundEnvironment
+     * @param roundEnv        RoundEnvironment
      * @param pluginElement   Element
      * @param plugin          {@link Plugin}
      * @param categoryElement Element
@@ -237,10 +259,16 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @return JSONObject jsonState
      * @throws JSONException If JSONObject is malformed
      */
-    private JSONObject processState(RoundEnvironment env, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element stateElement) throws JSONException {
+    private JSONObject processState(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element stateElement) throws JSONException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process State: " + stateElement.getSimpleName());
-
         State state = stateElement.getAnnotation(State.class);
+
+        try {
+            this.writeStateConstantsFile(pluginElement, categoryElement, category, stateElement, state);
+        }
+        catch (IOException ignored) {
+        }
+
         JSONObject jsonState = new JSONObject();
         jsonState.put(StateHelper.ID, StateHelper.getStateId(pluginElement, categoryElement, category, stateElement, state));
         String tpType = GenericHelper.getTouchPortalType(stateElement);
@@ -257,7 +285,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     /**
      * Generates a JSONObject representing the {@link Event}
      *
-     * @param env             RoundEnvironment
+     * @param roundEnv        RoundEnvironment
      * @param pluginElement   Element
      * @param plugin          {@link Plugin}
      * @param categoryElement Element
@@ -267,11 +295,17 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @throws JSONException   If JSONObject is malformed
      * @throws TPTypeException If any used type is not Supported
      */
-    private JSONObject processEvent(RoundEnvironment env, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element eventElement) throws JSONException, TPTypeException {
+    private JSONObject processEvent(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element eventElement) throws JSONException, TPTypeException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Event: " + eventElement.getSimpleName());
-
-        Event event = eventElement.getAnnotation(Event.class);
         State state = eventElement.getAnnotation(State.class);
+        Event event = eventElement.getAnnotation(Event.class);
+
+        try {
+            this.writeEventConstantsFile(pluginElement, categoryElement, category, eventElement, event);
+        }
+        catch (IOException ignored) {
+        }
+
         JSONObject jsonEvent = new JSONObject();
         jsonEvent.put(EventHelper.ID, EventHelper.getEventId(pluginElement, categoryElement, category, eventElement, event));
         jsonEvent.put(EventHelper.TYPE, EventHelper.TYPE_COMMUNICATE);
@@ -293,7 +327,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     /**
      * Generates a JSONObject representing the {@link Data}
      *
-     * @param env             RoundEnvironment
+     * @param roundEnv        RoundEnvironment
      * @param pluginElement   Element
      * @param plugin          {@link Plugin}
      * @param categoryElement Element
@@ -305,10 +339,16 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @return JSONObject jsonData
      * @throws JSONException jsonException
      */
-    private JSONObject processActionData(RoundEnvironment env, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement, Action action, JSONObject jsonAction, Element dataElement) throws JSONException {
+    private JSONObject processActionData(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement, Action action, JSONObject jsonAction, Element dataElement) throws JSONException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Action Data: " + dataElement.getSimpleName());
-
         Data data = dataElement.getAnnotation(Data.class);
+
+        try {
+            this.writeActionDataConstantsFile(pluginElement, categoryElement, category, actionElement, action, dataElement, data);
+        }
+        catch (IOException ignored) {
+        }
+
         JSONObject jsonData = new JSONObject();
         String dataId = DataHelper.getActionDataId(pluginElement, categoryElement, category, actionElement, action, dataElement, data);
         jsonData.put(DataHelper.ID, dataId);
@@ -325,6 +365,214 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         }
 
         return jsonData;
+    }
+
+    /**
+     * Generates a Java Class with Constants for the {@link Plugin}
+     *
+     * @param pluginElement Element
+     * @param plugin        {@link Plugin}
+     * @throws IOException ioException
+     */
+    private void writePluginConstantsFile(Element pluginElement, Plugin plugin) throws IOException {
+        String simpleClassName = pluginElement.getSimpleName().toString() + "Constants";
+        String packageName = ((PackageElement) pluginElement.getEnclosingElement()).getQualifiedName().toString();
+
+        JavaFileObject builderFile = processingEnv.getFiler().createSourceFile(simpleClassName);
+
+        try (PrintWriter out = new PrintWriter(builderFile.openWriter())) {
+
+            writePackage(packageName, out);
+
+            this.writeJavaClassHeader(simpleClassName, out);
+
+            this.writeConstant(out, "id", PluginHelper.getPluginId(pluginElement));
+
+            out.println("}");
+        }
+    }
+
+    /**
+     * Generates a Java Class with Constants for the {@link Category}
+     *
+     * @param pluginElement   Element
+     * @param categoryElement Element
+     * @param category        {@link Category}
+     * @throws IOException ioException
+     */
+    private void writeCategoryConstantsFile(Element pluginElement, Element categoryElement, Category category) throws IOException {
+        String simpleClassName = pluginElement.getSimpleName().toString() + categoryElement.getSimpleName().toString() + "Constants";
+        String packageName = ((PackageElement) pluginElement.getEnclosingElement()).getQualifiedName().toString();
+
+        JavaFileObject builderFile = processingEnv.getFiler().createSourceFile(simpleClassName);
+
+        try (PrintWriter out = new PrintWriter(builderFile.openWriter())) {
+
+            writePackage(packageName, out);
+
+            this.writeJavaClassHeader(simpleClassName, out);
+
+            this.writeConstant(out, "id", CategoryHelper.getCategoryId(pluginElement, categoryElement, category));
+
+            out.println("}");
+        }
+    }
+
+    /**
+     * Generates a Java Class with Constants for the {@link Action}
+     *
+     * @param pluginElement   Element
+     * @param categoryElement Element
+     * @param category        {@link Category}
+     * @param actionElement   Element
+     * @param action          {@link Action}
+     * @throws IOException ioException
+     */
+    private void writeActionConstantsFile(Element pluginElement, Element categoryElement, Category category, Element actionElement, Action action) throws IOException {
+        String simpleClassName = pluginElement.getSimpleName().toString() + categoryElement.getSimpleName().toString() + actionElement.getSimpleName().toString() + "Constants";
+        String packageName = ((PackageElement) pluginElement.getEnclosingElement()).getQualifiedName().toString();
+
+        JavaFileObject builderFile = processingEnv.getFiler().createSourceFile(simpleClassName);
+
+        try (PrintWriter out = new PrintWriter(builderFile.openWriter())) {
+
+            writePackage(packageName, out);
+
+            this.writeJavaClassHeader(simpleClassName, out);
+
+            this.writeConstant(out, "id", ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action));
+
+            out.println("}");
+        }
+    }
+
+    /**
+     * Generates a Java Class with Constants for the {@link Data}
+     *
+     * @param pluginElement   Element
+     * @param categoryElement Element
+     * @param category        {@link Category}
+     * @param actionElement   Element
+     * @param action          {@link Action}
+     * @param dataElement     Element
+     * @param data            {@link Data}
+     * @throws IOException ioException
+     */
+    private void writeActionDataConstantsFile(Element pluginElement, Element categoryElement, Category category, Element actionElement, Action action, Element dataElement, Data data) throws IOException {
+        String simpleClassName = pluginElement.getSimpleName().toString() + categoryElement.getSimpleName().toString() + actionElement.getSimpleName().toString() + dataElement.getSimpleName().toString() + "Constants";
+        String packageName = ((PackageElement) pluginElement.getEnclosingElement()).getQualifiedName().toString();
+
+        JavaFileObject builderFile = processingEnv.getFiler().createSourceFile(simpleClassName);
+
+        try (PrintWriter out = new PrintWriter(builderFile.openWriter())) {
+
+            writePackage(packageName, out);
+
+            this.writeJavaClassHeader(simpleClassName, out);
+
+            this.writeConstant(out, "id", DataHelper.getActionDataId(pluginElement, categoryElement, category, actionElement, action, dataElement, data));
+
+            out.println("}");
+        }
+    }
+
+    /**
+     * Generates a Java Class with Constants for the {@link State}
+     *
+     * @param pluginElement   Element
+     * @param categoryElement Element
+     * @param category        {@link Category}
+     * @param stateElement    Element
+     * @param state           {@link State}
+     * @throws IOException ioException
+     */
+    private void writeStateConstantsFile(Element pluginElement, Element categoryElement, Category category, Element stateElement, State state) throws IOException {
+        String simpleClassName = pluginElement.getSimpleName().toString() + categoryElement.getSimpleName().toString() + stateElement.getSimpleName() + "Constants";
+        String packageName = ((PackageElement) pluginElement.getEnclosingElement()).getQualifiedName().toString();
+
+        JavaFileObject builderFile = processingEnv.getFiler().createSourceFile(simpleClassName);
+
+        try (PrintWriter out = new PrintWriter(builderFile.openWriter())) {
+
+            writePackage(packageName, out);
+
+            this.writeJavaClassHeader(simpleClassName, out);
+
+            this.writeConstant(out, "id", StateHelper.getStateId(pluginElement, categoryElement, category, stateElement, state));
+
+            out.println("}");
+        }
+    }
+
+    /**
+     * Generates a Java Class with Constants for the {@link Event}
+     *
+     * @param pluginElement   Element
+     * @param categoryElement Element
+     * @param category        {@link Category}
+     * @param eventElement    Element
+     * @param event           {@link Event}
+     * @throws IOException ioException
+     */
+    private void writeEventConstantsFile(Element pluginElement, Element categoryElement, Category category, Element eventElement, Event event) throws IOException {
+        String simpleClassName = pluginElement.getSimpleName().toString() + categoryElement.getSimpleName().toString() + eventElement.getSimpleName() + "EventConstants";
+        String packageName = ((PackageElement) pluginElement.getEnclosingElement()).getQualifiedName().toString();
+
+        JavaFileObject builderFile = processingEnv.getFiler().createSourceFile(simpleClassName);
+
+        try (PrintWriter out = new PrintWriter(builderFile.openWriter())) {
+
+            writePackage(packageName, out);
+
+            this.writeJavaClassHeader(simpleClassName, out);
+
+            this.writeConstant(out, "id", EventHelper.getEventId(pluginElement, categoryElement, category, eventElement, event));
+
+            out.println("}");
+        }
+    }
+
+    /**
+     * Internal Write the Java Class Header
+     *
+     * @param simpleClassName String
+     * @param out             PrintWriter
+     */
+    private void writeJavaClassHeader(String simpleClassName, PrintWriter out) {
+        out.print("public class ");
+        out.print(simpleClassName);
+        out.println(" {");
+    }
+
+    /**
+     * Internal Write the Java Class Package
+     *
+     * @param packageName String
+     * @param out         PrintWriter
+     */
+    private void writePackage(String packageName, PrintWriter out) {
+        if (packageName != null) {
+            out.print("package ");
+            out.print(packageName);
+            out.println(";");
+            out.println();
+        }
+    }
+
+    /**
+     * Internal Write a Static Final Constant
+     *
+     * @param out       PrintWriter
+     * @param fieldName String
+     * @param value     String
+     */
+    private void writeConstant(PrintWriter out, String fieldName, String value) {
+        out.print("  public static final String ");
+        out.print(fieldName.toUpperCase());
+        out.print(" = \"");
+        out.print(value);
+        out.print("\";");
+        out.println();
     }
 
     /**

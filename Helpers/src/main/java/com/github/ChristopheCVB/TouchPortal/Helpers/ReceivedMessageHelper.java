@@ -72,7 +72,7 @@ public class ReceivedMessageHelper {
      * Retrieve the Action ID of a received Message
      *
      * @param jsonMessage {@link JSONObject}
-     * @return String Action ID
+     * @return String actionId
      */
     public static String getActionId(JSONObject jsonMessage) {
         String actionId = null;
@@ -105,6 +105,34 @@ public class ReceivedMessageHelper {
                 JSONObject jsonData = actionData.getJSONObject(actionDataIndex);
                 String receivedJsonDataId = jsonData.getString(ReceivedMessageHelper.ACTION_DATA_ID);
                 if (receivedJsonDataId.equals(DataHelper.getActionDataId(pluginClass, actionMethodName, actionParameterName))) {
+                    dataValue = jsonData.getString(ReceivedMessageHelper.ACTION_DATA_VALUE);
+                    break;
+                }
+            }
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return dataValue;
+    }
+
+    /**
+     * Retrieve an Action Data Value from a received Message
+     *
+     * @param jsonMessage  JSONObject
+     * @param actionDataId String
+     * @return String dataValue
+     */
+    public static String getActionDataValue(JSONObject jsonMessage, String actionDataId) {
+        String dataValue = "";
+
+        try {
+            JSONArray actionData = jsonMessage.getJSONArray(ActionHelper.DATA);
+            for (int actionDataIndex = 0; actionDataIndex < actionData.length(); actionDataIndex++) {
+                JSONObject jsonData = actionData.getJSONObject(actionDataIndex);
+                String receivedJsonDataId = jsonData.getString(ReceivedMessageHelper.ACTION_DATA_ID);
+                if (receivedJsonDataId.equals(actionDataId)) {
                     dataValue = jsonData.getString(ReceivedMessageHelper.ACTION_DATA_VALUE);
                     break;
                 }
