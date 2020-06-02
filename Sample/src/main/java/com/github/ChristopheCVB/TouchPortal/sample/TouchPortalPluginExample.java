@@ -43,7 +43,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
                 boolean connectedPairedAndListening = touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample);
 
                 if (connectedPairedAndListening) {
-                    touchPortalPluginExample.sendStateUpdate(TouchPortalPluginExampleConstants.BaseCategory.Events.CustomState.ID, "2");
+                    touchPortalPluginExample.sendStateUpdate(TouchPortalPluginExampleConstants.BaseCategory.States.CustomState.ID, "2");
                 }
             }
         }
