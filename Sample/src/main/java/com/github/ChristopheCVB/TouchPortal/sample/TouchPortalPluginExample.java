@@ -43,6 +43,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
                 boolean connectedPairedAndListening = touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample);
 
                 if (connectedPairedAndListening) {
+                    // Update a State with the ID from the Generated Constants Class
                     touchPortalPluginExample.sendStateUpdate(TouchPortalPluginExampleConstants.BaseCategory.States.CustomState.ID, "2");
                 }
             }
@@ -69,9 +70,11 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
         if (ReceivedMessageHelper.isAnAction(jsonMessage)) {
             String receivedActionId = ReceivedMessageHelper.getActionId(jsonMessage);
             if (TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.ID.equals(receivedActionId)) {
+                // Example with IDs from Generated Constants Class
                 this.dummyWithData(ReceivedMessageHelper.getActionDataValue(jsonMessage, TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.Text.ID));
             }
             else if (ActionHelper.getActionId(TouchPortalPluginExample.class, "dummyWithoutData").equals(receivedActionId)) {
+                // Example with IDs from Helper
                 this.dummyWithoutData(jsonMessage);
             }
         }
