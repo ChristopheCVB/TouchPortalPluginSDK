@@ -43,7 +43,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
                 boolean connectedPairedAndListening = touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample);
 
                 if (connectedPairedAndListening) {
-                    touchPortalPluginExample.sendStateUpdate(com.github.ChristopheCVB.TouchPortal.sample.TouchPortalPluginExampleBaseCategorycustomStateEventConstants.ID, "2");
+                    touchPortalPluginExample.sendStateUpdate(TouchPortalPluginExampleConstants.BaseCategory.Events.CustomState.ID, "2");
                 }
             }
         }
@@ -68,8 +68,8 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
     public void onReceive(JSONObject jsonMessage) {
         if (ReceivedMessageHelper.isAnAction(jsonMessage)) {
             String receivedActionId = ReceivedMessageHelper.getActionId(jsonMessage);
-            if (com.github.ChristopheCVB.TouchPortal.sample.TouchPortalPluginExampleBaseCategorydummyWithDataConstants.ID.equals(receivedActionId)) {
-                this.dummyWithData(ReceivedMessageHelper.getActionDataValue(jsonMessage, com.github.ChristopheCVB.TouchPortal.sample.TouchPortalPluginExampleBaseCategorydummyWithDatatextConstants.ID));
+            if (TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.ID.equals(receivedActionId)) {
+                this.dummyWithData(ReceivedMessageHelper.getActionDataValue(jsonMessage, TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.Text.ID));
             }
             else if (ActionHelper.getActionId(TouchPortalPluginExample.class, "dummyWithoutData").equals(receivedActionId)) {
                 this.dummyWithoutData(jsonMessage);
