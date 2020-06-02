@@ -28,12 +28,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.file.Paths;
+import java.util.Properties;
 
 /**
  * This is the class you need to extend in order to create a Touch Portal Plugin
@@ -42,8 +41,7 @@ public abstract class TouchPortalPlugin {
     /**
      * Touch Portal Plugin SDK Version
      */
-    protected static final String TOUCH_PORTAL_VERSION = "2.0";
-
+    protected static final int TOUCH_PORTAL_SDK_VERSION = PluginHelper.TOUCH_PORTAL_PLUGIN_VERSION;
     /**
      * Socket Server IP used by the Touch Portal Plugin System
      */
@@ -52,11 +50,18 @@ public abstract class TouchPortalPlugin {
      * Socket Server Port used by the Touch Portal Plugin System
      */
     private static final int SOCKET_PORT = 12136;
-    /**
-     * This is used internally to represent the Plugin ID
-     */
 
+    /**
+     * Actual Plugin Class
+     * <p>
+     * This is used internally to represent the Plugin ID
+     * </p>
+     */
     private final Class<? extends TouchPortalPlugin> pluginClass;
+    /**
+     * Touch Portal Plugin Folder passed at start command
+     */
+    private String touchPortalPluginFolder;
     /**
      * Touch Portal Socket Client connection
      */
@@ -69,6 +74,14 @@ public abstract class TouchPortalPlugin {
      * Used Buffer to read messages from Touch Portal Plugin System
      */
     private BufferedReader bufferedReader;
+    /**
+     * Properties
+     */
+    private Properties properties;
+    /**
+     * Properties File
+     */
+    private File propertiesFile;
     /**
      * Listener used for the callbacks
      */
@@ -111,7 +124,8 @@ public abstract class TouchPortalPlugin {
     /**
      * Constructor
      */
-    protected TouchPortalPlugin() {
+    protected TouchPortalPlugin(String[] args) {
+        this.touchPortalPluginFolder = args[1].trim();
         this.pluginClass = this.getClass();
     }
 
@@ -143,6 +157,12 @@ public abstract class TouchPortalPlugin {
      * @param exception Exception
      */
     private void close(Exception exception) {
+        try {
+            this.storeProperties();
+        }
+        catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
         if (this.touchPortalSocket != null && this.touchPortalSocket.isConnected()) {
             try {
                 this.bufferedOutputStream = null;
@@ -406,6 +426,63 @@ public abstract class TouchPortalPlugin {
      */
     public boolean isConnected() {
         return this.touchPortalSocket != null && this.touchPortalSocket.isConnected();
+    }
+
+    /**
+     * Loads a Properties file
+     *
+     * @param propertiesFileRelativePath String - Relative path of the properties File
+     * @throws IOException ioException
+     */
+    public void loadProperties(String propertiesFileRelativePath) throws IOException {
+        this.propertiesFile = Paths.get(this.touchPortalPluginFolder + this.pluginClass.getSimpleName() + "/" + propertiesFileRelativePath).toFile();
+        FileInputStream fis = new FileInputStream(propertiesFile.getAbsolutePath());
+        this.properties = new Properties();
+        this.properties.load(fis);
+    }
+
+    /**
+     * Read a property by the key
+     *
+     * @param key String
+     * @return String value
+     */
+    public String getProperty(String key) {
+        String value = null;
+
+        if (this.properties != null) {
+            value = this.properties.getProperty(key);
+        }
+
+        return value;
+    }
+
+    /**
+     * Set a property key to the specified value
+     *
+     * @param key   String
+     * @param value String
+     * @return String oldKey
+     */
+    public String setProperty(String key, String value) {
+        String oldValue = null;
+
+        if (this.properties != null) {
+            oldValue = (String) this.properties.setProperty(key, value);
+        }
+
+        return oldValue;
+    }
+
+    /**
+     * Save the current state of the Properties
+     *
+     * @throws IOException ioException
+     */
+    protected void storeProperties() throws IOException {
+        if (this.properties != null) {
+            this.properties.store(new FileOutputStream(this.propertiesFile), "");
+        }
     }
 
     /**

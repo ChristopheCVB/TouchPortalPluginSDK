@@ -40,9 +40,17 @@ public class PluginHelper {
     public static final String CATEGORIES = "categories";
 
     /**
+     * Touch Portal Plugin System version
+     */
+    public static final int TOUCH_PORTAL_PLUGIN_VERSION = 2;
+    /**
      * Argument passed to the jar to start the plugin
      */
     public static final String COMMAND_START = "start";
+    /**
+     * Touch Portal Plugin System TP_PLUGIN_FOLDER
+     */
+    public static final String TP_PLUGIN_FOLDER = "%TP_PLUGIN_FOLDER%";
     /**
      * Touch Portal entry file
      */
@@ -75,7 +83,7 @@ public class PluginHelper {
      * @param pluginClass Class
      * @return pluginId
      */
-    public static String getPluginId(Class pluginClass) {
+    public static String getPluginId(Class<?> pluginClass) {
         return PluginHelper._getPluginId(pluginClass.getName());
     }
 

@@ -136,7 +136,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         TypeSpec.Builder pluginTypeSpecBuilder = this.createPluginTypeSpecBuilder(pluginElement, plugin);
 
         JSONObject jsonPlugin = new JSONObject();
-        jsonPlugin.put(PluginHelper.SDK, 2);
+        jsonPlugin.put(PluginHelper.SDK, PluginHelper.TOUCH_PORTAL_PLUGIN_VERSION);
         jsonPlugin.put(PluginHelper.VERSION, plugin.version());
         jsonPlugin.put(PluginHelper.NAME, PluginHelper.getPluginName(pluginElement, plugin));
         jsonPlugin.put(PluginHelper.ID, PluginHelper.getPluginId(pluginElement));
@@ -144,7 +144,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonConfiguration.put(PluginHelper.CONFIGURATION_COLOR_DARK, plugin.colorDark());
         jsonConfiguration.put(PluginHelper.CONFIGURATION_COLOR_LIGHT, plugin.colorLight());
         jsonPlugin.put(PluginHelper.CONFIGURATION, jsonConfiguration);
-        jsonPlugin.put(PluginHelper.PLUGIN_START_COMMAND, "java -jar %TP_PLUGIN_FOLDER%" + pluginElement.getSimpleName() + "\\" + pluginElement.getSimpleName() + ".jar " + PluginHelper.COMMAND_START);
+        jsonPlugin.put(PluginHelper.PLUGIN_START_COMMAND, "java -jar " + PluginHelper.TP_PLUGIN_FOLDER + pluginElement.getSimpleName() + "\\" + pluginElement.getSimpleName() + ".jar " + PluginHelper.COMMAND_START + " \" " + PluginHelper.TP_PLUGIN_FOLDER + " \"");
 
         JSONArray jsonCategories = new JSONArray();
         Set<? extends Element> categoryElements = roundEnv.getElementsAnnotatedWith(Category.class);
@@ -178,7 +178,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         JSONObject jsonCategory = new JSONObject();
         jsonCategory.put(CategoryHelper.ID, CategoryHelper.getCategoryId(pluginElement, categoryElement, category));
         jsonCategory.put(CategoryHelper.NAME, CategoryHelper.getCategoryName(categoryElement, category));
-        jsonCategory.put(CategoryHelper.IMAGE_PATH, "%TP_PLUGIN_FOLDER%" + pluginElement.getSimpleName() + "/" + category.imagePath());
+        jsonCategory.put(CategoryHelper.IMAGE_PATH, PluginHelper.TP_PLUGIN_FOLDER + pluginElement.getSimpleName() + "/" + category.imagePath());
 
         TypeSpec.Builder actionsTypeSpecBuilder = TypeSpec.classBuilder("Actions");
         JSONArray jsonActions = new JSONArray();
