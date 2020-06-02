@@ -82,22 +82,28 @@ public abstract class TouchPortalPlugin {
                 String socketMessage = TouchPortalPlugin.this.bufferedReader.readLine();
                 JSONObject jsonMessage = new JSONObject(socketMessage);
                 if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, TouchPortalPlugin.this.pluginClass)) {
-                    if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
+                    String messageType = ReceivedMessageHelper.getType(jsonMessage);
+                    if (ReceivedMessageHelper.TYPE_CLOSE_PLUGIN.equals(messageType)) {
+                        System.out.println("Close Message Received");
+                        TouchPortalPlugin.this.close(null);
+                        break;
+                    }
+                    else {
+                        System.out.println("Message Received");
                         // TODO: Automatically Call Actions Methods (This require to Annotate an Interface that would be passed to the SDK)
-                        TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage);
+                        if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
+                            TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage);
+                        }
                     }
                 }
             }
             catch (IOException ioException) {
                 ioException.printStackTrace();
-                TouchPortalPlugin.this.close();
-                if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
-                    TouchPortalPlugin.this.touchPortalPluginListener.onDisconnect(ioException);
-                }
+                TouchPortalPlugin.this.close(ioException);
                 break;
             }
-            catch (Exception e) {
-                e.printStackTrace();
+            catch (JSONException jsonException) {
+                jsonException.printStackTrace();
             }
         }
     });
@@ -123,7 +129,7 @@ public abstract class TouchPortalPlugin {
             pairingMessage.put(SentMessageHelper.ID, PluginHelper.getPluginId(this.pluginClass));
 
             paired = this.send(pairingMessage);
-            System.out.println("Pairing Message sent");
+            System.out.println("Pairing Message Sent");
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -133,8 +139,10 @@ public abstract class TouchPortalPlugin {
 
     /**
      * Close the Socket connection
+     *
+     * @param exception Exception
      */
-    private void close() {
+    private void close(Exception exception) {
         if (this.touchPortalSocket != null && this.touchPortalSocket.isConnected()) {
             try {
                 this.bufferedOutputStream = null;
@@ -145,6 +153,9 @@ public abstract class TouchPortalPlugin {
             catch (IOException ioException) {
                 ioException.printStackTrace();
             }
+        }
+        if (this.touchPortalPluginListener != null) {
+            this.touchPortalPluginListener.onDisconnect(exception);
         }
     }
 
@@ -251,7 +262,7 @@ public abstract class TouchPortalPlugin {
                     .put(SentMessageHelper.ID, stateId)
                     .put(SentMessageHelper.VALUE, new JSONArray(values));
             sent = this.send(choiceUpdateMessage);
-            System.out.println("Update Choices [" + stateId + "] sent");
+            System.out.println("Update Choices [" + stateId + "] Sent [" + sent + "]");
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -275,7 +286,7 @@ public abstract class TouchPortalPlugin {
                     .put(SentMessageHelper.ID, listId)
                     .put(SentMessageHelper.VALUE, new JSONArray(values));
             sent = this.send(choiceUpdateMessage);
-            System.out.println("Update Choices [" + listId + "] sent");
+            System.out.println("Update Choices [" + listId + "] Sent [" + sent + "]");
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -303,7 +314,7 @@ public abstract class TouchPortalPlugin {
                     .put(SentMessageHelper.INSTANCE_ID, instanceId)
                     .put(SentMessageHelper.VALUE, new JSONArray(values));
             sent = this.send(specificChoiceUpdateMessage);
-            System.out.println("Update Choices [" + stateId + "] sent");
+            System.out.println("Update Choices [" + stateId + "] Sent [" + sent + "]");
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -329,7 +340,7 @@ public abstract class TouchPortalPlugin {
                     .put(SentMessageHelper.INSTANCE_ID, instanceId)
                     .put(SentMessageHelper.VALUE, new JSONArray(values));
             sent = this.send(specificChoiceUpdateMessage);
-            System.out.println("Update Specific Choices [" + choiceId + "] sent");
+            System.out.println("Update Specific Choices [" + choiceId + "] Sent [" + sent + "]");
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -355,7 +366,7 @@ public abstract class TouchPortalPlugin {
                     .put(SentMessageHelper.ID, stateId)
                     .put(SentMessageHelper.VALUE, value);
             sent = this.send(stateUpdateMessage);
-            System.out.println("Update State [" + stateId + "] sent");
+            System.out.println("Update State [" + stateId + "] Sent [" + sent + "]");
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -379,7 +390,7 @@ public abstract class TouchPortalPlugin {
                     .put(SentMessageHelper.ID, stateId)
                     .put(SentMessageHelper.VALUE, value);
             sent = this.send(stateUpdateMessage);
-            System.out.println("Update State [" + stateId + "] sent");
+            System.out.println("Update State [" + stateId + "] Sent [" + sent + "]");
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -402,17 +413,17 @@ public abstract class TouchPortalPlugin {
      */
     public interface TouchPortalPluginListener {
         /**
-         * Called when the Socket connection is lost
+         * Called when the Socket connection is lost or the plugin has received the close Message
          *
-         * @param exception {@link Exception} raised
+         * @param exception {@link Exception} raised or null if disconnection comes from the close Message
          */
         void onDisconnect(Exception exception);
 
         /**
          * Called when receiving a message from the Touch Portal Plugin System
          *
-         * @param message {@link JSONObject}
+         * @param jsonMessage {@link JSONObject}
          */
-        void onReceive(JSONObject message);
+        void onReceive(JSONObject jsonMessage);
     }
 }

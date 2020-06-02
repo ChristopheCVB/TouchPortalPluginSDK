@@ -62,7 +62,10 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
 
     @Override
     public void onDisconnect(Exception exception) {
-        // Socket connection is lost or closed
+        // Socket connection is lost or plugin has received close message
+        if (exception != null) {
+            exception.printStackTrace();
+        }
     }
 
     @Override

@@ -31,6 +31,7 @@ public class ReceivedMessageHelper {
     public static final String TYPE = GenericHelper.TYPE;
     public static final String TYPE_ACTION = "action";
     public static final String TYPE_LIST_CHANGE = "listChange";
+    public static final String TYPE_CLOSE_PLUGIN = "closePlugin";
     public static final String PLUGIN_ID = "pluginId";
     public static final String ACTION_ID = "actionId";
     public static final String LIST_ID = "listId";

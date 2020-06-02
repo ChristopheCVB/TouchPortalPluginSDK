@@ -2,8 +2,12 @@ plugins {
     id 'java-library'
 }
 
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+
 group 'com.github.ChristopheCVB.TouchPortal.AnnotationsProcessor'
-version '1.0.0'
+version "${versionMajor}.${versionMinor}.${versionPatch}"
 
 dependencies {
     implementation group: 'org.json', name: 'org.json', version: 'chargebee-1.0'
