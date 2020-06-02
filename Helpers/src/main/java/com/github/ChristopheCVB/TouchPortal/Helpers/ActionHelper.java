@@ -77,7 +77,7 @@ public class ActionHelper {
      * @param actionMethodName String
      * @return String actionId
      */
-    public static String getActionId(Class pluginClass, String actionMethodName) {
+    public static String getActionId(Class<?> pluginClass, String actionMethodName) {
         String actionId = "";
 
         for (Method method : pluginClass.getDeclaredMethods()) {

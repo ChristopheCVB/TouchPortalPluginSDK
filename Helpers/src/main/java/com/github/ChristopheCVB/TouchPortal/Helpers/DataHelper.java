@@ -76,7 +76,7 @@ public class DataHelper {
      * @param actionParameterName String
      * @return String actionDataId
      */
-    public static String getActionDataId(Class pluginClass, String actionMethodName, String actionParameterName) {
+    public static String getActionDataId(Class<?> pluginClass, String actionMethodName, String actionParameterName) {
         String actionDataId = "";
         for (Method declaredMethod : pluginClass.getDeclaredMethods()) {
             if (declaredMethod.getName().equals(actionMethodName)) {

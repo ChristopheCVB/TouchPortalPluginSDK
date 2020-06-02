@@ -73,7 +73,7 @@ public class StateHelper {
      * @param stateFieldName String
      * @return String stateId
      */
-    public static String getStateId(Class pluginClass, String categoryId, String stateFieldName) {
+    public static String getStateId(Class<?> pluginClass, String categoryId, String stateFieldName) {
         String stateId = "";
 
         try {

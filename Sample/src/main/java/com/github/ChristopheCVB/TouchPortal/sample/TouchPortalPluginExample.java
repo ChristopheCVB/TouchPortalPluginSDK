@@ -70,7 +70,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
 
                 if (connectedPairedAndListening) {
                     // Update a State with the ID from the Generated Constants Class
-                    touchPortalPluginExample.sendStateUpdate(TouchPortalPluginExampleConstants.BaseCategory.States.CustomState.ID, "2");
+                    boolean stateUpdated = touchPortalPluginExample.sendStateUpdate(TouchPortalPluginExampleConstants.BaseCategory.States.CustomState.ID, "2");
                 }
             }
         }

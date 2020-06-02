@@ -97,7 +97,7 @@ public class ReceivedMessageHelper {
      * @param actionParameterName String
      * @return String dataValue
      */
-    public static String getActionDataValue(Class pluginClass, JSONObject jsonMessage, String actionMethodName, String actionParameterName) {
+    public static String getActionDataValue(Class<?> pluginClass, JSONObject jsonMessage, String actionMethodName, String actionParameterName) {
         String dataValue = "";
 
         try {
@@ -153,11 +153,31 @@ public class ReceivedMessageHelper {
      * @param pluginClass Class
      * @return boolean isMessageForPlugin
      */
-    public static boolean isMessageForPlugin(JSONObject jsonMessage, Class pluginClass) {
+    public static boolean isMessageForPlugin(JSONObject jsonMessage, Class<?> pluginClass) {
         boolean isMessageForPlugin = false;
 
         try {
             isMessageForPlugin = jsonMessage.getString(ReceivedMessageHelper.PLUGIN_ID).equals(pluginClass.getName());
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return isMessageForPlugin;
+    }
+
+    /**
+     * Whether the received Message concerns the Plugin Class
+     *
+     * @param jsonMessage JSONObject
+     * @param pluginId    String
+     * @return boolean isMessageForPlugin
+     */
+    public static boolean isMessageForPlugin(JSONObject jsonMessage, String pluginId) {
+        boolean isMessageForPlugin = false;
+
+        try {
+            isMessageForPlugin = jsonMessage.getString(ReceivedMessageHelper.PLUGIN_ID).equals(pluginId);
         }
         catch (JSONException e) {
             e.printStackTrace();

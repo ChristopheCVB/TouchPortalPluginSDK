@@ -65,7 +65,7 @@ public class CategoryHelper {
      * @param categoryId  String
      * @return String categoryId
      */
-    public static String getCategoryId(Class pluginClass, String categoryId) {
+    public static String getCategoryId(Class<?> pluginClass, String categoryId) {
         return CategoryHelper._getCategoryId(PluginHelper.getPluginId(pluginClass), categoryId);
     }
 

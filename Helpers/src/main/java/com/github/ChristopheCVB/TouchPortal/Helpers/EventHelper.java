@@ -74,7 +74,7 @@ public class EventHelper {
      * @param eventId     String
      * @return String eventId
      */
-    public static String getEventId(Class pluginClass, String categoryId, String eventId) {
+    public static String getEventId(Class<?> pluginClass, String categoryId, String eventId) {
         return EventHelper._getEventId(CategoryHelper.getCategoryId(pluginClass, categoryId), eventId);
     }
 

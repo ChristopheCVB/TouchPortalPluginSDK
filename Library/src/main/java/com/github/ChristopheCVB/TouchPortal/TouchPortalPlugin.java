@@ -61,7 +61,7 @@ public abstract class TouchPortalPlugin {
     /**
      * Touch Portal Plugin Folder passed at start command
      */
-    private String touchPortalPluginFolder;
+    private final String touchPortalPluginFolder;
     /**
      * Touch Portal Socket Client connection
      */
@@ -462,7 +462,7 @@ public abstract class TouchPortalPlugin {
      *
      * @param key   String
      * @param value String
-     * @return String oldKey
+     * @return String oldKey - If present
      */
     public String setProperty(String key, String value) {
         String oldValue = null;
