@@ -84,9 +84,6 @@ public @interface Action {
     /**
      * Action format
      * <p>
-     * This is only added if tryInline is true
-     * </p>
-     * <p>
      * Default is ""
      * </p>
      *
