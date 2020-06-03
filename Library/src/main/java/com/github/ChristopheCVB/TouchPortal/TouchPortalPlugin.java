@@ -123,6 +123,8 @@ public abstract class TouchPortalPlugin {
 
     /**
      * Constructor
+     *
+     * @param args String[]
      */
     protected TouchPortalPlugin(String[] args) {
         this.touchPortalPluginFolder = args[1].trim();

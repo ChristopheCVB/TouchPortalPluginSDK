@@ -2,6 +2,12 @@
 
 This Project is an SDK to create a Touch Portal Plugin using Java and Gradle
 
+The Touch Portal Plugin documentation can be found [here](https://www.touch-portal.com/sdk)
+
+## Documentation
+
+Once you have cloned this project, you can run the `gradlew javaDoc` and browse the document in the `build/docs/javadoc` of each module
+
 ## Releases
 
 Last version is 2.2.0
