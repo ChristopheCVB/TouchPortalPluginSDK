@@ -163,8 +163,7 @@ public abstract class TouchPortalPlugin {
             paired = this.send(pairingMessage);
             System.out.println("Pairing Message Sent");
         }
-        catch (JSONException e) {
-            e.printStackTrace();
+        catch (JSONException ignored) {
         }
         return paired;
     }
@@ -181,8 +180,7 @@ public abstract class TouchPortalPlugin {
         try {
             this.storeProperties();
         }
-        catch (IOException ioException) {
-            ioException.printStackTrace();
+        catch (IOException ignored) {
         }
 
 
@@ -195,8 +193,7 @@ public abstract class TouchPortalPlugin {
             try {
                 this.bufferedReader.close();
             }
-            catch (IOException ioException) {
-                ioException.printStackTrace();
+            catch (IOException ignored) {
             }
             this.bufferedReader = null;
         }
@@ -204,8 +201,7 @@ public abstract class TouchPortalPlugin {
             try {
                 this.touchPortalSocket.close();
             }
-            catch (IOException ioException) {
-                ioException.printStackTrace();
+            catch (IOException ignored) {
             }
             this.touchPortalSocket = null;
 
@@ -287,8 +283,7 @@ public abstract class TouchPortalPlugin {
 
                 sent = true;
             }
-            catch (IOException ioException) {
-                ioException.printStackTrace();
+            catch (IOException ignored) {
             }
         }
 
@@ -325,8 +320,7 @@ public abstract class TouchPortalPlugin {
             sent = this.send(choiceUpdateMessage);
             System.out.println("Update Choices [" + listId + "] Sent [" + sent + "]");
         }
-        catch (JSONException e) {
-            e.printStackTrace();
+        catch (JSONException ignored) {
         }
 
         return sent;
@@ -365,8 +359,7 @@ public abstract class TouchPortalPlugin {
             sent = this.send(specificChoiceUpdateMessage);
             System.out.println("Update Specific Choices [" + choiceId + "] Sent [" + sent + "]");
         }
-        catch (JSONException e) {
-            e.printStackTrace();
+        catch (JSONException ignored) {
         }
 
         return sent;
@@ -402,8 +395,7 @@ public abstract class TouchPortalPlugin {
             sent = this.send(stateUpdateMessage);
             System.out.println("Update State [" + stateId + "] Sent [" + sent + "]");
         }
-        catch (JSONException e) {
-            e.printStackTrace();
+        catch (JSONException ignored) {
         }
 
         return sent;
