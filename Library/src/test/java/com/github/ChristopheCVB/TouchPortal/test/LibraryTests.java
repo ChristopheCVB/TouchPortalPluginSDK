@@ -1,6 +1,7 @@
 package com.github.ChristopheCVB.TouchPortal.test;
 
 import com.github.ChristopheCVB.TouchPortal.Helpers.*;
+import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,8 +12,10 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -21,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 public class LibraryTests {
     private ServerSocket serverSocket;
+    private Socket serverSocketClient;
     private TouchPortalPluginTest touchPortalPluginTest;
 
     @Before
@@ -30,12 +34,29 @@ public class LibraryTests {
         File testResourcesDirectory = new File("src/test/resources/");
         this.touchPortalPluginTest = new TouchPortalPluginTest(new String[]{"start", testResourcesDirectory.getAbsolutePath() + "/"});
 
-        this.touchPortalPluginTest.connectThenPairAndListen(null);
-        this.serverSocket.accept();
+        new Thread(() -> {
+            try {
+                LibraryTests.this.serverSocketClient = LibraryTests.this.serverSocket.accept();
+            }
+            catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        }).start();
+        boolean connectedPairedAndListening = this.touchPortalPluginTest.connectThenPairAndListen(new TouchPortalPlugin.TouchPortalPluginListener() {
+            @Override
+            public void onDisconnect(Exception exception) {
+            }
+
+            @Override
+            public void onReceive(JSONObject jsonMessage) {
+            }
+        });
+        assertTrue(connectedPairedAndListening);
     }
 
     @After
     public void close() throws IOException {
+        this.touchPortalPluginTest.close(null);
         this.serverSocket.close();
     }
 
@@ -45,8 +66,32 @@ public class LibraryTests {
     }
 
     @Test
+    public void testClose() {
+        this.touchPortalPluginTest.close(null);
+    }
+
+    @Test
     public void testSend() {
         assertTrue(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "New Value"));
+
+        assertTrue(this.touchPortalPluginTest.sendChoiceUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, new String[]{"New Value"}));
+
+        assertTrue(this.touchPortalPluginTest.sendSpecificChoiceUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "instanceId", new String[]{"New Value"}));
+
+        assertTrue(this.touchPortalPluginTest.sendStateUpdate("BaseCategory", "customState", "New Value"));
+
+        assertTrue(this.touchPortalPluginTest.sendChoiceUpdate("BaseCategory", "customState", new String[]{"New Value"}));
+
+        assertTrue(this.touchPortalPluginTest.sendSpecificChoiceUpdate("BaseCategory", "customState", "instanceId", new String[]{"New Value"}));
+    }
+
+    @Test
+    public void testReceive() throws JSONException, IOException {
+        JSONObject jsonMessage = new JSONObject();
+        jsonMessage.put(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.put(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
     }
 
     @Test
@@ -120,6 +165,7 @@ public class LibraryTests {
     @Test
     public void testProperties() throws IOException {
         this.touchPortalPluginTest.loadProperties("plugin.config");
+        assertTrue(this.touchPortalPluginTest.getPropertiesFile().exists());
 
         assertEquals("Sample Value", this.touchPortalPluginTest.getProperty("samplekey"));
 

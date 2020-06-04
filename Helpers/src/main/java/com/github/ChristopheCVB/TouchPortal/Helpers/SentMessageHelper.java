@@ -26,6 +26,7 @@ package com.github.ChristopheCVB.TouchPortal.Helpers;
 public class SentMessageHelper {
     public static final String TYPE = GenericHelper.TYPE;
     public static final String TYPE_STATE_UPDATE = "stateUpdate";
+    public static final String TYPE_PAIR = "pair";
     public static final String TYPE_CHOICE_UPDATE = "choiceUpdate";
     public static final String INSTANCE_ID = "instanceId";
     public static final String ID = GenericHelper.ID;

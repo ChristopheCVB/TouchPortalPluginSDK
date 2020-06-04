@@ -93,19 +93,21 @@ public abstract class TouchPortalPlugin {
         while (true) {
             try {
                 String socketMessage = TouchPortalPlugin.this.bufferedReader.readLine();
-                JSONObject jsonMessage = new JSONObject(socketMessage);
-                if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, TouchPortalPlugin.this.pluginClass)) {
-                    String messageType = ReceivedMessageHelper.getType(jsonMessage);
-                    if (ReceivedMessageHelper.TYPE_CLOSE_PLUGIN.equals(messageType)) {
-                        System.out.println("Close Message Received");
-                        TouchPortalPlugin.this.close(null);
-                        break;
-                    }
-                    else {
-                        System.out.println("Message Received");
-                        // TODO: Automatically Call Actions Methods (This require to Annotate an Interface that would be passed to the SDK)
-                        if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
-                            TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage);
+                if (socketMessage != null && !socketMessage.isEmpty()) {
+                    JSONObject jsonMessage = new JSONObject(socketMessage);
+                    if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, TouchPortalPlugin.this.pluginClass)) {
+                        String messageType = ReceivedMessageHelper.getType(jsonMessage);
+                        if (ReceivedMessageHelper.TYPE_CLOSE_PLUGIN.equals(messageType)) {
+                            System.out.println("Close Message Received");
+                            TouchPortalPlugin.this.close(null);
+                            break;
+                        }
+                        else {
+                            System.out.println("Message Received");
+                            // TODO: Automatically Call Actions Methods (This require to Annotate an Interface that would be passed to the SDK)
+                            if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
+                                TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage);
+                            }
                         }
                     }
                 }
@@ -141,7 +143,7 @@ public abstract class TouchPortalPlugin {
         try {
             // Send Pairing Message
             JSONObject pairingMessage = new JSONObject();
-            pairingMessage.put(SentMessageHelper.TYPE, "pair");
+            pairingMessage.put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_PAIR);
             pairingMessage.put(SentMessageHelper.ID, PluginHelper.getPluginId(this.pluginClass));
 
             paired = this.send(pairingMessage);
@@ -158,7 +160,7 @@ public abstract class TouchPortalPlugin {
      *
      * @param exception Exception
      */
-    private void close(Exception exception) {
+    public void close(Exception exception) {
         try {
             this.storeProperties();
         }
@@ -276,21 +278,8 @@ public abstract class TouchPortalPlugin {
      * @return boolean choiceUpdateMessageSent
      */
     public boolean sendChoiceUpdate(String categoryId, String stateFieldName, String[] values) {
-        boolean sent = false;
-        try {
-            String stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateFieldName);
-            JSONObject choiceUpdateMessage = new JSONObject()
-                    .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE)
-                    .put(SentMessageHelper.ID, stateId)
-                    .put(SentMessageHelper.VALUE, new JSONArray(values));
-            sent = this.send(choiceUpdateMessage);
-            System.out.println("Update Choices [" + stateId + "] Sent [" + sent + "]");
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return sent;
+        String stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateFieldName);
+        return this.sendChoiceUpdate(stateId, values);
     }
 
     /**
@@ -327,22 +316,8 @@ public abstract class TouchPortalPlugin {
      * @return boolean specificChoiceUpdateMessageSent
      */
     public boolean sendSpecificChoiceUpdate(String categoryId, String stateFieldName, String instanceId, String[] values) {
-        boolean sent = false;
-        try {
-            String stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateFieldName);
-            JSONObject specificChoiceUpdateMessage = new JSONObject()
-                    .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE)
-                    .put(SentMessageHelper.ID, stateId)
-                    .put(SentMessageHelper.INSTANCE_ID, instanceId)
-                    .put(SentMessageHelper.VALUE, new JSONArray(values));
-            sent = this.send(specificChoiceUpdateMessage);
-            System.out.println("Update Choices [" + stateId + "] Sent [" + sent + "]");
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return sent;
+        String stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateFieldName);
+        return this.sendSpecificChoiceUpdate(stateId, instanceId, values);
     }
 
     /**
@@ -380,21 +355,8 @@ public abstract class TouchPortalPlugin {
      * @return boolean stateUpdateMessageSent
      */
     public boolean sendStateUpdate(String categoryId, String stateFieldName, String value) {
-        boolean sent = false;
-        try {
-            String stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateFieldName);
-            JSONObject stateUpdateMessage = new JSONObject()
-                    .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE)
-                    .put(SentMessageHelper.ID, stateId)
-                    .put(SentMessageHelper.VALUE, value);
-            sent = this.send(stateUpdateMessage);
-            System.out.println("Update State [" + stateId + "] Sent [" + sent + "]");
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return sent;
+        String stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateFieldName);
+        return this.sendStateUpdate(stateId, value);
     }
 
     /**
@@ -512,7 +474,7 @@ public abstract class TouchPortalPlugin {
      *
      * @return File propertiesFile
      */
-    protected File getPropertiesFile() {
+    public File getPropertiesFile() {
         return this.propertiesFile;
     }
 
