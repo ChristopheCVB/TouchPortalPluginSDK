@@ -438,9 +438,29 @@ public abstract class TouchPortalPlugin {
      */
     public void loadProperties(String propertiesFileRelativePath) throws IOException {
         this.propertiesFile = Paths.get(this.touchPortalPluginFolder + this.pluginClass.getSimpleName() + "/" + propertiesFileRelativePath).toFile();
-        FileInputStream fis = new FileInputStream(propertiesFile.getAbsolutePath());
-        this.properties = new Properties();
-        this.properties.load(fis);
+        this.loadProperties();
+    }
+
+    /**
+     * Internal Load the set Properties File
+     *
+     * @throws IOException ioException
+     */
+    private void loadProperties() throws IOException {
+        if (this.propertiesFile != null) {
+            FileInputStream fis = new FileInputStream(this.propertiesFile.getAbsolutePath());
+            this.properties = new Properties();
+            this.properties.load(fis);
+        }
+    }
+
+    /**
+     * Reloads the Properties File previously set
+     *
+     * @throws IOException ioException
+     */
+    public void reloadProperties() throws IOException {
+        this.loadProperties();
     }
 
     /**
