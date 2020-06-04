@@ -67,11 +67,11 @@ public abstract class TouchPortalPlugin {
      */
     private Socket touchPortalSocket;
     /**
-     * Used Buffer to write messages to Touch Portal Plugin System
+     * Writer used to send messages to the Touch Portal Plugin System
      */
-    private BufferedOutputStream bufferedOutputStream;
+    private PrintWriter printWriter;
     /**
-     * Used Buffer to read messages from Touch Portal Plugin System
+     * Buffer used to read messages from Touch Portal Plugin System
      */
     private BufferedReader bufferedReader;
     /**
@@ -89,39 +89,51 @@ public abstract class TouchPortalPlugin {
     /**
      * Thread that continuously reads messages coming from Touch Portal Plugin System
      */
-    private final Thread listenerThread = new Thread(() -> {
-        while (true) {
-            try {
-                String socketMessage = TouchPortalPlugin.this.bufferedReader.readLine();
-                if (socketMessage != null && !socketMessage.isEmpty()) {
-                    JSONObject jsonMessage = new JSONObject(socketMessage);
-                    if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, TouchPortalPlugin.this.pluginClass)) {
-                        String messageType = ReceivedMessageHelper.getType(jsonMessage);
-                        if (ReceivedMessageHelper.TYPE_CLOSE_PLUGIN.equals(messageType)) {
-                            System.out.println("Close Message Received");
-                            TouchPortalPlugin.this.close(null);
-                            break;
-                        }
-                        else {
-                            System.out.println("Message Received");
-                            // TODO: Automatically Call Actions Methods (This require to Annotate an Interface that would be passed to the SDK)
-                            if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
-                                TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage);
+    private Thread listenerThread;
+
+    /**
+     * Create a new Listener Thread
+     *
+     * @return Thread listenerThread
+     */
+    private Thread createListenerThread() {
+        return new Thread(() -> {
+            while (true) {
+                try {
+                    if (TouchPortalPlugin.this.bufferedReader == null) {
+                        TouchPortalPlugin.this.bufferedReader = new BufferedReader(new InputStreamReader(TouchPortalPlugin.this.touchPortalSocket.getInputStream()));
+                    }
+                    String socketMessage = TouchPortalPlugin.this.bufferedReader.readLine();
+                    if (socketMessage != null && !socketMessage.isEmpty()) {
+                        JSONObject jsonMessage = new JSONObject(socketMessage);
+                        if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, TouchPortalPlugin.this.pluginClass)) {
+                            String messageType = ReceivedMessageHelper.getType(jsonMessage);
+                            if (ReceivedMessageHelper.TYPE_CLOSE_PLUGIN.equals(messageType)) {
+                                System.out.println("Close Message Received");
+                                TouchPortalPlugin.this.close(null);
+                                break;
+                            }
+                            else {
+                                System.out.println("Message Received");
+                                // TODO: Automatically Call Actions Methods (This require to Annotate an Interface that would be passed to the SDK)
+                                if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
+                                    TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage);
+                                }
                             }
                         }
                     }
                 }
+                catch (IOException ioException) {
+                    ioException.printStackTrace();
+                    TouchPortalPlugin.this.close(ioException);
+                    break;
+                }
+                catch (JSONException jsonException) {
+                    jsonException.printStackTrace();
+                }
             }
-            catch (IOException ioException) {
-                ioException.printStackTrace();
-                TouchPortalPlugin.this.close(ioException);
-                break;
-            }
-            catch (JSONException jsonException) {
-                jsonException.printStackTrace();
-            }
-        }
-    });
+        });
+    }
 
     /**
      * Constructor
@@ -157,6 +169,9 @@ public abstract class TouchPortalPlugin {
 
     /**
      * Close the Socket connection
+     * <p>
+     * The {@link TouchPortalPluginListener}.onDisconnect method will be called if the connection was alive.
+     * </p>
      *
      * @param exception Exception
      */
@@ -167,20 +182,61 @@ public abstract class TouchPortalPlugin {
         catch (IOException ioException) {
             ioException.printStackTrace();
         }
-        if (this.touchPortalSocket != null && this.touchPortalSocket.isConnected()) {
-            try {
-                this.bufferedOutputStream = null;
+
+        if (this.touchPortalSocket != null) {
+            System.out.println("closing");
+            if (this.printWriter != null) {
+                this.printWriter.close();
+                this.printWriter = null;
+            }
+            if (this.bufferedReader != null) {
+                try {
+                    this.bufferedReader.close();
+                }
+                catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
                 this.bufferedReader = null;
+            }
+            try {
                 this.touchPortalSocket.close();
-                this.touchPortalSocket = null;
             }
             catch (IOException ioException) {
                 ioException.printStackTrace();
             }
+            this.touchPortalSocket = null;
+            this.listenerThread = null;
+
+            if (this.touchPortalPluginListener != null) {
+                this.touchPortalPluginListener.onDisconnect(exception);
+            }
         }
-        if (this.touchPortalPluginListener != null) {
-            this.touchPortalPluginListener.onDisconnect(exception);
+    }
+
+    /**
+     * Connect to the Touch Portal Plugin System Socket Server.
+     * Then, Send the Pairing message.
+     *
+     * @return boolean pluginIsConnectedAndPaired
+     */
+    private boolean connectThenPair() {
+        System.out.println("connectingAndPairing");
+        boolean connectedAndPaired = this.isConnected();
+
+        if (!connectedAndPaired) {
+            try {
+                this.touchPortalSocket = new Socket(InetAddress.getByName(TouchPortalPlugin.SOCKET_IP), TouchPortalPlugin.SOCKET_PORT);
+                connectedAndPaired = this.isConnected() && this.sendPair();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+                if (this.touchPortalPluginListener != null) {
+                    this.touchPortalPluginListener.onDisconnect(e);
+                }
+            }
         }
+
+        return connectedAndPaired;
     }
 
     /**
@@ -189,16 +245,11 @@ public abstract class TouchPortalPlugin {
      * @return boolean Started listening
      */
     private boolean listen() {
-        if (this.bufferedReader == null) {
-            try {
-                this.bufferedReader = new BufferedReader(new InputStreamReader(this.touchPortalSocket.getInputStream()));
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
+        System.out.println("Start listening");
+        if (this.listenerThread == null) {
+            this.listenerThread = this.createListenerThread();
         }
-
-        if (this.bufferedReader != null && !this.listenerThread.isAlive()) {
+        if (!this.listenerThread.isAlive()) {
             this.listenerThread.start();
         }
 
@@ -214,27 +265,9 @@ public abstract class TouchPortalPlugin {
      * @return boolean pluginIsConnectedPairedAndListening
      */
     public boolean connectThenPairAndListen(TouchPortalPluginListener touchPortalPluginListener) {
-        boolean connected = false;
-
         this.touchPortalPluginListener = touchPortalPluginListener;
 
-        try {
-            this.touchPortalSocket = new Socket(InetAddress.getByName(TouchPortalPlugin.SOCKET_IP), TouchPortalPlugin.SOCKET_PORT);
-            connected = this.isConnected();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            if (this.touchPortalPluginListener != null) {
-                this.touchPortalPluginListener.onDisconnect(e);
-            }
-        }
-
-        boolean paired = false;
-        if (connected) {
-            paired = this.sendPair();
-        }
-
-        return connected && paired && this.listen();
+        return this.connectThenPair() && this.listen();
     }
 
     /**
@@ -244,25 +277,18 @@ public abstract class TouchPortalPlugin {
      * @return boolean isMessageSent
      */
     private boolean send(JSONObject message) {
-        if (this.bufferedOutputStream == null) {
-            try {
-                this.bufferedOutputStream = new BufferedOutputStream(this.touchPortalSocket.getOutputStream());
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         boolean sent = false;
-
-        if (this.touchPortalSocket != null && this.touchPortalSocket.isConnected() && this.bufferedOutputStream != null) {
+        if (this.isConnected()) {
             try {
-                this.bufferedOutputStream.write((message.toString() + "\n").getBytes());
-                this.bufferedOutputStream.flush();
+                if (this.printWriter == null) {
+                    this.printWriter = new PrintWriter(this.touchPortalSocket.getOutputStream(), true);
+                }
+                this.printWriter.println(message);
+
                 sent = true;
             }
-            catch (IOException e) {
-                e.printStackTrace();
+            catch (IOException ioException) {
+                ioException.printStackTrace();
             }
         }
 
@@ -453,6 +479,22 @@ public abstract class TouchPortalPlugin {
 
         if (this.properties != null) {
             oldValue = (String) this.properties.setProperty(key, value);
+        }
+
+        return oldValue;
+    }
+
+    /**
+     * Remove a property
+     *
+     * @param key String
+     * @return String oldValue - If present
+     */
+    public String removeProperty(String key) {
+        String oldValue = null;
+
+        if (this.properties != null) {
+            oldValue = (String) this.properties.remove(key);
         }
 
         return oldValue;

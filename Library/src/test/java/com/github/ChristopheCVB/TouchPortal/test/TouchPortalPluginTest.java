@@ -24,7 +24,7 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import org.json.JSONObject;
 
-@Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Test")
+@Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0")
 public class TouchPortalPluginTest extends TouchPortalPlugin {
     /**
      * State and Event definition example
@@ -47,7 +47,7 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
      *
      * @param text String
      */
-    @Action(description = "Long Description of Dummy Action with Data", format = "Set text to {$text$}", categoryId = "BaseCategory")
+    @Action(description = "Long Description of Dummy Action with Data", categoryId = "BaseCategory")
     private void dummyWithData(@Data String text) {
         System.out.println("Action dummyWithData received: " + text);
     }
@@ -66,7 +66,7 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
         /**
          * Category definition example
          */
-        @Category(name = "Touch Portal Plugin Test", imagePath = "images/icon-24.png")
+        @Category()
         BaseCategory
     }
 }
