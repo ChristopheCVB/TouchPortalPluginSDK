@@ -92,6 +92,16 @@ public abstract class TouchPortalPlugin {
     private Thread listenerThread;
 
     /**
+     * Constructor
+     *
+     * @param args String[]
+     */
+    protected TouchPortalPlugin(String[] args) {
+        this.touchPortalPluginFolder = args[1].trim();
+        this.pluginClass = this.getClass();
+    }
+
+    /**
      * Create a new Listener Thread
      *
      * @return Thread listenerThread
@@ -100,6 +110,9 @@ public abstract class TouchPortalPlugin {
         return new Thread(() -> {
             while (true) {
                 try {
+                    if (TouchPortalPlugin.this.touchPortalSocket == null) {
+                        throw new IOException("Can't Access Socket");
+                    }
                     if (TouchPortalPlugin.this.bufferedReader == null) {
                         TouchPortalPlugin.this.bufferedReader = new BufferedReader(new InputStreamReader(TouchPortalPlugin.this.touchPortalSocket.getInputStream()));
                     }
@@ -124,7 +137,6 @@ public abstract class TouchPortalPlugin {
                     }
                 }
                 catch (IOException ioException) {
-                    ioException.printStackTrace();
                     TouchPortalPlugin.this.close(ioException);
                     break;
                 }
@@ -133,16 +145,6 @@ public abstract class TouchPortalPlugin {
                 }
             }
         });
-    }
-
-    /**
-     * Constructor
-     *
-     * @param args String[]
-     */
-    protected TouchPortalPlugin(String[] args) {
-        this.touchPortalPluginFolder = args[1].trim();
-        this.pluginClass = this.getClass();
     }
 
     /**
@@ -183,21 +185,22 @@ public abstract class TouchPortalPlugin {
             ioException.printStackTrace();
         }
 
+
+        System.out.println("closing");
+        if (this.printWriter != null) {
+            this.printWriter.close();
+            this.printWriter = null;
+        }
+        if (this.bufferedReader != null) {
+            try {
+                this.bufferedReader.close();
+            }
+            catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+            this.bufferedReader = null;
+        }
         if (this.touchPortalSocket != null) {
-            System.out.println("closing");
-            if (this.printWriter != null) {
-                this.printWriter.close();
-                this.printWriter = null;
-            }
-            if (this.bufferedReader != null) {
-                try {
-                    this.bufferedReader.close();
-                }
-                catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
-                this.bufferedReader = null;
-            }
             try {
                 this.touchPortalSocket.close();
             }
@@ -205,12 +208,13 @@ public abstract class TouchPortalPlugin {
                 ioException.printStackTrace();
             }
             this.touchPortalSocket = null;
-            this.listenerThread = null;
 
             if (this.touchPortalPluginListener != null) {
                 this.touchPortalPluginListener.onDisconnect(exception);
             }
         }
+
+        this.listenerThread = null;
     }
 
     /**
@@ -228,11 +232,7 @@ public abstract class TouchPortalPlugin {
                 this.touchPortalSocket = new Socket(InetAddress.getByName(TouchPortalPlugin.SOCKET_IP), TouchPortalPlugin.SOCKET_PORT);
                 connectedAndPaired = this.isConnected() && this.sendPair();
             }
-            catch (IOException e) {
-                e.printStackTrace();
-                if (this.touchPortalPluginListener != null) {
-                    this.touchPortalPluginListener.onDisconnect(e);
-                }
+            catch (IOException ignored) {
             }
         }
 
