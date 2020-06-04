@@ -501,7 +501,7 @@ public abstract class TouchPortalPlugin {
      *
      * @throws IOException ioException
      */
-    protected void storeProperties() throws IOException {
+    public void storeProperties() throws IOException {
         if (this.properties != null) {
             this.properties.store(new FileOutputStream(this.propertiesFile), "");
         }
