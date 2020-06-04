@@ -488,6 +488,15 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Get the Properties File
+     *
+     * @return File propertiesFile
+     */
+    protected File getPropertiesFile() {
+        return this.propertiesFile;
+    }
+
+    /**
      * Interface Definition for Callbacks
      */
     public interface TouchPortalPluginListener {
