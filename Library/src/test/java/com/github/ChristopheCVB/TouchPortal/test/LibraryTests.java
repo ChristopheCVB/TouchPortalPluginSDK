@@ -105,10 +105,10 @@ public class LibraryTests {
     }
 
     @Test
-    public void testConnectTwice() {
+    public void testMultipleConnect() {
         // A connectThenPairAndListen is already done in the @Before
-        boolean connectedPairedAndListening = this.touchPortalPluginTest.connectThenPairAndListen(null);
-        assertTrue(connectedPairedAndListening);
+        assertTrue(this.touchPortalPluginTest.connectThenPairAndListen(null));
+        assertTrue(this.touchPortalPluginTest.connectThenPairAndListen(this.touchPortalPluginListener));
     }
 
     @Test
@@ -163,7 +163,18 @@ public class LibraryTests {
 
     @Test
     public void testReceiveAction() throws JSONException, IOException, InterruptedException {
-        this.touchPortalPluginTest.connectThenPairAndListen(this.touchPortalPluginListener);
+        JSONObject jsonMessage = new JSONObject();
+        jsonMessage.put(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.put(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+        Thread.sleep(10);
+        assertTrue(this.touchPortalPluginTest.isConnected());
+    }
+
+    @Test
+    public void testReceiveActionNoListener() throws JSONException, IOException, InterruptedException {
+        this.touchPortalPluginTest.connectThenPairAndListen(null);
         JSONObject jsonMessage = new JSONObject();
         jsonMessage.put(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.put(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
@@ -175,7 +186,6 @@ public class LibraryTests {
 
     @Test
     public void testReceiveBadPlugin() throws JSONException, IOException, InterruptedException {
-        this.touchPortalPluginTest.connectThenPairAndListen(this.touchPortalPluginListener);
         JSONObject jsonMessage = new JSONObject();
         jsonMessage.put(ReceivedMessageHelper.PLUGIN_ID, "falsePluginId");
         jsonMessage.put(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
@@ -187,7 +197,6 @@ public class LibraryTests {
 
     @Test
     public void testReceiveClose() throws JSONException, IOException, InterruptedException {
-        this.touchPortalPluginTest.connectThenPairAndListen(this.touchPortalPluginListener);
         JSONObject jsonMessage = new JSONObject();
         jsonMessage.put(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.put(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_CLOSE_PLUGIN);
