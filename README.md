@@ -14,7 +14,7 @@ Once you have cloned this project, you can run the `gradlew javaDoc` and browse 
 
 ## Releases
 
-Last version is 2.2.0
+Last version is 3.0.0
 
 Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 
