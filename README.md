@@ -1,5 +1,7 @@
 # [Touch Portal](https://www.touch-portal.com/) Plugin SDK
 
+![Touch Portal Plugin SDK](https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/resources/TP%20Plugin%20SDK%20Logo.png)
+
 This Project is an SDK to create a Touch Portal Plugin using Java and Gradle
 
 The Touch Portal Plugin documentation can be found [here](https://www.touch-portal.com/sdk)
