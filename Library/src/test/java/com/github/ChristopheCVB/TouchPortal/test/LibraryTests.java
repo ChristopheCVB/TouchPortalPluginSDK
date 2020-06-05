@@ -81,9 +81,15 @@ public class LibraryTests {
 
     @After
     public void close() throws IOException {
-        this.touchPortalPluginTest.close(null);
-        this.serverSocketClient.close();
-        this.serverSocket.close();
+        if (this.touchPortalPluginTest != null) {
+            this.touchPortalPluginTest.close(null);
+        }
+        if (this.serverSocketClient != null) {
+            this.serverSocketClient.close();
+        }
+        if (this.serverSocket != null) {
+            this.serverSocket.close();
+        }
     }
 
     @Test
