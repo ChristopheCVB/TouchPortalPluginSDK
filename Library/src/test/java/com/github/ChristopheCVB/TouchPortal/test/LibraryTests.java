@@ -252,7 +252,7 @@ public class LibraryTests {
 
     @Test
     public void testEntryTP() throws IOException, JSONException {
-        File testGeneratedResourcesDirectory = new File("build\\generated\\sources\\annotationProcessor\\java\\test\\resources");
+        File testGeneratedResourcesDirectory = new File("build/generated/sources/annotationProcessor/java/test/resources");
 
         JSONObject entry = new JSONObject(new String(Files.readAllBytes(Paths.get(new File(testGeneratedResourcesDirectory.getAbsolutePath() + "/entry.tp").getAbsolutePath()))));
 
