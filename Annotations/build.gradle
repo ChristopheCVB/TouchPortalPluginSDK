@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
 }
 
-def versionMajor = 1
+def versionMajor = 3
 def versionMinor = 0
 def versionPatch = 0
 
