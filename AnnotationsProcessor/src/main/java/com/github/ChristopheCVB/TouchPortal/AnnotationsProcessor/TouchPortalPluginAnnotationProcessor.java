@@ -248,17 +248,17 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
             jsonAction.put(ActionHelper.FORMAT, action.format());
         }
 
+        JSONArray jsonActionData = new JSONArray();
         Set<? extends Element> dataElements = roundEnv.getElementsAnnotatedWith(Data.class);
         for (Element dataElement : dataElements) {
             Element enclosingElement = dataElement.getEnclosingElement();
-            JSONArray jsonActionData = new JSONArray();
             if (actionElement.equals(enclosingElement)) {
                 Pair<JSONObject, TypeSpec.Builder> actionDataResult = this.processActionData(roundEnv, pluginElement, plugin, categoryElement, category, actionElement, action, jsonAction, dataElement);
                 jsonActionData.put(actionDataResult.first);
                 actionTypeSpecBuilder.addType(actionDataResult.second.build());
             }
-            jsonAction.put(ActionHelper.DATA, jsonActionData);
         }
+        jsonAction.put(ActionHelper.DATA, jsonActionData);
 
         return Pair.create(jsonAction, actionTypeSpecBuilder);
     }
