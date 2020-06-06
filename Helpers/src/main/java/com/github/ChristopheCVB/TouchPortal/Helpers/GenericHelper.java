@@ -26,6 +26,11 @@ import javax.lang.model.element.Element;
  * Touch Portal Plugin Generic Helper
  */
 public class GenericHelper {
+    public static final String TP_TYPE_TEXT = "text";
+    public static final String TP_TYPE_NUMBER = "number";
+    public static final String TP_TYPE_SWITCH = "switch";
+    public static final String TP_TYPE_CHOICE = "choice";
+
     protected static final String ID = "id";
     protected static final String NAME = "name";
     protected static final String TYPE = "type";
@@ -58,20 +63,20 @@ public class GenericHelper {
             case "java.lang.Long":
             case "java.lang.Float":
             case "java.lang.Double":
-                tpType = "Number";
+                tpType = GenericHelper.TP_TYPE_NUMBER;
                 break;
 
             case "boolean":
             case "java.lang.Boolean":
-                tpType = "switch";
+                tpType = GenericHelper.TP_TYPE_SWITCH;
                 break;
 
             default:
                 if (elementType.endsWith("[]")) {
-                    tpType = "choice";
+                    tpType = GenericHelper.TP_TYPE_CHOICE;
                 }
                 else {
-                    tpType = "text";
+                    tpType = GenericHelper.TP_TYPE_TEXT;
                 }
                 break;
         }

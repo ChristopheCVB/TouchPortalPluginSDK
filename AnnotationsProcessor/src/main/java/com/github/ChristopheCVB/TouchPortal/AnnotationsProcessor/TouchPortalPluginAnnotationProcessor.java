@@ -362,7 +362,24 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         String tpType = GenericHelper.getTouchPortalType(dataElement);
         jsonData.put(DataHelper.TYPE, tpType);
         jsonData.put(DataHelper.LABEL, DataHelper.getActionDataLabel(dataElement, data));
-        jsonData.put(DataHelper.DEFAULT, data.defaultValue());
+        switch (tpType) {
+            case GenericHelper.TP_TYPE_NUMBER:
+                double defaultValue = 0;
+                try {
+                    defaultValue = Double.parseDouble(data.defaultValue());
+                }
+                catch (NumberFormatException ignored) {}
+                jsonData.put(DataHelper.DEFAULT, defaultValue);
+                break;
+
+            case GenericHelper.TP_TYPE_SWITCH:
+                jsonData.put(DataHelper.DEFAULT, data.defaultValue().equals("true"));
+                break;
+
+            default:
+                jsonData.put(DataHelper.DEFAULT, data.defaultValue());
+                break;
+        }
         if (tpType.equals(DataHelper.TYPE_CHOICE)) {
             jsonData.put(DataHelper.VALUE_CHOICES, data.valueChoices());
         }
