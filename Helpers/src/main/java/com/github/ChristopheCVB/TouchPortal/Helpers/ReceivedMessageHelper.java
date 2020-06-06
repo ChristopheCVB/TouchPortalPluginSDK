@@ -147,6 +147,28 @@ public class ReceivedMessageHelper {
     }
 
     /**
+     * Retrieve an Action Data Value from a received Message as a Double
+     *
+     * @param jsonMessage  JSONObject
+     * @param actionDataId String
+     * @return Double dataValueDouble
+     */
+    public static Double getActionDataValueDouble(JSONObject jsonMessage, String actionDataId) {
+        return Double.valueOf(ReceivedMessageHelper.getActionDataValue(jsonMessage, actionDataId));
+    }
+
+    /**
+     * Retrieve an Action Data Value from a received Message as an Integer
+     *
+     * @param jsonMessage  JSONObject
+     * @param actionDataId String
+     * @return Double dataValueInteger
+     */
+    public static Integer getActionDataValueInteger(JSONObject jsonMessage, String actionDataId) {
+        return getActionDataValueDouble(jsonMessage, actionDataId).intValue();
+    }
+
+    /**
      * Whether the received Message concerns the Plugin Class
      *
      * @param jsonMessage JSONObject
