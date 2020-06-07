@@ -57,7 +57,9 @@ public @interface Data {
     /**
      * Data defaultValue
      * <p>
-     * Default is ""
+     * 0 for number
+     * false for switch
+     * "" (empty String) otherwise
      * </p>
      *
      * @return String defaultValue
