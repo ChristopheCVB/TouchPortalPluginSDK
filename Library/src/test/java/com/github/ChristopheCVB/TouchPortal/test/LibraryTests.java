@@ -143,22 +143,41 @@ public class LibraryTests {
     @Test
     public void testSend() {
         // Send State Update by ID from Constants
-        assertTrue(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "New Value"));
+        assertTrue(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "New Value 01"));
 
         // Send Choice Update by ID from Constants
-        assertTrue(this.touchPortalPluginTest.sendChoiceUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, new String[]{"New Value"}));
+        assertTrue(this.touchPortalPluginTest.sendChoiceUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, new String[]{"New Value 02"}));
 
         // Send Specific Choice Update by ID from Constants
-        assertTrue(this.touchPortalPluginTest.sendSpecificChoiceUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "instanceId", new String[]{"New Value"}));
+        assertTrue(this.touchPortalPluginTest.sendSpecificChoiceUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "instanceId", new String[]{"New Value 03"}));
 
         // Send State Update by Reflection Generated ID
-        assertTrue(this.touchPortalPluginTest.sendStateUpdate("BaseCategory", "customState", "New Value"));
+        assertTrue(this.touchPortalPluginTest.sendStateUpdate("BaseCategory", "customState", "New Value 04"));
 
         // Send Choice Update by Reflection Generated ID
-        assertTrue(this.touchPortalPluginTest.sendChoiceUpdate("BaseCategory", "customState", new String[]{"New Value"}));
+        assertTrue(this.touchPortalPluginTest.sendChoiceUpdate("BaseCategory", "customState", new String[]{"New Value 05"}));
 
         // Send Specific Choice Update by Reflection Generated ID
-        assertTrue(this.touchPortalPluginTest.sendSpecificChoiceUpdate("BaseCategory", "customState", "instanceId", new String[]{"New Value"}));
+        assertTrue(this.touchPortalPluginTest.sendSpecificChoiceUpdate("BaseCategory", "customState", "instanceId", new String[]{"New Value 06"}));
+    }
+
+    @Test
+    public void testSendFalseStates() {
+        assertFalse(this.touchPortalPluginTest.sendStateUpdate(null, null));
+        assertFalse(this.touchPortalPluginTest.sendStateUpdate("", ""));
+        assertFalse(this.touchPortalPluginTest.sendStateUpdate(null, ""));
+        assertFalse(this.touchPortalPluginTest.sendStateUpdate("", null));
+        assertFalse(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, null));
+        assertFalse(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, ""));
+        assertFalse(this.touchPortalPluginTest.sendStateUpdate(null, "Not Null"));
+    }
+
+    @Test
+    public void testLastStateValue() {
+        String stateValue = System.currentTimeMillis() + "";
+        assertTrue(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, stateValue));
+        assertFalse(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, stateValue));
+        assertEquals(stateValue, this.touchPortalPluginTest.getLastStateValue(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID));
     }
 
     @Test
@@ -341,5 +360,13 @@ public class LibraryTests {
     @Test(expected = FileNotFoundException.class)
     public void testPropertiesFail() throws IOException {
         this.touchPortalPluginTest.loadProperties("doesNot.exists");
+    }
+
+    @Test
+    public void testPropertiesAccess() {
+        // No Loaded Properties File
+        this.touchPortalPluginTest.removeProperty("non existent");
+        this.touchPortalPluginTest.getProperty("non existent");
+        this.touchPortalPluginTest.setProperty("non existent", "value");
     }
 }

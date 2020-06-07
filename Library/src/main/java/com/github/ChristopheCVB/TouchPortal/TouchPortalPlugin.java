@@ -32,6 +32,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Properties;
 
 /**
@@ -90,6 +91,10 @@ public abstract class TouchPortalPlugin {
      * Thread that continuously reads messages coming from Touch Portal Plugin System
      */
     private Thread listenerThread;
+    /**
+     * Last sent States Values
+     */
+    private final HashMap<String, String> currentStates = new HashMap<>();
 
     /**
      * Constructor
@@ -380,15 +385,26 @@ public abstract class TouchPortalPlugin {
      */
     public boolean sendStateUpdate(String stateId, String value) {
         boolean sent = false;
-        try {
-            JSONObject stateUpdateMessage = new JSONObject()
-                    .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE)
-                    .put(SentMessageHelper.ID, stateId)
-                    .put(SentMessageHelper.VALUE, value);
-            sent = this.send(stateUpdateMessage);
-            System.out.println("Update State [" + stateId + "] Sent [" + sent + "]");
+        boolean isLastValue = false;
+        if (stateId != null && !stateId.isEmpty() && value != null && !value.isEmpty()) {
+            if (this.currentStates.containsKey(stateId) && this.currentStates.get(stateId).equals(value)) {
+                isLastValue = true;
+            }
+            else {
+                try {
+                    JSONObject stateUpdateMessage = new JSONObject()
+                            .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE)
+                            .put(SentMessageHelper.ID, stateId)
+                            .put(SentMessageHelper.VALUE, value);
+                    sent = this.send(stateUpdateMessage);
+                    if (sent) {
+                        this.currentStates.put(stateId, value);
+                    }
+                }
+                catch (JSONException ignored) {}
+            }
         }
-        catch (JSONException ignored) {}
+        System.out.println("Update State [" + stateId + "] to Value [" + value + "] Sent [" + sent + "] Is Last Value [" + isLastValue + "]");
 
         return sent;
     }
@@ -502,6 +518,16 @@ public abstract class TouchPortalPlugin {
      */
     public File getPropertiesFile() {
         return this.propertiesFile;
+    }
+
+    /**
+     * Get the Last Sent State Value
+     *
+     * @param stateId String
+     * @return String lastStateValue
+     */
+    public String getLastStateValue(String stateId) {
+        return this.currentStates.get(stateId);
     }
 
     /**
