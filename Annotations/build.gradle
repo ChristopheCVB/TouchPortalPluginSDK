@@ -4,7 +4,7 @@ plugins {
 
 def versionMajor = 3
 def versionMinor = 0
-def versionPatch = 0
+def versionPatch = 1
 
 group 'com.github.ChristopheCVB.TouchPortal.Annotations'
 version "${versionMajor}.${versionMinor}.${versionPatch}"
