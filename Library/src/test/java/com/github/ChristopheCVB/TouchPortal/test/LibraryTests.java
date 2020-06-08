@@ -78,7 +78,7 @@ public class LibraryTests {
             }
         }).start();
         try {
-            Thread.sleep(50);
+            Thread.sleep(100);
         }
         catch (InterruptedException ignored) {}
     }
