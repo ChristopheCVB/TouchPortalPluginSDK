@@ -1,0 +1,96 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+    id "org.jetbrains.kotlin.kapt" version "1.3.72"
+    id 'java'
+}
+
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+
+def mainClassSimpleName = 'TouchPortalKotlinPlugin'
+def mainClassPackage = 'com.github.ChristopheCVB.TouchPortal.sample'
+group mainClassPackage
+version "${versionMajor}.${versionMinor}.${versionPatch}"
+
+dependencies {
+    compile project(':Library')
+    compile project(':Annotations')
+    compile project(':Helpers')
+
+    kapt project(':AnnotationsProcessor')
+
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+compileJava {
+    options.compilerArgs.add('-parameters')
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': "${mainClassSimpleName}",
+                'Implementation-Version': "${project.version}",
+                'Main-Class': "${mainClassPackage}.${mainClassSimpleName}"
+    }
+    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+task copyResources(type: Copy) {
+    from(file("$buildDir/resources/main/"))
+    into("$buildDir/plugin/${mainClassSimpleName}/")
+
+    doLast {
+        println 'Resources Copied into plugin directory'
+    }
+}
+
+task copyJar(type: Copy) {
+    dependsOn jar
+    from(file("$buildDir/libs/"))
+    into("$buildDir/plugin/${mainClassSimpleName}/")
+    rename {
+        "${mainClassSimpleName}.jar"
+    }
+
+    doLast {
+        println 'Jar Copied into plugin directory'
+    }
+}
+
+task copyGeneratedResources(type: Copy) {
+    dependsOn copyJar
+    from(file("$buildDir/generated/source/kapt/main/resources/"))
+    into("$buildDir/plugin/${mainClassSimpleName}/")
+
+    doLast {
+        println 'Generated Resources Copied into plugin directory'
+    }
+}
+
+task packagePlugin(type: Zip) {
+    dependsOn copyResources, copyGeneratedResources, copyJar
+    group 'Touch Portal - Plugin'
+    description 'Package the Project into a TPP'
+
+    archiveFileName = "${mainClassSimpleName}.tpp"
+    destinationDirectory = file("$buildDir/plugin")
+    from "$buildDir/plugin/"
+    exclude "*.tpp"
+    includeEmptyDirs = false
+
+    doLast {
+        println 'Plugin Packaged'
+    }
+}
