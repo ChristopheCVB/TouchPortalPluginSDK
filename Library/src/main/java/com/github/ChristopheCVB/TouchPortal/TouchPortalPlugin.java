@@ -428,13 +428,23 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
-     * Loads a Properties file
+     * Get a Resource File that is stored in the Plugin directory
      *
-     * @param propertiesFileRelativePath String - Relative path of the properties File
+     * @param resourcePluginFilePath String
+     * @return File resourceFile
+     */
+    public File getResourceFile(String resourcePluginFilePath) {
+        return Paths.get(this.touchPortalPluginFolder + this.pluginClass.getSimpleName() + "/" + resourcePluginFilePath).toFile();
+    }
+
+    /**
+     * Loads a Properties file from the Plugin directory
+     *
+     * @param propertiesPluginFilePath String - Relative path of the properties File
      * @throws IOException ioException
      */
-    public void loadProperties(String propertiesFileRelativePath) throws IOException {
-        this.propertiesFile = Paths.get(this.touchPortalPluginFolder + this.pluginClass.getSimpleName() + "/" + propertiesFileRelativePath).toFile();
+    public void loadProperties(String propertiesPluginFilePath) throws IOException {
+        this.propertiesFile = this.getResourceFile(propertiesPluginFilePath);
         this.loadProperties();
     }
 
