@@ -34,6 +34,8 @@ import java.net.Socket;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This is the class you need to extend in order to create a Touch Portal Plugin
@@ -92,9 +94,13 @@ public abstract class TouchPortalPlugin {
      */
     private Thread listenerThread;
     /**
-     * Last sent States Values
+     * Last sent States HashMap (Key, Value)
      */
     private final HashMap<String, String> currentStates = new HashMap<>();
+    /**
+     * Executor Service for callbacks
+     */
+    private final ExecutorService callbacksExecutor = Executors.newFixedThreadPool(5);
 
     /**
      * Constructor
@@ -135,7 +141,7 @@ public abstract class TouchPortalPlugin {
                                 System.out.println("Message Received");
                                 // TODO: Automatically Call Actions Methods (This require to Annotate an Interface that would be passed to the SDK)
                                 if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
-                                    TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage);
+                                    TouchPortalPlugin.this.callbacksExecutor.submit(() -> TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage));
                                 }
                             }
                         }
@@ -189,6 +195,9 @@ public abstract class TouchPortalPlugin {
 
 
         System.out.println("closing");
+        if (!this.callbacksExecutor.isShutdown()) {
+            this.callbacksExecutor.shutdownNow();
+        }
         if (this.printWriter != null) {
             this.printWriter.close();
             this.printWriter = null;
