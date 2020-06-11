@@ -30,6 +30,7 @@ import org.json.JSONObject;
 public class ReceivedMessageHelper {
     public static final String TYPE = GenericHelper.TYPE;
     public static final String TYPE_ACTION = "action";
+    public static final String TYPE_INFO = "info";
     public static final String TYPE_LIST_CHANGE = "listChange";
     public static final String TYPE_CLOSE_PLUGIN = "closePlugin";
     public static final String PLUGIN_ID = "pluginId";
@@ -158,14 +159,14 @@ public class ReceivedMessageHelper {
     }
 
     /**
-     * Retrieve an Action Data Value from a received Message as an Integer
+     * Retrieve an Action Data Value from a received Message as a Long
      *
      * @param jsonMessage  JSONObject
      * @param actionDataId String
-     * @return Double dataValueInteger
+     * @return Double dataValueLong
      */
-    public static Integer getActionDataValueInteger(JSONObject jsonMessage, String actionDataId) {
-        return getActionDataValueDouble(jsonMessage, actionDataId).intValue();
+    public static Long getActionDataValueLong(JSONObject jsonMessage, String actionDataId) {
+        return getActionDataValueDouble(jsonMessage, actionDataId).longValue();
     }
 
     /**
@@ -176,16 +177,7 @@ public class ReceivedMessageHelper {
      * @return boolean isMessageForPlugin
      */
     public static boolean isMessageForPlugin(JSONObject jsonMessage, Class<?> pluginClass) {
-        boolean isMessageForPlugin = false;
-
-        try {
-            isMessageForPlugin = jsonMessage.getString(ReceivedMessageHelper.PLUGIN_ID).equals(pluginClass.getName());
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return isMessageForPlugin;
+        return ReceivedMessageHelper.isMessageForPlugin(jsonMessage, pluginClass.getName());
     }
 
     /**
@@ -196,15 +188,6 @@ public class ReceivedMessageHelper {
      * @return boolean isMessageForPlugin
      */
     public static boolean isMessageForPlugin(JSONObject jsonMessage, String pluginId) {
-        boolean isMessageForPlugin = false;
-
-        try {
-            isMessageForPlugin = jsonMessage.getString(ReceivedMessageHelper.PLUGIN_ID).equals(pluginId);
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return isMessageForPlugin;
+        return jsonMessage.optString(ReceivedMessageHelper.PLUGIN_ID).equals(pluginId);
     }
 }

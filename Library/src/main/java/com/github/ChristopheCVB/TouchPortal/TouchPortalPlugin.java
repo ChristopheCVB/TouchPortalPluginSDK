@@ -119,6 +119,7 @@ public abstract class TouchPortalPlugin {
      */
     private Thread createListenerThread() {
         return new Thread(() -> {
+            socketReaderLoop:
             while (true) {
                 try {
                     if (TouchPortalPlugin.this.touchPortalSocket == null) {
@@ -130,20 +131,26 @@ public abstract class TouchPortalPlugin {
                     String socketMessage = TouchPortalPlugin.this.bufferedReader.readLine();
                     if (socketMessage != null && !socketMessage.isEmpty()) {
                         JSONObject jsonMessage = new JSONObject(socketMessage);
-                        if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, TouchPortalPlugin.this.pluginClass)) {
-                            String messageType = ReceivedMessageHelper.getType(jsonMessage);
-                            if (ReceivedMessageHelper.TYPE_CLOSE_PLUGIN.equals(messageType)) {
+                        String messageType = ReceivedMessageHelper.getType(jsonMessage);
+                        switch (messageType) {
+                            case ReceivedMessageHelper.TYPE_CLOSE_PLUGIN:
                                 System.out.println("Close Message Received");
                                 TouchPortalPlugin.this.close(null);
+                                break socketReaderLoop;
+
+                            case ReceivedMessageHelper.TYPE_INFO:
+                                // TODO: Handle Receiving type="info" message
                                 break;
-                            }
-                            else {
-                                System.out.println("Message Received");
-                                // TODO: Automatically Call Actions Methods (This require to Annotate an Interface that would be passed to the SDK)
-                                if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
-                                    TouchPortalPlugin.this.callbacksExecutor.submit(() -> TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage));
+
+                            default:
+                                if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, TouchPortalPlugin.this.pluginClass)) {
+                                    System.out.println("Message Received");
+                                    // TODO: Automatically Call Actions Methods (This require to Annotate an Interface that would be passed to the SDK)
+                                    if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
+                                        TouchPortalPlugin.this.callbacksExecutor.submit(() -> TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage));
+                                    }
                                 }
-                            }
+                                break;
                         }
                     }
                 }
