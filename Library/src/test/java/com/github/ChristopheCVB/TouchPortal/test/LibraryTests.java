@@ -22,6 +22,7 @@ package com.github.ChristopheCVB.TouchPortal.test;
 
 import com.github.ChristopheCVB.TouchPortal.Helpers.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
+import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -222,6 +223,28 @@ public class LibraryTests {
         out.println(jsonMessage.toString());
         Thread.sleep(10);
         assertTrue(this.touchPortalPluginTest.isConnected());
+    }
+
+    @Test
+    public void testReceiveInfo() throws JSONException, IOException, InterruptedException {
+        JSONObject jsonMessage = new JSONObject();
+        jsonMessage.put(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_INFO);
+        long sdkVersion = 2;
+        long tpVersionCode = 202000;
+        String tpVersionString = "2.2.000";
+        jsonMessage.put(TPInfo.SDK_VERSION, sdkVersion);
+        jsonMessage.put(TPInfo.TP_VERSION_CODE, tpVersionCode);
+        jsonMessage.put(TPInfo.TP_VERSION_STRING, tpVersionString);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+        Thread.sleep(10);
+        assertTrue(this.touchPortalPluginTest.isConnected());
+
+        TPInfo tpInfo = this.touchPortalPluginTest.getTPInfo();
+        assertNotNull(tpInfo);
+        assertEquals(sdkVersion, tpInfo.sdkVersion);
+        assertEquals(tpVersionCode, tpInfo.tpVersionCode);
+        assertEquals(tpVersionString, tpInfo.tpVersionString);
     }
 
     @Test

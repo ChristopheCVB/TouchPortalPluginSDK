@@ -24,6 +24,7 @@ import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.ReceivedMessageHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.SentMessageHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.StateHelper;
+import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -103,6 +104,11 @@ public abstract class TouchPortalPlugin {
     private final ExecutorService callbacksExecutor = Executors.newFixedThreadPool(5);
 
     /**
+     * Info sent by the Touch Portal Plugin System
+     */
+    private TPInfo tpInfo;
+
+    /**
      * Constructor
      *
      * @param args String[]
@@ -139,7 +145,7 @@ public abstract class TouchPortalPlugin {
                                 break socketReaderLoop;
 
                             case ReceivedMessageHelper.TYPE_INFO:
-                                // TODO: Handle Receiving type="info" message
+                                TouchPortalPlugin.this.tpInfo = TPInfo.from(jsonMessage);
                                 break;
 
                             default:
@@ -184,6 +190,15 @@ public abstract class TouchPortalPlugin {
         catch (JSONException ignored) {
         }
         return paired;
+    }
+
+    /**
+     * Get TPInfo
+     *
+     * @return TPInfo tpInfo
+     */
+    public TPInfo getTPInfo() {
+        return this.tpInfo;
     }
 
     /**
