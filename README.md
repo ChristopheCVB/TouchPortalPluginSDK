@@ -31,7 +31,7 @@ Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
                 // Initialize the Plugin
                 MyTouchPortalPlugin myTouchPortalPlugin = new MyTouchPortalPlugin(args);
                 // Initiate the connection with the Touch Portal Plugin System
-                boolean connectedPairedAndListening = myTouchPortalPlugin.connectThenPairAndListen(touchPortalPluginExample);
+                boolean connectedPairedAndListening = myTouchPortalPlugin.connectThenPairAndListen(myTouchPortalPlugin);
             }
         }
     }
