@@ -170,6 +170,17 @@ public class ReceivedMessageHelper {
     }
 
     /**
+     * Retrieve an Action Data Value from a received Message as a Boolean
+     *
+     * @param jsonMessage  JSONObject
+     * @param actionDataId String
+     * @return Double dataValueLong
+     */
+    public static Boolean getActionDataValueBoolean(JSONObject jsonMessage, String actionDataId) {
+        return getActionDataValue(jsonMessage, actionDataId).equals("On");
+    }
+
+    /**
      * Whether the received Message concerns the Plugin Class
      *
      * @param jsonMessage JSONObject

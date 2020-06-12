@@ -21,7 +21,6 @@
 package com.github.ChristopheCVB.TouchPortal.sample;
 
 import com.github.ChristopheCVB.TouchPortal.Annotations.*;
-import com.github.ChristopheCVB.TouchPortal.Helpers.ActionHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.ReceivedMessageHelper;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
@@ -96,6 +95,11 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
         System.out.println("Action dummyWithoutData received [" + jsonAction + "]");
     }
 
+    @Action(description = "Long Description of Dummy Switch Action", format = "Switch to {$isOn$}", categoryId = "BaseCategory")
+    private void dummySwitchAction(@Data(defaultValue = "false") boolean isOn) {
+        System.out.println("Action dummySwitchAction received: " + isOn);
+    }
+
     @Override
     public void onDisconnect(Exception exception) {
         // Socket connection is lost or plugin has received close message
@@ -110,15 +114,22 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
         if (ReceivedMessageHelper.isAnAction(jsonMessage)) {
             // Get the Action ID
             String receivedActionId = ReceivedMessageHelper.getActionId(jsonMessage);
-            if (TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.ID.equals(receivedActionId)) {
-                // Example with IDs from Generated Constants Class
-                // Manually call the action method
-                this.dummyWithData(ReceivedMessageHelper.getActionDataValue(jsonMessage, TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.Text.ID));
-            }
-            else if (ActionHelper.getActionId(TouchPortalPluginExample.class, "dummyWithoutData").equals(receivedActionId)) {
-                // Example with IDs from Helper
-                // Manually call the action method
-                this.dummyWithoutData(jsonMessage);
+            switch (receivedActionId) {
+                case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.ID:
+                    // Example with IDs from Generated Constants Class
+                    // Manually call the action method
+                    this.dummyWithData(ReceivedMessageHelper.getActionDataValue(jsonMessage, TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.Text.ID));
+                    break;
+
+                case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithoutData.ID:
+                    // Example with IDs from Helper
+                    // Manually call the action method
+                    this.dummyWithoutData(jsonMessage);
+                    break;
+
+                case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummySwitchAction.ID:
+                    this.dummySwitchAction(ReceivedMessageHelper.getActionDataValueBoolean(jsonMessage, TouchPortalPluginExampleConstants.BaseCategory.Actions.DummySwitchAction.IsOn.ID));
+                    break;
             }
         }
     }
