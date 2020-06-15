@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-def versionMajor = 1
+def versionMajor = 4
 def versionMinor = 0
 def versionPatch = 0
 

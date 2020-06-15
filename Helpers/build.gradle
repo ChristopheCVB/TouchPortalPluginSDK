@@ -2,9 +2,9 @@ plugins {
     id 'java-library'
 }
 
-def versionMajor = 3
+def versionMajor = 4
 def versionMinor = 0
-def versionPatch = 1
+def versionPatch = 0
 
 group 'com.github.ChristopheCVB.TouchPortal.Helpers'
 version "${versionMajor}.${versionMinor}.${versionPatch}"
