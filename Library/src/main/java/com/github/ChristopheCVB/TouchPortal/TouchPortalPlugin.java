@@ -137,7 +137,7 @@ public abstract class TouchPortalPlugin {
                     }
                     String socketMessage = TouchPortalPlugin.this.bufferedReader.readLine();
                     if (socketMessage != null && !socketMessage.isEmpty()) {
-                        JsonObject jsonMessage = new JsonParser().parse(socketMessage).getAsJsonObject();
+                        JsonObject jsonMessage = JsonParser.parseString(socketMessage).getAsJsonObject();
                         String messageType = ReceivedMessageHelper.getType(jsonMessage);
                         if (messageType != null) {
                             switch (messageType) {

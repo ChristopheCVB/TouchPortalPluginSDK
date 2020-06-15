@@ -306,7 +306,7 @@ public class LibraryTests {
     public void testEntryTP() throws IOException {
         File testGeneratedResourcesDirectory = new File("build/generated/sources/annotationProcessor/java/test/resources");
 
-        JsonObject entry = new JsonParser().parse(new String(Files.readAllBytes(Paths.get(new File(testGeneratedResourcesDirectory.getAbsolutePath() + "/entry.tp").getAbsolutePath())))).getAsJsonObject();
+        JsonObject entry = JsonParser.parseString(new String(Files.readAllBytes(Paths.get(new File(testGeneratedResourcesDirectory.getAbsolutePath() + "/entry.tp").getAbsolutePath())))).getAsJsonObject();
 
         // Plugin
         assertEquals(TouchPortalPluginTestConstants.ID, entry.get(PluginHelper.ID).getAsString());
