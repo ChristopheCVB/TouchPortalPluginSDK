@@ -4,7 +4,7 @@
 
 ![Java CI with Gradle](https://github.com/ChristopheCVB/TouchPortalPluginSDK/workflows/Java%20CI%20with%20Gradle/badge.svg)
 
-This Project is an SDK to create a Touch Portal Plugin using Java and Gradle
+This Project is an SDK to create a Touch Portal Plugin using Java or Kotlin and Gradle
 
 The Touch Portal Plugin documentation can be found [here](https://www.touch-portal.com/sdk)
 
@@ -14,7 +14,7 @@ Once you have cloned this project, you can run the `gradlew javaDoc` and browse 
 
 ## Releases
 
-Last version is 3.0.1
+Last version is 4.0.0
 
 Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 
