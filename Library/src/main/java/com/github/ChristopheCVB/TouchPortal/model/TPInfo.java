@@ -1,6 +1,6 @@
 package com.github.ChristopheCVB.TouchPortal.model;
 
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
 
 public class TPInfo {
     public static final String TP_VERSION_STRING = "tpVersionString";
@@ -11,12 +11,12 @@ public class TPInfo {
     public long tpVersionCode;
     public long sdkVersion;
 
-    public static TPInfo from(JSONObject jsonInfoMessage) {
+    public static TPInfo from(JsonObject jsonInfoMessage) {
         TPInfo tpInfo = new TPInfo();
 
-        tpInfo.tpVersionString = jsonInfoMessage.optString(TPInfo.TP_VERSION_STRING);
-        tpInfo.tpVersionCode = jsonInfoMessage.optLong(TPInfo.TP_VERSION_CODE);
-        tpInfo.sdkVersion = jsonInfoMessage.optLong(TPInfo.SDK_VERSION);
+        tpInfo.tpVersionString = jsonInfoMessage.has(TPInfo.TP_VERSION_STRING) ? jsonInfoMessage.get(TPInfo.TP_VERSION_STRING).getAsString() : null;
+        tpInfo.tpVersionCode = jsonInfoMessage.has(TPInfo.TP_VERSION_CODE) ? jsonInfoMessage.get(TPInfo.TP_VERSION_CODE).getAsLong() : -1;
+        tpInfo.sdkVersion = jsonInfoMessage.has(TPInfo.SDK_VERSION) ? jsonInfoMessage.get(TPInfo.SDK_VERSION).getAsLong() : -1;
 
         return tpInfo;
     }

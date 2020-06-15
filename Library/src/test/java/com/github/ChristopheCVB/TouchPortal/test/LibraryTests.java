@@ -23,9 +23,9 @@ package com.github.ChristopheCVB.TouchPortal.test;
 import com.github.ChristopheCVB.TouchPortal.Helpers.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class LibraryTests {
         }
 
         @Override
-        public void onReceive(JSONObject jsonMessage) {
+        public void onReceive(JsonObject jsonMessage) {
         }
     };
 
@@ -192,10 +192,10 @@ public class LibraryTests {
     }
 
     @Test
-    public void testReceiveAction() throws JSONException, IOException, InterruptedException {
-        JSONObject jsonMessage = new JSONObject();
-        jsonMessage.put(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
-        jsonMessage.put(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+    public void testReceiveAction() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
         Thread.sleep(10);
@@ -203,11 +203,11 @@ public class LibraryTests {
     }
 
     @Test
-    public void testReceiveActionNoListener() throws JSONException, IOException, InterruptedException {
+    public void testReceiveActionNoListener() throws IOException, InterruptedException {
         this.touchPortalPluginTest.connectThenPairAndListen(null);
-        JSONObject jsonMessage = new JSONObject();
-        jsonMessage.put(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
-        jsonMessage.put(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
         Thread.sleep(10);
@@ -215,10 +215,10 @@ public class LibraryTests {
     }
 
     @Test
-    public void testReceiveBadPlugin() throws JSONException, IOException, InterruptedException {
-        JSONObject jsonMessage = new JSONObject();
-        jsonMessage.put(ReceivedMessageHelper.PLUGIN_ID, "falsePluginId");
-        jsonMessage.put(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+    public void testReceiveBadPlugin() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, "falsePluginId");
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
         Thread.sleep(10);
@@ -226,15 +226,15 @@ public class LibraryTests {
     }
 
     @Test
-    public void testReceiveInfo() throws JSONException, IOException, InterruptedException {
-        JSONObject jsonMessage = new JSONObject();
-        jsonMessage.put(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_INFO);
+    public void testReceiveInfo() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_INFO);
         long sdkVersion = 2;
         long tpVersionCode = 202000;
         String tpVersionString = "2.2.000";
-        jsonMessage.put(TPInfo.SDK_VERSION, sdkVersion);
-        jsonMessage.put(TPInfo.TP_VERSION_CODE, tpVersionCode);
-        jsonMessage.put(TPInfo.TP_VERSION_STRING, tpVersionString);
+        jsonMessage.addProperty(TPInfo.SDK_VERSION, sdkVersion);
+        jsonMessage.addProperty(TPInfo.TP_VERSION_CODE, tpVersionCode);
+        jsonMessage.addProperty(TPInfo.TP_VERSION_STRING, tpVersionString);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
         Thread.sleep(10);
@@ -248,10 +248,10 @@ public class LibraryTests {
     }
 
     @Test
-    public void testReceiveClose() throws JSONException, IOException, InterruptedException {
-        JSONObject jsonMessage = new JSONObject();
-        jsonMessage.put(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
-        jsonMessage.put(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_CLOSE_PLUGIN);
+    public void testReceiveClose() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_CLOSE_PLUGIN);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
 
@@ -303,61 +303,61 @@ public class LibraryTests {
     }
 
     @Test
-    public void testEntryTP() throws IOException, JSONException {
+    public void testEntryTP() throws IOException {
         File testGeneratedResourcesDirectory = new File("build/generated/sources/annotationProcessor/java/test/resources");
 
-        JSONObject entry = new JSONObject(new String(Files.readAllBytes(Paths.get(new File(testGeneratedResourcesDirectory.getAbsolutePath() + "/entry.tp").getAbsolutePath()))));
+        JsonObject entry = new JsonParser().parse(new String(Files.readAllBytes(Paths.get(new File(testGeneratedResourcesDirectory.getAbsolutePath() + "/entry.tp").getAbsolutePath())))).getAsJsonObject();
 
         // Plugin
-        assertEquals(TouchPortalPluginTestConstants.ID, entry.getString(PluginHelper.ID));
+        assertEquals(TouchPortalPluginTestConstants.ID, entry.get(PluginHelper.ID).getAsString());
 
         // Categories
-        JSONArray jsonCategories = entry.getJSONArray(PluginHelper.CATEGORIES);
-        assertEquals(1, jsonCategories.length());
+        JsonArray jsonCategories = entry.getAsJsonArray(PluginHelper.CATEGORIES);
+        assertEquals(1, jsonCategories.size());
 
         // Base Category
-        JSONObject baseCategory = jsonCategories.getJSONObject(0);
-        assertEquals(TouchPortalPluginTestConstants.BaseCategory.ID, baseCategory.getString(CategoryHelper.ID));
+        JsonObject baseCategory = jsonCategories.get(0).getAsJsonObject();
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.ID, baseCategory.get(CategoryHelper.ID).getAsString());
 
         // Base Category Actions
-        JSONArray baseCategoryActions = baseCategory.getJSONArray(CategoryHelper.ACTIONS);
-        assertEquals(2, baseCategoryActions.length());
+        JsonArray baseCategoryActions = baseCategory.getAsJsonArray(CategoryHelper.ACTIONS);
+        assertEquals(2, baseCategoryActions.size());
 
         // Base Category Action DummyWithData
-        JSONObject baseCategoryActionDummyWithData = baseCategoryActions.getJSONObject(0);
-        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithData.ID, baseCategoryActionDummyWithData.getString(ActionHelper.ID));
+        JsonObject baseCategoryActionDummyWithData = baseCategoryActions.get(0).getAsJsonObject();
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithData.ID, baseCategoryActionDummyWithData.get(ActionHelper.ID).getAsString());
 
         // Base Category Action DummyWithData Data items
-        JSONArray baseCategoryActionDummyWithDataItems = baseCategoryActionDummyWithData.getJSONArray(ActionHelper.DATA);
-        assertEquals(1, baseCategoryActionDummyWithDataItems.length());
+        JsonArray baseCategoryActionDummyWithDataItems = baseCategoryActionDummyWithData.getAsJsonArray(ActionHelper.DATA);
+        assertEquals(1, baseCategoryActionDummyWithDataItems.size());
 
         // Base Category Action DummyWithData Data Text item
-        JSONObject baseCategoryActionDummyWithDataItemText = baseCategoryActionDummyWithDataItems.getJSONObject(0);
-        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithData.Text.ID, baseCategoryActionDummyWithDataItemText.getString(DataHelper.ID));
+        JsonObject baseCategoryActionDummyWithDataItemText = baseCategoryActionDummyWithDataItems.get(0).getAsJsonObject();
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithData.Text.ID, baseCategoryActionDummyWithDataItemText.get(DataHelper.ID).getAsString());
 
         // Base Category Action DummyWithoutData
-        JSONObject baseCategoryActionDummyWithoutData = baseCategoryActions.getJSONObject(1);
-        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithoutData.ID, baseCategoryActionDummyWithoutData.getString(ActionHelper.ID));
+        JsonObject baseCategoryActionDummyWithoutData = baseCategoryActions.get(1).getAsJsonObject();
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithoutData.ID, baseCategoryActionDummyWithoutData.get(ActionHelper.ID).getAsString());
 
         // Base Category Action DummyWithoutData Data items
-        JSONArray baseCategoryActionDummyWithoutDataItems = baseCategoryActionDummyWithoutData.getJSONArray(ActionHelper.DATA);
-        assertEquals(0, baseCategoryActionDummyWithoutDataItems.length());
+        JsonArray baseCategoryActionDummyWithoutDataItems = baseCategoryActionDummyWithoutData.getAsJsonArray(ActionHelper.DATA);
+        assertEquals(0, baseCategoryActionDummyWithoutDataItems.size());
 
         // Base Category Events
-        JSONArray baseCategoryEvents = baseCategory.getJSONArray(CategoryHelper.EVENTS);
-        assertEquals(1, baseCategoryEvents.length());
+        JsonArray baseCategoryEvents = baseCategory.getAsJsonArray(CategoryHelper.EVENTS);
+        assertEquals(1, baseCategoryEvents.size());
 
         // Base Category Event Custom Event
-        JSONObject baseCategoryEventCustomState = baseCategoryEvents.getJSONObject(0);
-        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Events.CustomState.ID, baseCategoryEventCustomState.getString(EventHelper.ID));
+        JsonObject baseCategoryEventCustomState = baseCategoryEvents.get(0).getAsJsonObject();
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Events.CustomState.ID, baseCategoryEventCustomState.get(EventHelper.ID).getAsString());
 
         // Base Category States
-        JSONArray baseCategoryStates = baseCategory.getJSONArray(CategoryHelper.STATES);
-        assertEquals(1, baseCategoryStates.length());
+        JsonArray baseCategoryStates = baseCategory.getAsJsonArray(CategoryHelper.STATES);
+        assertEquals(1, baseCategoryStates.size());
 
         // Base Category State Custom State
-        JSONObject baseCategoryStateCustomState = baseCategoryStates.getJSONObject(0);
-        assertEquals(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, baseCategoryStateCustomState.getString(StateHelper.ID));
+        JsonObject baseCategoryStateCustomState = baseCategoryStates.get(0).getAsJsonObject();
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, baseCategoryStateCustomState.get(StateHelper.ID).getAsString());
     }
 
     @Test

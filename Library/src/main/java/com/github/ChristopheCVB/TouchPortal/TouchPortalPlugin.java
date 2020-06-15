@@ -25,9 +25,10 @@ import com.github.ChristopheCVB.TouchPortal.Helpers.ReceivedMessageHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.SentMessageHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.StateHelper;
 import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -136,36 +137,35 @@ public abstract class TouchPortalPlugin {
                     }
                     String socketMessage = TouchPortalPlugin.this.bufferedReader.readLine();
                     if (socketMessage != null && !socketMessage.isEmpty()) {
-                        JSONObject jsonMessage = new JSONObject(socketMessage);
+                        JsonObject jsonMessage = new JsonParser().parse(socketMessage).getAsJsonObject();
                         String messageType = ReceivedMessageHelper.getType(jsonMessage);
-                        switch (messageType) {
-                            case ReceivedMessageHelper.TYPE_CLOSE_PLUGIN:
-                                System.out.println("Close Message Received");
-                                TouchPortalPlugin.this.close(null);
-                                break socketReaderLoop;
+                        if (messageType != null) {
+                            switch (messageType) {
+                                case ReceivedMessageHelper.TYPE_CLOSE_PLUGIN:
+                                    System.out.println("Close Message Received");
+                                    TouchPortalPlugin.this.close(null);
+                                    break socketReaderLoop;
 
-                            case ReceivedMessageHelper.TYPE_INFO:
-                                TouchPortalPlugin.this.tpInfo = TPInfo.from(jsonMessage);
-                                break;
+                                case ReceivedMessageHelper.TYPE_INFO:
+                                    TouchPortalPlugin.this.tpInfo = TPInfo.from(jsonMessage);
+                                    break;
 
-                            default:
-                                if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, TouchPortalPlugin.this.pluginClass)) {
-                                    System.out.println("Message Received");
-                                    // TODO: Automatically Call Actions Methods (This require to Annotate an Interface that would be passed to the SDK)
-                                    if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
-                                        TouchPortalPlugin.this.callbacksExecutor.submit(() -> TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage));
+                                default:
+                                    if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, TouchPortalPlugin.this.pluginClass)) {
+                                        System.out.println("Message Received");
+                                        // TODO: Automatically Call Actions Methods (This require to Annotate an Interface that would be passed to the SDK)
+                                        if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
+                                            TouchPortalPlugin.this.callbacksExecutor.submit(() -> TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage));
+                                        }
                                     }
-                                }
-                                break;
+                                    break;
+                            }
                         }
                     }
                 }
                 catch (IOException ioException) {
                     TouchPortalPlugin.this.close(ioException);
                     break;
-                }
-                catch (JSONException jsonException) {
-                    jsonException.printStackTrace();
                 }
             }
         });
@@ -177,18 +177,14 @@ public abstract class TouchPortalPlugin {
      * @return boolean Pairing Message sent
      */
     private boolean sendPair() {
-        boolean paired = false;
-        try {
-            // Send Pairing Message
-            JSONObject pairingMessage = new JSONObject();
-            pairingMessage.put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_PAIR);
-            pairingMessage.put(SentMessageHelper.ID, PluginHelper.getPluginId(this.pluginClass));
+        // Send Pairing Message
+        JsonObject pairingMessage = new JsonObject();
+        pairingMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_PAIR);
+        pairingMessage.addProperty(SentMessageHelper.ID, PluginHelper.getPluginId(this.pluginClass));
 
-            paired = this.send(pairingMessage);
-            System.out.println("Pairing Message Sent");
-        }
-        catch (JSONException ignored) {
-        }
+        boolean paired = this.send(pairingMessage);
+        System.out.println("Pairing Message Sent");
+
         return paired;
     }
 
@@ -301,10 +297,10 @@ public abstract class TouchPortalPlugin {
     /**
      * Internal Send a Message to the Touch Portal Plugin System
      *
-     * @param message {@link JSONObject}
+     * @param message {@link JsonObject}
      * @return boolean isMessageSent
      */
-    private boolean send(JSONObject message) {
+    private boolean send(JsonObject message) {
         boolean sent = false;
         if (this.isConnected()) {
             try {
@@ -342,16 +338,16 @@ public abstract class TouchPortalPlugin {
      * @return boolean choiceUpdateMessageSent
      */
     public boolean sendChoiceUpdate(String listId, String[] values) {
-        boolean sent = false;
-        try {
-            JSONObject choiceUpdateMessage = new JSONObject()
-                    .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE)
-                    .put(SentMessageHelper.ID, listId)
-                    .put(SentMessageHelper.VALUE, new JSONArray(values));
-            sent = this.send(choiceUpdateMessage);
-            System.out.println("Update Choices [" + listId + "] Sent [" + sent + "]");
+        JsonObject choiceUpdateMessage = new JsonObject();
+        choiceUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE);
+        choiceUpdateMessage.addProperty(SentMessageHelper.ID, listId);
+        JsonArray jsonValues = new JsonArray();
+        for (String value : values) {
+            jsonValues.add(new JsonPrimitive(value));
         }
-        catch (JSONException ignored) {}
+        choiceUpdateMessage.add(SentMessageHelper.VALUE, jsonValues);
+        boolean sent = this.send(choiceUpdateMessage);
+        System.out.println("Update Choices [" + listId + "] Sent [" + sent + "]");
 
         return sent;
     }
@@ -379,17 +375,17 @@ public abstract class TouchPortalPlugin {
      * @return boolean specificChoiceUpdateMessageSent
      */
     public boolean sendSpecificChoiceUpdate(String choiceId, String instanceId, String[] values) {
-        boolean sent = false;
-        try {
-            JSONObject specificChoiceUpdateMessage = new JSONObject()
-                    .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE)
-                    .put(SentMessageHelper.ID, choiceId)
-                    .put(SentMessageHelper.INSTANCE_ID, instanceId)
-                    .put(SentMessageHelper.VALUE, new JSONArray(values));
-            sent = this.send(specificChoiceUpdateMessage);
-            System.out.println("Update Specific Choices [" + choiceId + "] Sent [" + sent + "]");
+        JsonObject specificChoiceUpdateMessage = new JsonObject();
+        specificChoiceUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE);
+        specificChoiceUpdateMessage.addProperty(SentMessageHelper.ID, choiceId);
+        specificChoiceUpdateMessage.addProperty(SentMessageHelper.INSTANCE_ID, instanceId);
+        JsonArray jsonValues = new JsonArray();
+        for (String value : values) {
+            jsonValues.add(new JsonPrimitive(value));
         }
-        catch (JSONException ignored) {}
+        specificChoiceUpdateMessage.add(SentMessageHelper.VALUE, jsonValues);
+        boolean sent = this.send(specificChoiceUpdateMessage);
+        System.out.println("Update Specific Choices [" + choiceId + "] Sent [" + sent + "]");
 
         return sent;
     }
@@ -422,17 +418,14 @@ public abstract class TouchPortalPlugin {
                 isLastValue = true;
             }
             else {
-                try {
-                    JSONObject stateUpdateMessage = new JSONObject()
-                            .put(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE)
-                            .put(SentMessageHelper.ID, stateId)
-                            .put(SentMessageHelper.VALUE, value);
-                    sent = this.send(stateUpdateMessage);
-                    if (sent) {
-                        this.currentStates.put(stateId, value);
-                    }
+                JsonObject stateUpdateMessage = new JsonObject();
+                stateUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE);
+                stateUpdateMessage.addProperty(SentMessageHelper.ID, stateId);
+                stateUpdateMessage.addProperty(SentMessageHelper.VALUE, value);
+                sent = this.send(stateUpdateMessage);
+                if (sent) {
+                    this.currentStates.put(stateId, value);
                 }
-                catch (JSONException ignored) {}
             }
         }
         System.out.println("Update State [" + stateId + "] to Value [" + value + "] Sent [" + sent + "] Is Last Value [" + isLastValue + "]");
@@ -585,8 +578,8 @@ public abstract class TouchPortalPlugin {
         /**
          * Called when receiving a message from the Touch Portal Plugin System
          *
-         * @param jsonMessage {@link JSONObject}
+         * @param jsonMessage {@link JsonObject}
          */
-        void onReceive(JSONObject jsonMessage);
+        void onReceive(JsonObject jsonMessage);
     }
 }

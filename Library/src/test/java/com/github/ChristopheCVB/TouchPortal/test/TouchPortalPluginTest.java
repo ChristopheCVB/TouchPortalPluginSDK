@@ -22,7 +22,7 @@ package com.github.ChristopheCVB.TouchPortal.test;
 
 import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
 
 @Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0")
 public class TouchPortalPluginTest extends TouchPortalPlugin {
@@ -58,7 +58,7 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
      * @param jsonAction JSONObject
      */
     @Action(description = "Long Description of Dummy Action without Data", categoryId = "BaseCategory")
-    private void dummyWithoutData(JSONObject jsonAction) {
+    private void dummyWithoutData(JsonObject jsonAction) {
         System.out.println("Action dummyWithoutData received [" + jsonAction + "]");
     }
 

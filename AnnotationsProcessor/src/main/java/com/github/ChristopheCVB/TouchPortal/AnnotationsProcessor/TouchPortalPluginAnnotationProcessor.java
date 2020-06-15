@@ -24,12 +24,12 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.AnnotationsProcessor.utils.Pair;
 import com.github.ChristopheCVB.TouchPortal.Helpers.*;
 import com.google.auto.service.AutoService;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -97,12 +97,12 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 throw new Exception("You need 1(one) @Plugin Annotation, you have " + plugins.size());
             }
             for (Element pluginElement : plugins) {
-                Pair<JSONObject, TypeSpec.Builder> pluginPair = this.processPlugin(roundEnv, pluginElement);
+                Pair<JsonObject, TypeSpec.Builder> pluginPair = this.processPlugin(roundEnv, pluginElement);
 
                 String actionFileName = "resources/" + PluginHelper.ENTRY_TP;
                 FileObject actionFileObject = this.filer.createResource(StandardLocation.SOURCE_OUTPUT, "", actionFileName, pluginElement);
                 Writer writer = actionFileObject.openWriter();
-                writer.write(pluginPair.first.toString(2));
+                writer.write(pluginPair.first.toString());
                 writer.flush();
                 writer.close();
 
@@ -111,116 +111,114 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 JavaFile javaConstantsFile = JavaFile.builder(packageName, pluginTypeSpec).build();
                 javaConstantsFile.writeTo(this.filer);
             }
-
         }
         catch (Exception exception) {
-            exception.printStackTrace();
+            this.messager.printMessage(Diagnostic.Kind.ERROR, exception.getMessage());
         }
 
         return true;
     }
 
     /**
-     * Generates a JSONObject and a TypeSpec.Builder representing the {@link Plugin}
+     * Generates a JsonObject and a TypeSpec.Builder representing the {@link Plugin}
      *
      * @param roundEnv      RoundEnvironment
      * @param pluginElement Element
-     * @return Pair<JSONObject, TypeSpec.Builder> pluginPair
-     * @throws JSONException jsonException
+     * @return Pair<JsonObject, TypeSpec.Builder> pluginPair
+     * @throws TPTypeException If a used type is not Supported
      */
-    private Pair<JSONObject, TypeSpec.Builder> processPlugin(RoundEnvironment roundEnv, Element pluginElement) throws JSONException, TPTypeException {
+    private Pair<JsonObject, TypeSpec.Builder> processPlugin(RoundEnvironment roundEnv, Element pluginElement) throws TPTypeException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Plugin: " + pluginElement.getSimpleName());
         Plugin plugin = pluginElement.getAnnotation(Plugin.class);
 
         TypeSpec.Builder pluginTypeSpecBuilder = this.createPluginTypeSpecBuilder(pluginElement, plugin);
 
-        JSONObject jsonPlugin = new JSONObject();
-        jsonPlugin.put(PluginHelper.SDK, PluginHelper.TOUCH_PORTAL_PLUGIN_VERSION);
-        jsonPlugin.put(PluginHelper.VERSION, plugin.version());
-        jsonPlugin.put(PluginHelper.NAME, PluginHelper.getPluginName(pluginElement, plugin));
-        jsonPlugin.put(PluginHelper.ID, PluginHelper.getPluginId(pluginElement));
-        JSONObject jsonConfiguration = new JSONObject();
-        jsonConfiguration.put(PluginHelper.CONFIGURATION_COLOR_DARK, plugin.colorDark());
-        jsonConfiguration.put(PluginHelper.CONFIGURATION_COLOR_LIGHT, plugin.colorLight());
-        jsonPlugin.put(PluginHelper.CONFIGURATION, jsonConfiguration);
-        jsonPlugin.put(PluginHelper.PLUGIN_START_COMMAND, "java -jar " + PluginHelper.TP_PLUGIN_FOLDER + pluginElement.getSimpleName() + "\\" + pluginElement.getSimpleName() + ".jar " + PluginHelper.COMMAND_START + " \" " + PluginHelper.TP_PLUGIN_FOLDER + " \"");
+        JsonObject jsonPlugin = new JsonObject();
+        jsonPlugin.addProperty(PluginHelper.SDK, PluginHelper.TOUCH_PORTAL_PLUGIN_VERSION);
+        jsonPlugin.addProperty(PluginHelper.VERSION, plugin.version());
+        jsonPlugin.addProperty(PluginHelper.NAME, PluginHelper.getPluginName(pluginElement, plugin));
+        jsonPlugin.addProperty(PluginHelper.ID, PluginHelper.getPluginId(pluginElement));
+        JsonObject jsonConfiguration = new JsonObject();
+        jsonConfiguration.addProperty(PluginHelper.CONFIGURATION_COLOR_DARK, plugin.colorDark());
+        jsonConfiguration.addProperty(PluginHelper.CONFIGURATION_COLOR_LIGHT, plugin.colorLight());
+        jsonPlugin.add(PluginHelper.CONFIGURATION, jsonConfiguration);
+        jsonPlugin.addProperty(PluginHelper.PLUGIN_START_COMMAND, "java -jar " + PluginHelper.TP_PLUGIN_FOLDER + pluginElement.getSimpleName() + "\\" + pluginElement.getSimpleName() + ".jar " + PluginHelper.COMMAND_START + " \" " + PluginHelper.TP_PLUGIN_FOLDER + " \"");
 
-        JSONArray jsonCategories = new JSONArray();
+        JsonArray jsonCategories = new JsonArray();
         Set<? extends Element> categoryElements = roundEnv.getElementsAnnotatedWith(Category.class);
         for (Element categoryElement : categoryElements) {
-            Pair<JSONObject, TypeSpec.Builder> categoryResult = this.processCategory(roundEnv, pluginElement, plugin, categoryElement);
-            jsonCategories.put(categoryResult.first);
+            Pair<JsonObject, TypeSpec.Builder> categoryResult = this.processCategory(roundEnv, pluginElement, plugin, categoryElement);
+            jsonCategories.add(categoryResult.first);
             pluginTypeSpecBuilder.addType(categoryResult.second.build());
         }
-        jsonPlugin.put(PluginHelper.CATEGORIES, jsonCategories);
+        jsonPlugin.add(PluginHelper.CATEGORIES, jsonCategories);
 
         return Pair.create(jsonPlugin, pluginTypeSpecBuilder);
     }
 
     /**
-     * Generates a JSONObject and a TypeSpec.Builder representing the {@link Category}
+     * Generates a JsonObject and a TypeSpec.Builder representing the {@link Category}
      *
      * @param roundEnv        RoundEnvironment
      * @param pluginElement   Element
      * @param plugin          {@link Plugin}
      * @param categoryElement Element
-     * @return Pair<JSONObject, TypeSpec.Builder> categoryPair
-     * @throws JSONException   If JSONObject is malformed
+     * @return Pair<JsonObject, TypeSpec.Builder> categoryPair
      * @throws TPTypeException If a used type is not Supported
      */
-    private Pair<JSONObject, TypeSpec.Builder> processCategory(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement) throws JSONException, TPTypeException {
+    private Pair<JsonObject, TypeSpec.Builder> processCategory(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement) throws TPTypeException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Category: " + categoryElement.getSimpleName());
         Category category = categoryElement.getAnnotation(Category.class);
 
         TypeSpec.Builder categoryTypeSpecBuilder = this.createCategoryTypeSpecBuilder(pluginElement, categoryElement, category);
 
-        JSONObject jsonCategory = new JSONObject();
-        jsonCategory.put(CategoryHelper.ID, CategoryHelper.getCategoryId(pluginElement, categoryElement, category));
-        jsonCategory.put(CategoryHelper.NAME, CategoryHelper.getCategoryName(categoryElement, category));
-        jsonCategory.put(CategoryHelper.IMAGE_PATH, PluginHelper.TP_PLUGIN_FOLDER + pluginElement.getSimpleName() + "/" + category.imagePath());
+        JsonObject jsonCategory = new JsonObject();
+        jsonCategory.addProperty(CategoryHelper.ID, CategoryHelper.getCategoryId(pluginElement, categoryElement, category));
+        jsonCategory.addProperty(CategoryHelper.NAME, CategoryHelper.getCategoryName(categoryElement, category));
+        jsonCategory.addProperty(CategoryHelper.IMAGE_PATH, PluginHelper.TP_PLUGIN_FOLDER + pluginElement.getSimpleName() + "/" + category.imagePath());
 
         TypeSpec.Builder actionsTypeSpecBuilder = TypeSpec.classBuilder("Actions");
-        JSONArray jsonActions = new JSONArray();
+        JsonArray jsonActions = new JsonArray();
         Set<? extends Element> actionElements = roundEnv.getElementsAnnotatedWith(Action.class);
         for (Element actionElement : actionElements) {
             Action action = actionElement.getAnnotation(Action.class);
             String categoryId = category.id().isEmpty() ? categoryElement.getSimpleName().toString() : category.id();
             if (categoryId.equals(action.categoryId())) {
-                Pair<JSONObject, TypeSpec.Builder> actionResult = this.processAction(roundEnv, pluginElement, plugin, categoryElement, category, actionElement);
-                jsonActions.put(actionResult.first);
+                Pair<JsonObject, TypeSpec.Builder> actionResult = this.processAction(roundEnv, pluginElement, plugin, categoryElement, category, actionElement);
+                jsonActions.add(actionResult.first);
                 actionsTypeSpecBuilder.addType(actionResult.second.build());
             }
         }
         categoryTypeSpecBuilder.addType(actionsTypeSpecBuilder.build());
-        jsonCategory.put(CategoryHelper.ACTIONS, jsonActions);
+        jsonCategory.add(CategoryHelper.ACTIONS, jsonActions);
 
         TypeSpec.Builder statesTypeSpecBuilder = TypeSpec.classBuilder("States");
-        JSONArray jsonStates = new JSONArray();
+        JsonArray jsonStates = new JsonArray();
         Set<? extends Element> stateElements = roundEnv.getElementsAnnotatedWith(State.class);
         for (Element stateElement : stateElements) {
-            Pair<JSONObject, TypeSpec.Builder> stateResult = this.processState(roundEnv, pluginElement, plugin, categoryElement, category, stateElement);
-            jsonStates.put(stateResult.first);
+            Pair<JsonObject, TypeSpec.Builder> stateResult = this.processState(roundEnv, pluginElement, plugin, categoryElement, category, stateElement);
+            jsonStates.add(stateResult.first);
             statesTypeSpecBuilder.addType(stateResult.second.build());
         }
         categoryTypeSpecBuilder.addType(statesTypeSpecBuilder.build());
-        jsonCategory.put(CategoryHelper.STATES, jsonStates);
+        jsonCategory.add(CategoryHelper.STATES, jsonStates);
 
         TypeSpec.Builder eventsTypeSpecBuilder = TypeSpec.classBuilder("Events");
-        JSONArray jsonEvents = new JSONArray();
+        JsonArray jsonEvents = new JsonArray();
         Set<? extends Element> eventElements = roundEnv.getElementsAnnotatedWith(Event.class);
         for (Element eventElement : eventElements) {
-            Pair<JSONObject, TypeSpec.Builder> eventResult = this.processEvent(roundEnv, pluginElement, plugin, categoryElement, category, eventElement);
-            jsonEvents.put(eventResult.first);
+            Pair<JsonObject, TypeSpec.Builder> eventResult = this.processEvent(roundEnv, pluginElement, plugin, categoryElement, category, eventElement);
+            jsonEvents.add(eventResult.first);
             eventsTypeSpecBuilder.addType(eventResult.second.build());
         }
         categoryTypeSpecBuilder.addType(eventsTypeSpecBuilder.build());
-        jsonCategory.put(CategoryHelper.EVENTS, jsonEvents);
+        jsonCategory.add(CategoryHelper.EVENTS, jsonEvents);
 
         return Pair.create(jsonCategory, categoryTypeSpecBuilder);
     }
 
     /**
-     * Generates a JSONObject and a TypeSpec.Builder representing the {@link Action}
+     * Generates a JsonObject and a TypeSpec.Builder representing the {@link Action}
      *
      * @param roundEnv        RoundEnvironment
      * @param pluginElement   Element
@@ -228,43 +226,42 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param categoryElement Element
      * @param category        {@link Category}
      * @param actionElement   Element
-     * @return Pair<JSONObject, TypeSpec.Builder> actionPair
-     * @throws JSONException If JSONObject is malformed
+     * @return Pair<JsonObject, TypeSpec.Builder> actionPair
      */
-    private Pair<JSONObject, TypeSpec.Builder> processAction(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement) throws JSONException {
+    private Pair<JsonObject, TypeSpec.Builder> processAction(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement) {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Action: " + actionElement.getSimpleName());
         Action action = actionElement.getAnnotation(Action.class);
 
         TypeSpec.Builder actionTypeSpecBuilder = this.createActionTypeSpecBuilder(pluginElement, categoryElement, category, actionElement, action);
 
-        JSONObject jsonAction = new JSONObject();
-        jsonAction.put(ActionHelper.ID, ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action));
-        jsonAction.put(ActionHelper.NAME, ActionHelper.getActionName(actionElement, action));
-        jsonAction.put(ActionHelper.PREFIX, action.prefix());
-        jsonAction.put(ActionHelper.TYPE, action.type());
-        jsonAction.put(ActionHelper.DESCRIPTION, action.description());
+        JsonObject jsonAction = new JsonObject();
+        jsonAction.addProperty(ActionHelper.ID, ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action));
+        jsonAction.addProperty(ActionHelper.NAME, ActionHelper.getActionName(actionElement, action));
+        jsonAction.addProperty(ActionHelper.PREFIX, action.prefix());
+        jsonAction.addProperty(ActionHelper.TYPE, action.type());
+        jsonAction.addProperty(ActionHelper.DESCRIPTION, action.description());
         if (!action.format().isEmpty()) {
-            jsonAction.put(ActionHelper.TRY_INLINE, true);
-            jsonAction.put(ActionHelper.FORMAT, action.format());
+            jsonAction.addProperty(ActionHelper.TRY_INLINE, true);
+            jsonAction.addProperty(ActionHelper.FORMAT, action.format());
         }
 
-        JSONArray jsonActionData = new JSONArray();
+        JsonArray jsonActionData = new JsonArray();
         Set<? extends Element> dataElements = roundEnv.getElementsAnnotatedWith(Data.class);
         for (Element dataElement : dataElements) {
             Element enclosingElement = dataElement.getEnclosingElement();
             if (actionElement.equals(enclosingElement)) {
-                Pair<JSONObject, TypeSpec.Builder> actionDataResult = this.processActionData(roundEnv, pluginElement, plugin, categoryElement, category, actionElement, action, jsonAction, dataElement);
-                jsonActionData.put(actionDataResult.first);
+                Pair<JsonObject, TypeSpec.Builder> actionDataResult = this.processActionData(roundEnv, pluginElement, plugin, categoryElement, category, actionElement, action, jsonAction, dataElement);
+                jsonActionData.add(actionDataResult.first);
                 actionTypeSpecBuilder.addType(actionDataResult.second.build());
             }
         }
-        jsonAction.put(ActionHelper.DATA, jsonActionData);
+        jsonAction.add(ActionHelper.DATA, jsonActionData);
 
         return Pair.create(jsonAction, actionTypeSpecBuilder);
     }
 
     /**
-     * Generates a JSONObject and a TypeSpec.Builder representing the {@link State}
+     * Generates a JsonObject and a TypeSpec.Builder representing the {@link State}
      *
      * @param roundEnv        RoundEnvironment
      * @param pluginElement   Element
@@ -272,33 +269,37 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param categoryElement Element
      * @param category        {@link Category}
      * @param stateElement    Element
-     * @return Pair<JSONObject, TypeSpec.Builder> statePair
-     * @throws JSONException If JSONObject is malformed
+     * @return Pair<JsonObject, TypeSpec.Builder> statePair
+     * @throws TPTypeException If a used type is not Supported
      */
-    private Pair<JSONObject, TypeSpec.Builder> processState(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element stateElement) throws JSONException, TPTypeException {
+    private Pair<JsonObject, TypeSpec.Builder> processState(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element stateElement) throws TPTypeException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process State: " + stateElement.getSimpleName());
         State state = stateElement.getAnnotation(State.class);
 
         TypeSpec.Builder stateTypeSpecBuilder = this.createStateTypeSpecBuilder(pluginElement, categoryElement, category, stateElement, state);
 
-        JSONObject jsonState = new JSONObject();
-        jsonState.put(StateHelper.ID, StateHelper.getStateId(pluginElement, categoryElement, category, stateElement, state));
+        JsonObject jsonState = new JsonObject();
+        jsonState.addProperty(StateHelper.ID, StateHelper.getStateId(pluginElement, categoryElement, category, stateElement, state));
         String tpType = GenericHelper.getTouchPortalType(stateElement);
-        jsonState.put(StateHelper.TYPE, tpType);
-        jsonState.put(StateHelper.DESC, StateHelper.getStateDesc(stateElement, state));
-        jsonState.put(StateHelper.DEFAULT, state.defaultValue());
+        jsonState.addProperty(StateHelper.TYPE, tpType);
+        jsonState.addProperty(StateHelper.DESC, StateHelper.getStateDesc(stateElement, state));
+        jsonState.addProperty(StateHelper.DEFAULT, state.defaultValue());
         if (tpType.equals(StateHelper.TYPE_CHOICE)) {
-            jsonState.put(StateHelper.VALUE_CHOICES, state.valueChoices());
+            JsonArray stateValueChoices = new JsonArray();
+            for (String valueChoice : state.valueChoices()) {
+                stateValueChoices.add(new JsonPrimitive(valueChoice));
+            }
+            jsonState.add(StateHelper.VALUE_CHOICES, stateValueChoices);
         }
         else if (!tpType.equals(StateHelper.TYPE_TEXT)) {
-            throw new TPTypeException("The type '" + tpType + "' is not supported for states, only '" + StateHelper.TYPE_CHOICE + "' and '" + StateHelper.TYPE_TEXT + "' are.");
+            throw new TPTypeException(stateElement, "The type '" + tpType + "' is not supported for states, only '" + StateHelper.TYPE_CHOICE + "' and '" + StateHelper.TYPE_TEXT + "' are.");
         }
 
         return Pair.create(jsonState, stateTypeSpecBuilder);
     }
 
     /**
-     * Generates a JSONObject and a TypeSpec.Builder representing the {@link Event}
+     * Generates a JsonObject and a TypeSpec.Builder representing the {@link Event}
      *
      * @param roundEnv        RoundEnvironment
      * @param pluginElement   Element
@@ -306,37 +307,40 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param categoryElement Element
      * @param category        {@link Category}
      * @param eventElement    Element
-     * @return Pair<JSONObject, TypeSpec.Builder> eventPair
-     * @throws JSONException   If JSONObject is malformed
+     * @return Pair<JsonObject, TypeSpec.Builder> eventPair
      * @throws TPTypeException If any used type is not Supported
      */
-    private Pair<JSONObject, TypeSpec.Builder> processEvent(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element eventElement) throws JSONException, TPTypeException {
+    private Pair<JsonObject, TypeSpec.Builder> processEvent(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element eventElement) throws TPTypeException {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Event: " + eventElement.getSimpleName());
         State state = eventElement.getAnnotation(State.class);
         Event event = eventElement.getAnnotation(Event.class);
 
         TypeSpec.Builder eventTypeSpecBuilder = this.createEventTypeSpecBuilder(pluginElement, categoryElement, category, eventElement, event);
 
-        JSONObject jsonEvent = new JSONObject();
-        jsonEvent.put(EventHelper.ID, EventHelper.getEventId(pluginElement, categoryElement, category, eventElement, event));
-        jsonEvent.put(EventHelper.TYPE, EventHelper.TYPE_COMMUNICATE);
-        jsonEvent.put(EventHelper.NAME, EventHelper.getEventName(eventElement, event));
-        jsonEvent.put(EventHelper.FORMAT, event.format());
+        JsonObject jsonEvent = new JsonObject();
+        jsonEvent.addProperty(EventHelper.ID, EventHelper.getEventId(pluginElement, categoryElement, category, eventElement, event));
+        jsonEvent.addProperty(EventHelper.TYPE, EventHelper.TYPE_COMMUNICATE);
+        jsonEvent.addProperty(EventHelper.NAME, EventHelper.getEventName(eventElement, event));
+        jsonEvent.addProperty(EventHelper.FORMAT, event.format());
         String tpType = GenericHelper.getTouchPortalType(eventElement);
-        jsonEvent.put(EventHelper.VALUE_TYPE, tpType);
+        jsonEvent.addProperty(EventHelper.VALUE_TYPE, tpType);
         if (tpType.equals(EventHelper.VALUE_TYPE_CHOICE)) {
-            jsonEvent.put(EventHelper.VALUE_CHOICES, state.valueChoices());
-            jsonEvent.put(EventHelper.VALUE_STATE_ID, StateHelper.getStateId(pluginElement, categoryElement, category, eventElement, state));
+            JsonArray stateValueChoices = new JsonArray();
+            for (String valueChoice : state.valueChoices()) {
+                stateValueChoices.add(new JsonPrimitive(valueChoice));
+            }
+            jsonEvent.add(EventHelper.VALUE_CHOICES, stateValueChoices);
+            jsonEvent.addProperty(EventHelper.VALUE_STATE_ID, StateHelper.getStateId(pluginElement, categoryElement, category, eventElement, state));
         }
         else {
-            throw new TPTypeException("The type '" + tpType + "' is not supported for events, only '" + EventHelper.VALUE_TYPE_CHOICE + "' is.");
+            throw new TPTypeException(eventElement, "The type '" + tpType + "' is not supported for events, only '" + EventHelper.VALUE_TYPE_CHOICE + "' is.");
         }
 
         return Pair.create(jsonEvent, eventTypeSpecBuilder);
     }
 
     /**
-     * Generates a JSONObject and a TypeSpec.Builder representing the {@link Data}
+     * Generates a JsonObject and a TypeSpec.Builder representing the {@link Data}
      *
      * @param roundEnv        RoundEnvironment
      * @param pluginElement   Element
@@ -345,23 +349,22 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param category        {@link Category}
      * @param actionElement   Element
      * @param action          {@link Action}
-     * @param jsonAction      JSONObject
+     * @param jsonAction      JsonObject
      * @param dataElement     Element
-     * @return Pair<JSONObject, TypeSpec.Builder> dataPair
-     * @throws JSONException jsonException
+     * @return Pair<JsonObject, TypeSpec.Builder> dataPair
      */
-    private Pair<JSONObject, TypeSpec.Builder> processActionData(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement, Action action, JSONObject jsonAction, Element dataElement) throws JSONException {
+    private Pair<JsonObject, TypeSpec.Builder> processActionData(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement, Action action, JsonObject jsonAction, Element dataElement) {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Action Data: " + dataElement.getSimpleName());
         Data data = dataElement.getAnnotation(Data.class);
 
         TypeSpec.Builder actionDataTypeSpecBuilder = this.createActionDataTypeSpecBuilder(pluginElement, categoryElement, category, actionElement, action, dataElement, data);
 
-        JSONObject jsonData = new JSONObject();
+        JsonObject jsonData = new JsonObject();
         String dataId = DataHelper.getActionDataId(pluginElement, categoryElement, category, actionElement, action, dataElement, data);
-        jsonData.put(DataHelper.ID, dataId);
+        jsonData.addProperty(DataHelper.ID, dataId);
         String tpType = GenericHelper.getTouchPortalType(dataElement);
-        jsonData.put(DataHelper.TYPE, tpType);
-        jsonData.put(DataHelper.LABEL, DataHelper.getActionDataLabel(dataElement, data));
+        jsonData.addProperty(DataHelper.TYPE, tpType);
+        jsonData.addProperty(DataHelper.LABEL, DataHelper.getActionDataLabel(dataElement, data));
         switch (tpType) {
             case GenericHelper.TP_TYPE_NUMBER:
                 double defaultValue = 0;
@@ -369,23 +372,27 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                     defaultValue = Double.parseDouble(data.defaultValue());
                 }
                 catch (NumberFormatException ignored) {}
-                jsonData.put(DataHelper.DEFAULT, defaultValue);
+                jsonData.addProperty(DataHelper.DEFAULT, defaultValue);
                 break;
 
             case GenericHelper.TP_TYPE_SWITCH:
-                jsonData.put(DataHelper.DEFAULT, data.defaultValue().equals("true"));
+                jsonData.addProperty(DataHelper.DEFAULT, data.defaultValue().equals("true"));
                 break;
 
             default:
-                jsonData.put(DataHelper.DEFAULT, data.defaultValue());
+                jsonData.addProperty(DataHelper.DEFAULT, data.defaultValue());
                 break;
         }
         if (tpType.equals(DataHelper.TYPE_CHOICE)) {
-            jsonData.put(DataHelper.VALUE_CHOICES, data.valueChoices());
+            JsonArray dataValueChoices = new JsonArray();
+            for (String valueChoice : data.valueChoices()) {
+                dataValueChoices.add(new JsonPrimitive(valueChoice));
+            }
+            jsonData.add(DataHelper.VALUE_CHOICES, dataValueChoices);
         }
         if (!action.format().isEmpty()) {
-            String rawFormat = jsonAction.getString(ActionHelper.FORMAT);
-            jsonAction.put(ActionHelper.FORMAT, rawFormat.replace("{$" + (data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id()) + "$}", "{$" + dataId + "$}"));
+            String rawFormat = jsonAction.get(ActionHelper.FORMAT).getAsString();
+            jsonAction.addProperty(ActionHelper.FORMAT, rawFormat.replace("{$" + (data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id()) + "$}", "{$" + dataId + "$}"));
         }
 
         return Pair.create(jsonData, actionDataTypeSpecBuilder);
@@ -528,8 +535,8 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
          *
          * @param message String
          */
-        public TPTypeException(String message) {
-            super(message);
+        public TPTypeException(Element element, String message) {
+            super(element.getEnclosingElement().getSimpleName() + "." + element.getSimpleName() + ": " + message);
         }
     }
 }

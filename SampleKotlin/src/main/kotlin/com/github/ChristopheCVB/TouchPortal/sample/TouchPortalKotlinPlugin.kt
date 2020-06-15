@@ -6,7 +6,7 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.Plugin
 import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper
 import com.github.ChristopheCVB.TouchPortal.Helpers.ReceivedMessageHelper
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin
-import org.json.JSONObject
+import com.google.gson.JsonObject
 
 @Plugin(version = 1, colorDark = "#556677", colorLight = "#112233")
 class TouchPortalKotlinPlugin(args: Array<out String>?) : TouchPortalPlugin(args), TouchPortalPlugin.TouchPortalPluginListener {
@@ -19,7 +19,10 @@ class TouchPortalKotlinPlugin(args: Array<out String>?) : TouchPortalPlugin(args
                     val touchPortalPluginExample = TouchPortalKotlinPlugin(args)
 
                     // Initiate the connection with the Touch Portal Plugin System
-                    val connectedPairedAndListening: Boolean = touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample)
+                    val connectedPairedAndListening = touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample)
+                    if (connectedPairedAndListening) {
+                        // Let's go!
+                    }
                 }
             }
         }
@@ -39,7 +42,7 @@ class TouchPortalKotlinPlugin(args: Array<out String>?) : TouchPortalPlugin(args
         System.exit(0)
     }
 
-    override fun onReceive(jsonMessage: JSONObject?) {
+    override fun onReceive(jsonMessage: JsonObject?) {
         if (ReceivedMessageHelper.isAnAction(jsonMessage)) {
             val actionId = ReceivedMessageHelper.getActionId(jsonMessage)
             when (actionId) {

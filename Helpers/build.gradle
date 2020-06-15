@@ -10,7 +10,7 @@ group 'com.github.ChristopheCVB.TouchPortal.Helpers'
 version "${versionMajor}.${versionMinor}.${versionPatch}"
 
 dependencies {
-    implementation group: 'org.json', name: 'org.json', version: 'chargebee-1.0'
+    api group: 'com.google.code.gson', name: 'gson', version: '2.2.4'
     api project(':Annotations')
 
     testImplementation group: 'junit', name: 'junit', version: '4.12'

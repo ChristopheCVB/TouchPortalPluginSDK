@@ -20,9 +20,8 @@
 
 package com.github.ChristopheCVB.TouchPortal.Helpers;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * Touch Portal Plugin Received Message Helper
@@ -44,20 +43,11 @@ public class ReceivedMessageHelper {
     /**
      * Retrieve the Type of a ReceivedMessage
      *
-     * @param jsonMessage {@link JSONObject}
+     * @param jsonMessage {@link JsonObject}
      * @return String Message Type
      */
-    public static String getType(JSONObject jsonMessage) {
-        String messageType = null;
-
-        try {
-            messageType = jsonMessage.getString(ReceivedMessageHelper.TYPE);
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return messageType;
+    public static String getType(JsonObject jsonMessage) {
+        return jsonMessage.has(ReceivedMessageHelper.TYPE) ? jsonMessage.get(ReceivedMessageHelper.TYPE).getAsString() : null;
     }
 
     /**
@@ -66,82 +56,53 @@ public class ReceivedMessageHelper {
      * @param jsonMessage JSONObject
      * @return boolean isMessageAnAction
      */
-    public static boolean isAnAction(JSONObject jsonMessage) {
+    public static boolean isAnAction(JsonObject jsonMessage) {
         return ReceivedMessageHelper.TYPE_ACTION.equals(ReceivedMessageHelper.getType(jsonMessage));
     }
 
     /**
      * Retrieve the Action ID of a received Message
      *
-     * @param jsonMessage {@link JSONObject}
+     * @param jsonMessage {@link JsonObject}
      * @return String actionId
      */
-    public static String getActionId(JSONObject jsonMessage) {
-        String actionId = null;
-
-        try {
-            actionId = jsonMessage.getString(ReceivedMessageHelper.ACTION_ID);
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return actionId;
+    public static String getActionId(JsonObject jsonMessage) {
+        return jsonMessage.has(ReceivedMessageHelper.ACTION_ID) ? jsonMessage.get(ReceivedMessageHelper.ACTION_ID).getAsString() : "";
     }
 
     /**
      * Retrieve an Action Data Value from a received Message
      *
      * @param pluginClass         Class
-     * @param jsonMessage         JSONObject
+     * @param jsonMessage         JsonObject
      * @param actionMethodName    String
      * @param actionParameterName String
      * @return String dataValue
      */
-    public static String getActionDataValue(Class<?> pluginClass, JSONObject jsonMessage, String actionMethodName, String actionParameterName) {
-        String dataValue = "";
-
-        try {
-            JSONArray actionData = jsonMessage.getJSONArray(ActionHelper.DATA);
-            for (int actionDataIndex = 0; actionDataIndex < actionData.length(); actionDataIndex++) {
-                JSONObject jsonData = actionData.getJSONObject(actionDataIndex);
-                String receivedJsonDataId = jsonData.getString(ReceivedMessageHelper.ACTION_DATA_ID);
-                if (receivedJsonDataId.equals(DataHelper.getActionDataId(pluginClass, actionMethodName, actionParameterName))) {
-                    dataValue = jsonData.getString(ReceivedMessageHelper.ACTION_DATA_VALUE);
-                    break;
-                }
-            }
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return dataValue;
+    public static String getActionDataValue(Class<?> pluginClass, JsonObject jsonMessage, String actionMethodName, String actionParameterName) {
+        return ReceivedMessageHelper.getActionDataValue(jsonMessage, DataHelper.getActionDataId(pluginClass, actionMethodName, actionParameterName));
     }
 
     /**
      * Retrieve an Action Data Value from a received Message
      *
-     * @param jsonMessage  JSONObject
+     * @param jsonMessage  JsonObject
      * @param actionDataId String
      * @return String dataValue
      */
-    public static String getActionDataValue(JSONObject jsonMessage, String actionDataId) {
+    public static String getActionDataValue(JsonObject jsonMessage, String actionDataId) {
         String dataValue = "";
 
-        try {
-            JSONArray actionData = jsonMessage.getJSONArray(ActionHelper.DATA);
-            for (int actionDataIndex = 0; actionDataIndex < actionData.length(); actionDataIndex++) {
-                JSONObject jsonData = actionData.getJSONObject(actionDataIndex);
-                String receivedJsonDataId = jsonData.getString(ReceivedMessageHelper.ACTION_DATA_ID);
+        if (jsonMessage.has(ActionHelper.DATA)) {
+            JsonArray actionData = jsonMessage.getAsJsonArray(ActionHelper.DATA);
+            for (int actionDataIndex = 0; actionDataIndex < actionData.size(); actionDataIndex++) {
+                JsonObject jsonData = actionData.get(actionDataIndex).getAsJsonObject();
+                String receivedJsonDataId = jsonData.has(ReceivedMessageHelper.ACTION_DATA_ID) ? jsonData.get(ReceivedMessageHelper.ACTION_DATA_ID).getAsString() : "";
                 if (receivedJsonDataId.equals(actionDataId)) {
-                    dataValue = jsonData.getString(ReceivedMessageHelper.ACTION_DATA_VALUE);
+                    dataValue = jsonData.get(ReceivedMessageHelper.ACTION_DATA_VALUE).getAsString();
                     break;
                 }
             }
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
         }
 
         return dataValue;
@@ -150,55 +111,55 @@ public class ReceivedMessageHelper {
     /**
      * Retrieve an Action Data Value from a received Message as a Double
      *
-     * @param jsonMessage  JSONObject
+     * @param jsonMessage  JsonObject
      * @param actionDataId String
      * @return Double dataValueDouble
      */
-    public static Double getActionDataValueDouble(JSONObject jsonMessage, String actionDataId) {
+    public static Double getActionDataValueDouble(JsonObject jsonMessage, String actionDataId) {
         return Double.valueOf(ReceivedMessageHelper.getActionDataValue(jsonMessage, actionDataId));
     }
 
     /**
      * Retrieve an Action Data Value from a received Message as a Long
      *
-     * @param jsonMessage  JSONObject
+     * @param jsonMessage  JsonObject
      * @param actionDataId String
      * @return Double dataValueLong
      */
-    public static Long getActionDataValueLong(JSONObject jsonMessage, String actionDataId) {
-        return getActionDataValueDouble(jsonMessage, actionDataId).longValue();
+    public static Long getActionDataValueLong(JsonObject jsonMessage, String actionDataId) {
+        return ReceivedMessageHelper.getActionDataValueDouble(jsonMessage, actionDataId).longValue();
     }
 
     /**
      * Retrieve an Action Data Value from a received Message as a Boolean
      *
-     * @param jsonMessage  JSONObject
+     * @param jsonMessage  JsonObject
      * @param actionDataId String
      * @return Double dataValueLong
      */
-    public static Boolean getActionDataValueBoolean(JSONObject jsonMessage, String actionDataId) {
-        return getActionDataValue(jsonMessage, actionDataId).equals("On");
+    public static Boolean getActionDataValueBoolean(JsonObject jsonMessage, String actionDataId) {
+        return ReceivedMessageHelper.getActionDataValue(jsonMessage, actionDataId).equals("On");
     }
 
     /**
      * Whether the received Message concerns the Plugin Class
      *
-     * @param jsonMessage JSONObject
+     * @param jsonMessage JsonObject
      * @param pluginClass Class
      * @return boolean isMessageForPlugin
      */
-    public static boolean isMessageForPlugin(JSONObject jsonMessage, Class<?> pluginClass) {
+    public static boolean isMessageForPlugin(JsonObject jsonMessage, Class<?> pluginClass) {
         return ReceivedMessageHelper.isMessageForPlugin(jsonMessage, pluginClass.getName());
     }
 
     /**
      * Whether the received Message concerns the Plugin Class
      *
-     * @param jsonMessage JSONObject
+     * @param jsonMessage JsonObject
      * @param pluginId    String
      * @return boolean isMessageForPlugin
      */
-    public static boolean isMessageForPlugin(JSONObject jsonMessage, String pluginId) {
-        return jsonMessage.optString(ReceivedMessageHelper.PLUGIN_ID).equals(pluginId);
+    public static boolean isMessageForPlugin(JsonObject jsonMessage, String pluginId) {
+        return jsonMessage.has(ReceivedMessageHelper.PLUGIN_ID) && jsonMessage.get(ReceivedMessageHelper.PLUGIN_ID).getAsString().equals(pluginId);
     }
 }

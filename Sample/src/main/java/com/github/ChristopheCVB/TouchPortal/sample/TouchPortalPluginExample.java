@@ -24,7 +24,7 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.ReceivedMessageHelper;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
-import org.json.JSONObject;
+import com.google.gson.JsonObject;
 
 import java.io.IOException;
 
@@ -91,7 +91,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
      * @param jsonAction JSONObject
      */
     @Action(description = "Long Description of Dummy Action without Data", categoryId = "BaseCategory")
-    private void dummyWithoutData(JSONObject jsonAction) {
+    private void dummyWithoutData(JsonObject jsonAction) {
         System.out.println("Action dummyWithoutData received [" + jsonAction + "]");
     }
 
@@ -109,7 +109,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
     }
 
     @Override
-    public void onReceive(JSONObject jsonMessage) {
+    public void onReceive(JsonObject jsonMessage) {
         // Check if ReceiveMessage is an Action
         if (ReceivedMessageHelper.isAnAction(jsonMessage)) {
             // Get the Action ID
