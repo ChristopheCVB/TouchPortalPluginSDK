@@ -26,3 +26,8 @@ jobs:
       run: ./gradlew build
     - name: JaCoco Test Report
       run: ./gradlew jacocoTestReport
+    - name: Archive Code Coverage report
+      uses: actions/upload-artifact@v1
+      with:
+        name: code-coverage-report
+        path: Library/build/reports/jacoco/test/html/
