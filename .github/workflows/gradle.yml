@@ -33,5 +33,5 @@ jobs:
         path: Library/build/reports/jacoco/test/html/
     -name: Upload to CodeCov.io
       uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secret.CODECOV_TOKEN }}
+      with:
+        token: ${{ secret.CODECOV_TOKEN }}
