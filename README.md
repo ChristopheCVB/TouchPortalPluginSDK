@@ -3,6 +3,7 @@
 ![Touch Portal Plugin SDK](https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/resources/TP%20Plugin%20SDK%20Logo.png)
 
 ![Java CI with Gradle](https://github.com/ChristopheCVB/TouchPortalPluginSDK/workflows/Java%20CI%20with%20Gradle/badge.svg)
+[![Library Code Coverage](https://codecov.io/gh/ChristopheCVB/TouchPortalPluginSDK/branch/master/graph/badge.svg)](https://codecov.io/gh/ChristopheCVB/TouchPortalPluginSDK)
 
 This Project is an SDK to create a Touch Portal Plugin using Java or Kotlin and Gradle
 
@@ -39,10 +40,10 @@ Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 - Edit the properties `mainClassPackage` and `mainClassSimpleName` in your `build.gradle`
 - Implement the interface methods
 - Creating the `entry.tp` file
-  - Use Annotations (Example can be found in the Sample module)
-  - Create and edit the file `src/main/resources/entry.tp` of your module to add your actions, states and events
+  * **Highly recommended method**: Use Annotations (Example can be found in the Sample module)
+  * *Not recommended*: Create and edit manually the file `src/main/resources/entry.tp` of your module to add your actions, states and events
 - Add the Plugin icon into the following directory `src/main/resources/` of your module
-- Start calling the actions in the `onReceive(JSONObject jsonMessage)` method
+- Start calling your actions in the `onReceive(JsonObject jsonMessage)` method
 
 ## Build
 
