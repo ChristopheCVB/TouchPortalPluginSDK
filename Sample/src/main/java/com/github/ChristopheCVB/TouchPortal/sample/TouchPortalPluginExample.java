@@ -111,25 +111,27 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
     @Override
     public void onReceive(JsonObject jsonMessage) {
         // Check if ReceiveMessage is an Action
-        if (ReceivedMessageHelper.isAnAction(jsonMessage)) {
+        if (ReceivedMessageHelper.isTypeAction(jsonMessage)) {
             // Get the Action ID
             String receivedActionId = ReceivedMessageHelper.getActionId(jsonMessage);
-            switch (receivedActionId) {
-                case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.ID:
-                    // Example with IDs from Generated Constants Class
-                    // Manually call the action method
-                    this.dummyWithData(ReceivedMessageHelper.getActionDataValue(jsonMessage, TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.Text.ID));
-                    break;
+            if (receivedActionId != null) {
+                switch (receivedActionId) {
+                    case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.ID:
+                        // Example with IDs from Generated Constants Class
+                        // Manually call the action method
+                        this.dummyWithData(ReceivedMessageHelper.getActionDataValue(jsonMessage, TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.Text.ID));
+                        break;
 
-                case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithoutData.ID:
-                    // Example with IDs from Helper
-                    // Manually call the action method
-                    this.dummyWithoutData(jsonMessage);
-                    break;
+                    case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithoutData.ID:
+                        // Example with IDs from Helper
+                        // Manually call the action method
+                        this.dummyWithoutData(jsonMessage);
+                        break;
 
-                case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummySwitchAction.ID:
-                    this.dummySwitchAction(ReceivedMessageHelper.getActionDataValueBoolean(jsonMessage, TouchPortalPluginExampleConstants.BaseCategory.Actions.DummySwitchAction.IsOn.ID));
-                    break;
+                    case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummySwitchAction.ID:
+                        this.dummySwitchAction(ReceivedMessageHelper.getActionDataValueBoolean(jsonMessage, TouchPortalPluginExampleConstants.BaseCategory.Actions.DummySwitchAction.IsOn.ID));
+                        break;
+                }
             }
         }
     }

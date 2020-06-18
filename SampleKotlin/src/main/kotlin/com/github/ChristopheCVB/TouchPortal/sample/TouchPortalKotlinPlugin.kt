@@ -20,6 +20,7 @@ class TouchPortalKotlinPlugin(args: Array<out String>?) : TouchPortalPlugin(args
 
                     // Initiate the connection with the Touch Portal Plugin System
                     val connectedPairedAndListening = touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample)
+                    @Suppress("ControlFlowWithEmptyBody")
                     if (connectedPairedAndListening) {
                         // Let's go!
                     }
@@ -43,7 +44,7 @@ class TouchPortalKotlinPlugin(args: Array<out String>?) : TouchPortalPlugin(args
     }
 
     override fun onReceive(jsonMessage: JsonObject?) {
-        if (ReceivedMessageHelper.isAnAction(jsonMessage)) {
+        if (ReceivedMessageHelper.isTypeAction(jsonMessage)) {
             val actionId = ReceivedMessageHelper.getActionId(jsonMessage)
             when (actionId) {
                 TouchPortalKotlinPluginConstants.BaseCategory.Actions.LogTime.ID -> logTime()

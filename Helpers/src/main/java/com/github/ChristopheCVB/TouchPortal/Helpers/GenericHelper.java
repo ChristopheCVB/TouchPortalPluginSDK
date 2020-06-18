@@ -42,22 +42,29 @@ public class GenericHelper {
     /**
      * Retrieve the internal Touch Portal type according to the Java's element type
      *
-     * @param element Element
+     * @param reference String
+     * @param element   Element
      * @return String tpType
      */
-    public static String getTouchPortalType(Element element) {
+    public static String getTouchPortalType(String reference, Element element) throws GenericHelper.TPTypeException {
+        return GenericHelper.getTouchPortalType(reference, element.asType().toString());
+    }
+
+    /**
+     * Retrieve the internal Touch Portal type according to the Java's type
+     *
+     * @param reference String
+     * @param rawType   String
+     * @return String tpType
+     */
+    public static String getTouchPortalType(String reference, String rawType) throws GenericHelper.TPTypeException {
         String tpType;
-        String elementType = element.asType().toString();
-        switch (elementType) {
-            case "byte":
-            case "char":
+        switch (rawType) {
             case "short":
             case "int":
             case "long":
             case "float":
             case "double":
-            case "java.lang.Byte":
-            case "java.lang.Char":
             case "java.lang.Short":
             case "java.lang.Integer":
             case "java.lang.Long":
@@ -71,15 +78,64 @@ public class GenericHelper {
                 tpType = GenericHelper.TP_TYPE_SWITCH;
                 break;
 
-            default:
-                if (elementType.endsWith("[]")) {
-                    tpType = GenericHelper.TP_TYPE_CHOICE;
-                }
-                else {
-                    tpType = GenericHelper.TP_TYPE_TEXT;
-                }
+            case "java.lang.String":
+                tpType = GenericHelper.TP_TYPE_TEXT;
                 break;
+
+            case "java.lang.String[]":
+                tpType = GenericHelper.TP_TYPE_CHOICE;
+                break;
+
+            default:
+                throw new TPTypeException.Builder(reference, rawType).build();
         }
         return tpType;
+    }
+
+    /**
+     * Touch Portal Type Exception
+     */
+    public static class TPTypeException extends Exception {
+
+        /**
+         * Constructor
+         *
+         * @param message String
+         */
+        private TPTypeException(String message) {
+            super(message);
+        }
+
+        public static class Builder {
+            private String message;
+
+            public Builder(String reference, ForAnnotation forAnnotation, String tpType) {
+                this.message = reference + ": The type '" + tpType + "' is not supported";
+                if (forAnnotation != null) {
+                    switch (forAnnotation) {
+                        case STATE:
+                            this.message += " for states, only '" + StateHelper.TYPE_CHOICE + "' and '" + StateHelper.TYPE_TEXT + "' are.";
+                            break;
+
+                        case EVENT:
+                            this.message += " for events, only '" + EventHelper.VALUE_TYPE_CHOICE + "' is.";
+                            break;
+                    }
+                }
+            }
+
+            public Builder(String reference, String rawType) {
+                this(reference, null, rawType);
+            }
+
+            public TPTypeException build() {
+                return new TPTypeException(this.message);
+            }
+        }
+
+        public enum ForAnnotation {
+            STATE,
+            EVENT
+        }
     }
 }

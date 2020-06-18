@@ -48,8 +48,8 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
      * @param text String
      */
     @Action(description = "Long Description of Dummy Action with Data", categoryId = "BaseCategory")
-    private void dummyWithData(@Data String text) {
-        System.out.println("Action dummyWithData received: " + text);
+    private void dummyWithData(@Data String text, @Data Integer number) {
+        System.out.println("Action dummyWithData received: text [" + text + "] number [" + number + "]");
     }
 
     /**

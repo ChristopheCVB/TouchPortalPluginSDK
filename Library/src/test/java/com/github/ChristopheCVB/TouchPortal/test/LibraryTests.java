@@ -203,6 +203,51 @@ public class LibraryTests {
     }
 
     @Test
+    public void testReceiveDummyWithDataAction() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+        jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithData.ID);
+        JsonArray data = new JsonArray();
+        JsonObject textDataItem = new JsonObject();
+        textDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithData.Text.ID);
+        textDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_VALUE, "Text from Tests !");
+        data.add(textDataItem);
+        JsonObject numberDataItem = new JsonObject();
+        numberDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithData.Number.ID);
+        numberDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_VALUE, 42);
+        data.add(numberDataItem);
+        jsonMessage.add(ActionHelper.DATA, data);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+        Thread.sleep(10);
+        assertTrue(this.touchPortalPluginTest.isConnected());
+    }
+
+    @Test
+    public void testReceiveDummyWithoutDataAction() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+        jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithoutData.ID);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+        Thread.sleep(10);
+        assertTrue(this.touchPortalPluginTest.isConnected());
+    }
+
+    @Test
+    public void testReceiveListChange() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_LIST_CHANGE);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+        Thread.sleep(10);
+        assertTrue(this.touchPortalPluginTest.isConnected());
+    }
+
+    @Test
     public void testReceiveActionNoListener() throws IOException, InterruptedException {
         this.touchPortalPluginTest.connectThenPairAndListen(null);
         JsonObject jsonMessage = new JsonObject();
@@ -219,6 +264,16 @@ public class LibraryTests {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, "falsePluginId");
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+        Thread.sleep(10);
+        assertTrue(this.touchPortalPluginTest.isConnected());
+    }
+
+    @Test
+    public void testReceiveNoMessageType() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
         Thread.sleep(10);
@@ -329,7 +384,7 @@ public class LibraryTests {
 
         // Base Category Action DummyWithData Data items
         JsonArray baseCategoryActionDummyWithDataItems = baseCategoryActionDummyWithData.getAsJsonArray(ActionHelper.DATA);
-        assertEquals(1, baseCategoryActionDummyWithDataItems.size());
+        assertEquals(2, baseCategoryActionDummyWithDataItems.size());
 
         // Base Category Action DummyWithData Data Text item
         JsonObject baseCategoryActionDummyWithDataItemText = baseCategoryActionDummyWithDataItems.get(0).getAsJsonObject();

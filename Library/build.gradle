@@ -18,6 +18,10 @@ dependencies {
     testAnnotationProcessor project(':AnnotationsProcessor')
 }
 
+compileTestJava {
+    options.compilerArgs.add('-parameters')
+}
+
 apply plugin: 'jacoco'
 
 jacocoTestReport {
