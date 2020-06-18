@@ -647,7 +647,6 @@ public abstract class TouchPortalPlugin {
      */
     public static class ActionMethodDataParameterException extends ReflectiveOperationException {
         /**
-         * l
          * Constructor with a detail message.
          *
          * @param method    Method
