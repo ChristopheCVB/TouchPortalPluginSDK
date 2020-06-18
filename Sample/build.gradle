@@ -11,7 +11,7 @@ plugins {
 }
 
 def versionMajor = 4
-def versionMinor = 0
+def versionMinor = 1
 def versionPatch = 0
 
 def mainClassSimpleName = 'TouchPortalPluginExample'

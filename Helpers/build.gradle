@@ -3,7 +3,7 @@ plugins {
 }
 
 def versionMajor = 4
-def versionMinor = 0
+def versionMinor = 1
 def versionPatch = 0
 
 group 'com.github.ChristopheCVB.TouchPortal.Helpers'
