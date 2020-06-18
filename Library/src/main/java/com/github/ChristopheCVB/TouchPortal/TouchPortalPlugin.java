@@ -147,7 +147,7 @@ public abstract class TouchPortalPlugin {
     }
 
     private void onMessage(String socketMessage) throws SocketException, JsonParseException {
-        if (socketMessage != null && !socketMessage.isEmpty()) {
+        if (!socketMessage.isEmpty()) {
             final JsonElement jsonElement = JsonParser.parseString(socketMessage);
             if (!jsonElement.isJsonObject()) {
                 throw new JsonParseException("Received Message is not a JsonObject");
@@ -647,6 +647,7 @@ public abstract class TouchPortalPlugin {
      */
     public static class ActionMethodDataParameterException extends ReflectiveOperationException {
         /**
+         * l
          * Constructor with a detail message.
          *
          * @param method    Method

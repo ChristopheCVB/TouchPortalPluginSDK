@@ -229,10 +229,25 @@ public class LibraryTests {
     }
 
     @Test
-    public void testReceiveAction() throws IOException, InterruptedException {
+    public void testReceiveActionNoId() throws IOException, InterruptedException {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
+    public void testReceiveActionEmptyId() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+        jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, "");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
 
@@ -361,6 +376,26 @@ public class LibraryTests {
         assertEquals(sdkVersion, tpInfo.sdkVersion);
         assertEquals(tpVersionCode, tpInfo.tpVersionCode);
         assertEquals(tpVersionString, tpInfo.tpVersionString);
+    }
+
+    @Test
+    public void testReceiveInfoMissingPropsAndNoListener() throws IOException, InterruptedException {
+        this.touchPortalPluginTest.connectThenPairAndListen(null);
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_INFO);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+
+        TPInfo tpInfo = this.touchPortalPluginTest.getTPInfo();
+        assertNotNull(tpInfo);
+        assertEquals(-1, tpInfo.sdkVersion);
+        assertEquals(-1, tpInfo.tpVersionCode);
+        assertNull(tpInfo.tpVersionString);
     }
 
     @Test
