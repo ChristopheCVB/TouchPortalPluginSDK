@@ -23,6 +23,9 @@ package com.github.ChristopheCVB.TouchPortal.Helpers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+
 /**
  * Touch Portal Plugin Received Message Helper
  */
@@ -56,8 +59,18 @@ public class ReceivedMessageHelper {
      * @param jsonMessage JSONObject
      * @return boolean isMessageAnAction
      */
-    public static boolean isAnAction(JsonObject jsonMessage) {
+    public static boolean isTypeAction(JsonObject jsonMessage) {
         return ReceivedMessageHelper.TYPE_ACTION.equals(ReceivedMessageHelper.getType(jsonMessage));
+    }
+
+    /**
+     * Return true if the  received jsonMessage is a List Change
+     *
+     * @param jsonMessage JSONObject
+     * @return boolean isMessageAListChange
+     */
+    public static boolean isTypeListChange(JsonObject jsonMessage) {
+        return ReceivedMessageHelper.TYPE_LIST_CHANGE.equals(ReceivedMessageHelper.getType(jsonMessage));
     }
 
     /**
@@ -67,20 +80,37 @@ public class ReceivedMessageHelper {
      * @return String actionId
      */
     public static String getActionId(JsonObject jsonMessage) {
-        return jsonMessage.has(ReceivedMessageHelper.ACTION_ID) ? jsonMessage.get(ReceivedMessageHelper.ACTION_ID).getAsString() : "";
+        return jsonMessage.has(ReceivedMessageHelper.ACTION_ID) ? jsonMessage.get(ReceivedMessageHelper.ACTION_ID).getAsString() : null;
     }
 
     /**
-     * Retrieve an Action Data Value from a received Message
+     * Retrieve the List ID of a received Message
      *
-     * @param pluginClass         Class
-     * @param jsonMessage         JsonObject
-     * @param actionMethodName    String
-     * @param actionParameterName String
-     * @return String dataValue
+     * @param jsonMessage {@link JsonObject}
+     * @return String listId
      */
-    public static String getActionDataValue(Class<?> pluginClass, JsonObject jsonMessage, String actionMethodName, String actionParameterName) {
-        return ReceivedMessageHelper.getActionDataValue(jsonMessage, DataHelper.getActionDataId(pluginClass, actionMethodName, actionParameterName));
+    public static String getListId(JsonObject jsonMessage) {
+        return jsonMessage.has(ReceivedMessageHelper.LIST_ID) ? jsonMessage.get(ReceivedMessageHelper.LIST_ID).getAsString() : null;
+    }
+
+    /**
+     * Retrieve the Instance ID of a received Message
+     *
+     * @param jsonMessage {@link JsonObject}
+     * @return String instanceId
+     */
+    public static String getListInstanceId(JsonObject jsonMessage) {
+        return jsonMessage.has(ReceivedMessageHelper.INSTANCE_ID) ? jsonMessage.get(ReceivedMessageHelper.INSTANCE_ID).getAsString() : null;
+    }
+
+    /**
+     * Retrieve the List Value of a received Message
+     *
+     * @param jsonMessage {@link JsonObject}
+     * @return String instanceId
+     */
+    public static String getListValue(JsonObject jsonMessage) {
+        return jsonMessage.has(ReceivedMessageHelper.VALUE) ? jsonMessage.get(ReceivedMessageHelper.VALUE).getAsString() : null;
     }
 
     /**
@@ -91,7 +121,7 @@ public class ReceivedMessageHelper {
      * @return String dataValue
      */
     public static String getActionDataValue(JsonObject jsonMessage, String actionDataId) {
-        String dataValue = "";
+        String dataValue = null;
 
         if (jsonMessage.has(ActionHelper.DATA)) {
             JsonArray actionData = jsonMessage.getAsJsonArray(ActionHelper.DATA);
@@ -109,6 +139,83 @@ public class ReceivedMessageHelper {
     }
 
     /**
+     * Retrieve an Action Data Value from a received Message
+     *
+     * @param jsonMessage         JsonObject
+     * @param pluginClass         Class
+     * @param actionMethodName    String
+     * @param actionParameterName String
+     * @return String dataValue
+     */
+    public static String getActionDataValue(JsonObject jsonMessage, Class<?> pluginClass, String actionMethodName, String actionParameterName) {
+        return ReceivedMessageHelper.getActionDataValue(jsonMessage, DataHelper.getActionDataId(pluginClass, actionMethodName, actionParameterName));
+    }
+
+    /**
+     * Retrieve an Action Data Value from a received Message for a specific Parameter
+     *
+     * @param jsonMessage      JsonObject
+     * @param parameterDataId  String
+     * @param parameterRawType String
+     * @return Object actionDataValue
+     */
+    protected static Object getTypedActionDataValue(JsonObject jsonMessage, String parameterDataId, String parameterRawType) {
+        Object argumentValue = ReceivedMessageHelper.getActionDataValue(jsonMessage, parameterDataId);
+        if (argumentValue != null) {
+            switch (parameterRawType) {
+                case "short":
+                case "java.lang.Short":
+                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue).shortValue();
+                    break;
+
+                case "int":
+                case "java.lang.Integer":
+                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue).intValue();
+                    break;
+
+                case "float":
+                case "java.lang.Float":
+                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue).floatValue();
+                    break;
+
+                case "double":
+                case "java.lang.Double":
+                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue);
+                    break;
+
+                case "long":
+                case "java.lang.Long":
+                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue).longValue();
+                    break;
+
+                case "boolean":
+                case "java.lang.Boolean":
+                    argumentValue = ReceivedMessageHelper.getActionDataValueBoolean(jsonMessage, parameterDataId);
+                    break;
+
+                case "java.lang.String[]":
+                    argumentValue = new String[]{(String) argumentValue};
+                    break;
+            }
+        }
+        return argumentValue;
+    }
+
+    /**
+     * Retrieve an Action Data Value from a received Message for a specific Parameter
+     *
+     * @param jsonMessage JsonObject
+     * @param pluginClass Class
+     * @param method      Method
+     * @param parameter   Parameter
+     * @return Object actionDataValue
+     */
+    public static Object getTypedActionDataValue(JsonObject jsonMessage, Class<?> pluginClass, Method method, Parameter parameter) {
+        String parameterDataId = DataHelper.getActionDataId(pluginClass, method.getName(), parameter.getName());
+        return ReceivedMessageHelper.getTypedActionDataValue(jsonMessage, parameterDataId, parameter.getParameterizedType().getTypeName());
+    }
+
+    /**
      * Retrieve an Action Data Value from a received Message as a Double
      *
      * @param jsonMessage  JsonObject
@@ -116,18 +223,21 @@ public class ReceivedMessageHelper {
      * @return Double dataValueDouble
      */
     public static Double getActionDataValueDouble(JsonObject jsonMessage, String actionDataId) {
-        return Double.valueOf(ReceivedMessageHelper.getActionDataValue(jsonMessage, actionDataId));
+        return ReceivedMessageHelper.getActionDataValueDouble(ReceivedMessageHelper.getActionDataValue(jsonMessage, actionDataId));
     }
 
     /**
-     * Retrieve an Action Data Value from a received Message as a Long
+     * Retrieve an Action Data Value from a received Message as a Double
      *
-     * @param jsonMessage  JsonObject
-     * @param actionDataId String
-     * @return Double dataValueLong
+     * @param actionDataValue String
+     * @return Double dataValueDouble
      */
-    public static Long getActionDataValueLong(JsonObject jsonMessage, String actionDataId) {
-        return ReceivedMessageHelper.getActionDataValueDouble(jsonMessage, actionDataId).longValue();
+    protected static Double getActionDataValueDouble(String actionDataValue) {
+        Double actionDataValueDouble = null;
+        if (actionDataValue != null) {
+            actionDataValueDouble = Double.valueOf(actionDataValue);
+        }
+        return actionDataValueDouble;
     }
 
     /**
@@ -138,7 +248,7 @@ public class ReceivedMessageHelper {
      * @return Double dataValueLong
      */
     public static Boolean getActionDataValueBoolean(JsonObject jsonMessage, String actionDataId) {
-        return ReceivedMessageHelper.getActionDataValue(jsonMessage, actionDataId).equals("On");
+        return "On".equals(ReceivedMessageHelper.getActionDataValue(jsonMessage, actionDataId));
     }
 
     /**

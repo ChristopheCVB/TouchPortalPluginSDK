@@ -3,7 +3,7 @@ plugins {
 }
 
 def versionMajor = 4
-def versionMinor = 0
+def versionMinor = 1
 def versionPatch = 0
 
 group 'com.github.ChristopheCVB.TouchPortal'
@@ -16,6 +16,10 @@ dependencies {
 
     testImplementation group: 'junit', name: 'junit', version: '4.12'
     testAnnotationProcessor project(':AnnotationsProcessor')
+}
+
+compileTestJava {
+    options.compilerArgs.add('-parameters')
 }
 
 apply plugin: 'jacoco'

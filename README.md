@@ -21,29 +21,93 @@ Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 
 ## Get Started
 
-- Clone/Download this project
+- Clone/Download/Fork this project
 - Create a new Gradle Java Module (i.e. `MyTPPlugin`)
 - Copy the `build.gradle` from the `Sample` module to your new module and remove unnecessary dependencies
-- Create a class, in the package you chose, extending `TouchPortalPlugin` (i.e. `MyTouchPortalPlugin extends TouchPortalPlugin`) containing:
-```
+- Create a class, in the package you chose, extending `TouchPortalPlugin` (i.e. `MyTouchPortalPlugin extends TouchPortalPlugin`) like the example below:
+```java
+public class MyTouchPortalPlugin extends TouchPortalPlugin {
+    /**
+     * Constructor calling super
+     *
+     * @param args String[]
+     */
+    public MyTouchPortalPlugin(String[] args) {
+        super(args);
+    }
+
     public static void main(String[] args) {
         if (args != null && args.length == 2) {
             if (PluginHelper.COMMAND_START.equals(args[0])) {
-                // Initialize the Plugin
+                // Initialize your Plugin
                 MyTouchPortalPlugin myTouchPortalPlugin = new MyTouchPortalPlugin(args);
                 // Initiate the connection with the Touch Portal Plugin System
                 boolean connectedPairedAndListening = myTouchPortalPlugin.connectThenPairAndListen(myTouchPortalPlugin);
             }
         }
     }
+
+    @Override
+    public void onDisconnect(Exception exception) {
+        // Socket connection is lost or plugin has received close message
+        if (exception != null) {
+            exception.printStackTrace();
+        }
+        System.exit(0);
+    }
+
+    @Override
+    public void onReceive(JsonObject jsonMessage) {
+        // Check if ReceiveMessage is an Action
+        if (ReceivedMessageHelper.isTypeAction(jsonMessage)) {
+            // Get the Action ID
+            String receivedActionId = ReceivedMessageHelper.getActionId(jsonMessage);
+            if (receivedActionId != null) {
+                // Manually call the action methods which not all parameters are annotated with @Data
+                switch (receivedActionId) {
+                    // case ...:
+                    // break;
+                }
+            }
+        }
+        // dummyWithData and dummySwitchAction are automatically called by the SDK
+    }
+
+}
 ```
 - Edit the properties `mainClassPackage` and `mainClassSimpleName` in your `build.gradle`
 - Implement the interface methods
-- Creating the `entry.tp` file
-  * **Highly recommended method**: Use Annotations (Example can be found in the Sample module)
-  * *Not recommended*: Create and edit manually the file `src/main/resources/entry.tp` of your module to add your actions, states and events
+- Generating the `entry.tp` file using Annotations (More examples can be found in the Sample module)
+```java
+package com.github.ChristopheCVB.TouchPortal.sample;
+
+// import ...
+
+@Plugin(version = 1, colorDark = "#203060", colorLight = "#4070F0", name = "My Touch Portal Plugin")
+public class MyTouchPortalPlugin extends TouchPortalPlugin {
+    //...
+
+    /**
+     * Action example that contains a dynamic data text
+     *
+     * @param text String
+     */
+    @Action(description = "Long Description of Dummy Action with Data", format = "Set text to {$text$}", categoryId = "BaseCategory")
+    private void dummyWithData(@Data String text) {
+        System.out.println("Action dummyWithData received: " + text);
+    }
+    private enum Categories {
+        /**
+         * Category definition example
+         */
+        @Category(name = "My Touch Portal Plugin", imagePath = "images/icon-24.png")
+        BaseCategory
+    }
+
+}
+```
 - Add the Plugin icon into the following directory `src/main/resources/` of your module
-- Start calling your actions in the `onReceive(JsonObject jsonMessage)` method
+- If your declared Methods only contain `@Data` annotated parameter, it will be called automatically by the SDK, otherwise call your actions in the `onReceive(JsonObject jsonMessage)` method
 
 ## Build
 

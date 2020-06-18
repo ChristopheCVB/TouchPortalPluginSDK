@@ -28,7 +28,8 @@ import com.google.gson.JsonObject;
 
 import java.io.IOException;
 
-@Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
+@SuppressWarnings("unused")
+@Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
 public class TouchPortalPluginExample extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
     /**
      * State and Event definition example
@@ -80,9 +81,20 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
      *
      * @param text String
      */
-    @Action(description = "Long Description of Dummy Action with Data", format = "Set text to {$text$}", categoryId = "BaseCategory")
-    private void dummyWithData(@Data String text) {
-        System.out.println("Action dummyWithData received: " + text);
+    @Action(description = "Long Description of Dummy Action with Data Text", format = "Set text to {$text$}", categoryId = "BaseCategory")
+    private void dummyWithDataText(@Data String text) {
+        System.out.println("Action dummyWithDataText received: " + text);
+    }
+
+    /**
+     * Action example that contains a dynamic data text
+     *
+     * @param action String[]
+     */
+    @Action(description = "Long Description of Dummy Action with Data Text", format = "Do action {$action$}", categoryId = "BaseCategory")
+    private void dummyWithDataChoice(@Data(valueChoices = {"Enable", "Disable", "Toggle"}, defaultValue = "Toggle") String[] action) {
+        // The selected value is passed at index 0
+        System.out.println("Action dummyWithDataChoice received: " + action[0]);
     }
 
     /**
@@ -100,6 +112,11 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
         System.out.println("Action dummySwitchAction received: " + isOn);
     }
 
+    @Action(description = "Long Description of Dummy Action", format = "Do a dummy action", categoryId = "BaseCategory")
+    private void dummyAction() {
+        System.out.println("Action dummyAction received");
+    }
+
     @Override
     public void onDisconnect(Exception exception) {
         // Socket connection is lost or plugin has received close message
@@ -111,27 +128,19 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
     @Override
     public void onReceive(JsonObject jsonMessage) {
         // Check if ReceiveMessage is an Action
-        if (ReceivedMessageHelper.isAnAction(jsonMessage)) {
+        if (ReceivedMessageHelper.isTypeAction(jsonMessage)) {
             // Get the Action ID
             String receivedActionId = ReceivedMessageHelper.getActionId(jsonMessage);
-            switch (receivedActionId) {
-                case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.ID:
-                    // Example with IDs from Generated Constants Class
-                    // Manually call the action method
-                    this.dummyWithData(ReceivedMessageHelper.getActionDataValue(jsonMessage, TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithData.Text.ID));
-                    break;
-
-                case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithoutData.ID:
-                    // Example with IDs from Helper
-                    // Manually call the action method
-                    this.dummyWithoutData(jsonMessage);
-                    break;
-
-                case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummySwitchAction.ID:
-                    this.dummySwitchAction(ReceivedMessageHelper.getActionDataValueBoolean(jsonMessage, TouchPortalPluginExampleConstants.BaseCategory.Actions.DummySwitchAction.IsOn.ID));
-                    break;
+            if (receivedActionId != null) {
+                switch (receivedActionId) {
+                    case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithoutData.ID:
+                        // Manually call the action method because the parameter jsonMessage is not annotated with @Data
+                        this.dummyWithoutData(jsonMessage);
+                        break;
+                }
             }
         }
+        // dummyWithDataText, dummyWithDataChoice, dummySwitchAction and dummyAction are automatically called by the SDK
     }
 
     private enum Categories {
