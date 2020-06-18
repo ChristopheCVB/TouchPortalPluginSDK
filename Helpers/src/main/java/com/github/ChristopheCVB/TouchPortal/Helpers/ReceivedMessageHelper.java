@@ -192,6 +192,10 @@ public class ReceivedMessageHelper {
                 case "java.lang.Boolean":
                     argumentValue = ReceivedMessageHelper.getActionDataValueBoolean(jsonMessage, parameterDataId);
                     break;
+
+                case "java.lang.String[]":
+                    argumentValue = new String[]{(String) argumentValue};
+                    break;
             }
         }
         return argumentValue;
