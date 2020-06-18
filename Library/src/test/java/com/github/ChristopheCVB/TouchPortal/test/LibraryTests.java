@@ -54,6 +54,10 @@ public class LibraryTests {
         @Override
         public void onReceive(JsonObject jsonMessage) {
         }
+
+        @Override
+        public void onInfo(TPInfo tpInfo) {
+        }
     };
 
     @Before
@@ -72,7 +76,15 @@ public class LibraryTests {
     private void serverSocketAccept() {
         new Thread(() -> {
             try {
-                LibraryTests.this.serverSocketClient = LibraryTests.this.serverSocket.accept();
+                if (this.serverSocketClient != null) {
+                    this.serverSocketClient.close();
+                }
+            }
+            catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+            try {
+                this.serverSocketClient = this.serverSocket.accept();
             }
             catch (IOException ioException) {
                 ioException.printStackTrace();
@@ -85,33 +97,58 @@ public class LibraryTests {
     }
 
     @After
-    public void close() throws IOException {
-        if (this.touchPortalPluginTest != null) {
-            this.touchPortalPluginTest.close(null);
+    public void close() {
+        try {
+            if (this.serverSocketClient != null) {
+                this.serverSocketClient.close();
+            }
         }
-        if (this.serverSocketClient != null) {
-            this.serverSocketClient.close();
+        catch (IOException ioException) {
+            ioException.printStackTrace();
         }
-        if (this.serverSocket != null) {
-            this.serverSocket.close();
+        try {
+            if (this.serverSocket != null) {
+                this.serverSocket.close();
+            }
         }
+        catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+        try {
+            Thread.sleep(10);
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+//        if (this.touchPortalPluginTest != null) {
+//            this.touchPortalPluginTest.close(null);
+//        }
     }
 
     @Test
     public void testConnection() {
+        try {
+            Thread.sleep(1000);
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
     }
 
     @Test
-    public void testConnectionFail() throws IOException {
+    public void testConnectionFail() {
         this.close();
 
         boolean connectedPairedAndListening = this.touchPortalPluginTest.connectThenPairAndListen(null);
         assertFalse(connectedPairedAndListening);
+        assertFalse(this.touchPortalPluginTest.isListening());
         assertFalse(this.touchPortalPluginTest.isConnected());
 
         connectedPairedAndListening = this.touchPortalPluginTest.connectThenPairAndListen(this.touchPortalPluginListener);
         assertFalse(connectedPairedAndListening);
+        assertFalse(this.touchPortalPluginTest.isListening());
         assertFalse(this.touchPortalPluginTest.isConnected());
     }
 
@@ -198,8 +235,11 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
+
         Thread.sleep(10);
+
         assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
     }
 
     @Test
@@ -220,8 +260,11 @@ public class LibraryTests {
         jsonMessage.add(ActionHelper.DATA, data);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
+
         Thread.sleep(10);
+
         assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
     }
 
     @Test
@@ -232,8 +275,11 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithoutData.ID);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
+
         Thread.sleep(10);
+
         assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
     }
 
     @Test
@@ -243,8 +289,11 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_LIST_CHANGE);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
+
         Thread.sleep(10);
+
         assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
     }
 
     @Test
@@ -255,8 +304,11 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
+
         Thread.sleep(10);
+
         assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
     }
 
     @Test
@@ -266,8 +318,11 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
+
         Thread.sleep(10);
+
         assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
     }
 
     @Test
@@ -276,8 +331,11 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
+
         Thread.sleep(10);
+
         assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
     }
 
     @Test
@@ -292,8 +350,11 @@ public class LibraryTests {
         jsonMessage.addProperty(TPInfo.TP_VERSION_STRING, tpVersionString);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
+
         Thread.sleep(10);
+
         assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
 
         TPInfo tpInfo = this.touchPortalPluginTest.getTPInfo();
         assertNotNull(tpInfo);
@@ -314,6 +375,7 @@ public class LibraryTests {
         Thread.sleep(10);
 
         assertFalse(this.touchPortalPluginTest.isConnected());
+        assertFalse(this.touchPortalPluginTest.isListening());
     }
 
     @Test
@@ -324,6 +386,7 @@ public class LibraryTests {
         Thread.sleep(10);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
     }
 
     @Test
@@ -334,17 +397,22 @@ public class LibraryTests {
         Thread.sleep(10);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
     }
 
     @Test
     public void testReceivePart() throws IOException, InterruptedException {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.print("");
+        out.print("This");
+        out.print("is");
+        out.print("partial");
+        out.print("data");
         out.println();
 
         Thread.sleep(10);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
     }
 
     @Test

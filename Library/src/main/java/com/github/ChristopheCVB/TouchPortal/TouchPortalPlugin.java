@@ -24,10 +24,7 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.Action;
 import com.github.ChristopheCVB.TouchPortal.Annotations.Data;
 import com.github.ChristopheCVB.TouchPortal.Helpers.*;
 import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -35,6 +32,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Properties;
@@ -128,86 +126,94 @@ public abstract class TouchPortalPlugin {
      */
     private Thread createListenerThread() {
         return new Thread(() -> {
-            socketReaderLoop:
             while (true) {
                 try {
-                    if (TouchPortalPlugin.this.touchPortalSocket == null) {
-                        throw new IOException("Socket Access lost");
+                    if (this.bufferedReader == null) {
+                        this.bufferedReader = new BufferedReader(new InputStreamReader(this.touchPortalSocket.getInputStream()));
                     }
-                    if (TouchPortalPlugin.this.bufferedReader == null) {
-                        TouchPortalPlugin.this.bufferedReader = new BufferedReader(new InputStreamReader(TouchPortalPlugin.this.touchPortalSocket.getInputStream()));
+                    String socketMessage = this.bufferedReader.readLine();
+                    if (socketMessage == null) {
+                        throw new SocketException("Server Socket Closed");
                     }
-                    String socketMessage = TouchPortalPlugin.this.bufferedReader.readLine();
-                    if (socketMessage != null && !socketMessage.isEmpty()) {
-                        final JsonObject jsonMessage = JsonParser.parseString(socketMessage).getAsJsonObject();
-                        final String messageType = ReceivedMessageHelper.getType(jsonMessage);
-                        if (messageType != null) {
-                            switch (messageType) {
-                                case ReceivedMessageHelper.TYPE_CLOSE_PLUGIN:
-                                    System.out.println("Close Message Received");
-                                    TouchPortalPlugin.this.close(null);
-                                    break socketReaderLoop;
+                    this.onMessage(socketMessage);
+                }
+                catch (IOException ioException) {
+                    this.close(ioException);
+                    break;
+                }
+                catch (JsonParseException ignored) {}
+            }
+        });
+    }
 
-                                case ReceivedMessageHelper.TYPE_INFO:
-                                    TouchPortalPlugin.this.tpInfo = TPInfo.from(jsonMessage);
-                                    break;
+    private void onMessage(String socketMessage) throws SocketException, JsonParseException {
+        if (socketMessage != null && !socketMessage.isEmpty()) {
+            final JsonElement jsonElement = JsonParser.parseString(socketMessage);
+            if (!jsonElement.isJsonObject()) {
+                throw new JsonParseException("Received Message is not a JsonObject");
+            }
+            final JsonObject jsonMessage = jsonElement.getAsJsonObject();
+            final String messageType = ReceivedMessageHelper.getType(jsonMessage);
+            if (messageType != null) {
+                switch (messageType) {
+                    case ReceivedMessageHelper.TYPE_CLOSE_PLUGIN:
+                        throw new SocketException("Close Message Received");
 
-                                default:
-                                    this.callbacksExecutor.submit(() -> {
-                                        if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, TouchPortalPlugin.this.pluginClass)) {
-                                            boolean called = false;
-                                            if (messageType.equals(ReceivedMessageHelper.TYPE_ACTION)) {
-                                                String messageActionId = ReceivedMessageHelper.getActionId(jsonMessage);
-                                                if (messageActionId != null && !messageActionId.isEmpty()) {
-                                                    for (Method method : TouchPortalPlugin.this.pluginClass.getDeclaredMethods()) {
-                                                        if (method.isAnnotationPresent(Action.class)) {
-                                                            String methodActionId = ActionHelper.getActionId(TouchPortalPlugin.this.pluginClass, method.getName());
-                                                            if (messageActionId.equals(methodActionId)) {
-                                                                try {
-                                                                    Parameter[] parameters = method.getParameters();
-                                                                    Object[] arguments = new Object[parameters.length];
-                                                                    for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
-                                                                        Parameter parameter = parameters[parameterIndex];
-                                                                        if (parameter.isAnnotationPresent(Data.class)) {
-                                                                            arguments[parameterIndex] = ReceivedMessageHelper.getTypedActionDataValue(jsonMessage, TouchPortalPlugin.this.pluginClass, method, parameter);
-                                                                        }
-                                                                        if (arguments[parameterIndex] == null) {
-                                                                            throw new NoSuchFieldException("Impossible to retrieve Action Data Item for Method [" + method.getName() + "] and parameter [" + parameter.getName() + "]");
-                                                                        }
-                                                                    }
-                                                                    method.setAccessible(true);
-                                                                    method.invoke(TouchPortalPlugin.this, arguments);
-                                                                    System.out.println("Auto Called Action");
-                                                                    called = true;
-                                                                }
-                                                                catch (IllegalAccessException | InvocationTargetException | SecurityException | NoSuchFieldException e) {
-                                                                    e.printStackTrace();
-                                                                }
-                                                                break;
+                    case ReceivedMessageHelper.TYPE_INFO:
+                        this.tpInfo = TPInfo.from(jsonMessage);
+                        if (this.touchPortalPluginListener != null) {
+                            this.touchPortalPluginListener.onInfo(this.tpInfo);
+                        }
+                        break;
+
+                    default:
+                        this.callbacksExecutor.submit(() -> {
+                            if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, this.pluginClass)) {
+                                boolean called = false;
+                                System.out.println("Message Received");
+                                if (messageType.equals(ReceivedMessageHelper.TYPE_ACTION)) {
+                                    String messageActionId = ReceivedMessageHelper.getActionId(jsonMessage);
+                                    if (messageActionId != null && !messageActionId.isEmpty()) {
+                                        for (Method method : this.pluginClass.getDeclaredMethods()) {
+                                            if (method.isAnnotationPresent(Action.class)) {
+                                                String methodActionId = ActionHelper.getActionId(this.pluginClass, method.getName());
+                                                if (messageActionId.equals(methodActionId)) {
+                                                    try {
+                                                        Parameter[] parameters = method.getParameters();
+                                                        Object[] arguments = new Object[parameters.length];
+                                                        for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
+                                                            Parameter parameter = parameters[parameterIndex];
+                                                            if (parameter.isAnnotationPresent(Data.class)) {
+                                                                arguments[parameterIndex] = ReceivedMessageHelper.getTypedActionDataValue(jsonMessage, this.pluginClass, method, parameter);
+                                                            }
+                                                            if (arguments[parameterIndex] == null) {
+                                                                throw new ActionMethodDataParameterException(method, parameter);
                                                             }
                                                         }
+                                                        method.setAccessible(true);
+                                                        method.invoke(this, arguments);
+                                                        called = true;
                                                     }
-                                                }
-                                            }
-                                            if (!called) {
-                                                System.out.println("Message Received");
-                                                if (TouchPortalPlugin.this.touchPortalPluginListener != null) {
-                                                    TouchPortalPlugin.this.touchPortalPluginListener.onReceive(jsonMessage);
+                                                    catch (IllegalAccessException | InvocationTargetException | SecurityException | ActionMethodDataParameterException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    break;
                                                 }
                                             }
                                         }
-                                    });
-                                    break;
+                                    }
+                                }
+                                if (!called) {
+                                    if (this.touchPortalPluginListener != null) {
+                                        this.touchPortalPluginListener.onReceive(jsonMessage);
+                                    }
+                                }
                             }
-                        }
-                    }
-                }
-                catch (IOException ioException) {
-                    TouchPortalPlugin.this.close(ioException);
-                    break;
+                        });
+                        break;
                 }
             }
-        });
+        }
     }
 
     /**
@@ -244,29 +250,34 @@ public abstract class TouchPortalPlugin {
      *
      * @param exception Exception
      */
-    public void close(Exception exception) {
-        try {
-            this.storeProperties();
-        }
-        catch (IOException ignored) {}
+    public synchronized void close(Exception exception) {
+        System.out.println("Closing" + (exception != null ? " because " + exception.getMessage() : ""));
 
-
-        System.out.println("closing");
-        if (!this.callbacksExecutor.isShutdown()) {
-            this.callbacksExecutor.shutdownNow();
-        }
-        if (this.printWriter != null) {
-            this.printWriter.close();
-            this.printWriter = null;
-        }
-        if (this.bufferedReader != null) {
+        if (this.touchPortalSocket != null) {
             try {
-                this.bufferedReader.close();
+                this.storeProperties();
             }
             catch (IOException ignored) {}
-            this.bufferedReader = null;
-        }
-        if (this.touchPortalSocket != null) {
+
+            if (this.listenerThread != null) {
+                this.listenerThread.interrupt();
+                this.listenerThread = null;
+            }
+            if (!this.callbacksExecutor.isShutdown()) {
+                this.callbacksExecutor.shutdownNow();
+            }
+            if (this.printWriter != null) {
+                this.printWriter.close();
+                this.printWriter = null;
+            }
+            if (this.bufferedReader != null) {
+                try {
+                    this.bufferedReader.close();
+                }
+                catch (IOException ignored) {}
+                this.bufferedReader = null;
+            }
+
             try {
                 this.touchPortalSocket.close();
             }
@@ -277,8 +288,6 @@ public abstract class TouchPortalPlugin {
                 this.touchPortalPluginListener.onDisconnect(exception);
             }
         }
-
-        this.listenerThread = null;
     }
 
     /**
@@ -481,6 +490,10 @@ public abstract class TouchPortalPlugin {
         return this.touchPortalSocket != null && this.touchPortalSocket.isConnected();
     }
 
+    public boolean isListening() {
+        return this.listenerThread != null && this.listenerThread.isAlive();
+    }
+
     /**
      * Get a Resource File that is stored in the Plugin directory
      *
@@ -620,5 +633,27 @@ public abstract class TouchPortalPlugin {
          * @param jsonMessage {@link JsonObject}
          */
         void onReceive(JsonObject jsonMessage);
+
+        /**
+         * Called when the Info Message is received
+         *
+         * @param tpInfo {@link TPInfo}
+         */
+        void onInfo(TPInfo tpInfo);
+    }
+
+    /**
+     * Signals that the @Action Annotated Method have a parameter which is not @Data Annotated.
+     */
+    public static class ActionMethodDataParameterException extends ReflectiveOperationException {
+        /**
+         * Constructor with a detail message.
+         *
+         * @param method    Method
+         * @param parameter Parameter
+         */
+        public ActionMethodDataParameterException(Method method, Parameter parameter) {
+            super("Impossible to retrieve Action Data Item for Method [" + method.getName() + "] and parameter [" + parameter.getName() + "]");
+        }
     }
 }

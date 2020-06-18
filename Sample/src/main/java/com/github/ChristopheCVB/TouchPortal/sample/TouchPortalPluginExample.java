@@ -24,6 +24,7 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.ReceivedMessageHelper;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
+import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
@@ -31,6 +32,14 @@ import java.io.IOException;
 @SuppressWarnings("unused")
 @Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
 public class TouchPortalPluginExample extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
+    private enum Categories {
+        /**
+         * Category definition example
+         */
+        @Category(name = "Touch Portal Plugin Example", imagePath = "images/icon-24.png")
+        BaseCategory
+    }
+
     /**
      * State and Event definition example
      */
@@ -120,9 +129,6 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
     @Override
     public void onDisconnect(Exception exception) {
         // Socket connection is lost or plugin has received close message
-        if (exception != null) {
-            exception.printStackTrace();
-        }
     }
 
     @Override
@@ -132,6 +138,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
             // Get the Action ID
             String receivedActionId = ReceivedMessageHelper.getActionId(jsonMessage);
             if (receivedActionId != null) {
+                //noinspection SwitchStatementWithTooFewBranches
                 switch (receivedActionId) {
                     case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithoutData.ID:
                         // Manually call the action method because the parameter jsonMessage is not annotated with @Data
@@ -143,11 +150,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
         // dummyWithDataText, dummyWithDataChoice, dummySwitchAction and dummyAction are automatically called by the SDK
     }
 
-    private enum Categories {
-        /**
-         * Category definition example
-         */
-        @Category(name = "Touch Portal Plugin Example", imagePath = "images/icon-24.png")
-        BaseCategory
+    @Override
+    public void onInfo(TPInfo tpInfo) {
     }
 }

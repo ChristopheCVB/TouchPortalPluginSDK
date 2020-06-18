@@ -4,11 +4,12 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.Action
 import com.github.ChristopheCVB.TouchPortal.Annotations.Category
 import com.github.ChristopheCVB.TouchPortal.Annotations.Plugin
 import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper
-import com.github.ChristopheCVB.TouchPortal.Helpers.ReceivedMessageHelper
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin
+import com.github.ChristopheCVB.TouchPortal.model.TPInfo
 import com.google.gson.JsonObject
 import kotlin.system.exitProcess
 
+@Suppress("unused")
 @Plugin(version = 4100, colorDark = "#556677", colorLight = "#112233")
 class TouchPortalKotlinPlugin(args: Array<out String>?) : TouchPortalPlugin(args), TouchPortalPlugin.TouchPortalPluginListener {
     companion object {
@@ -45,11 +46,7 @@ class TouchPortalKotlinPlugin(args: Array<out String>?) : TouchPortalPlugin(args
         exitProcess(0)
     }
 
-    override fun onReceive(jsonMessage: JsonObject?) {
-        if (ReceivedMessageHelper.isTypeAction(jsonMessage)) {
-            when (ReceivedMessageHelper.getActionId(jsonMessage)) {
-                TouchPortalKotlinPluginConstants.BaseCategory.Actions.LogTime.ID -> logTime()
-            }
-        }
-    }
+    override fun onReceive(jsonMessage: JsonObject) {}
+
+    override fun onInfo(tpInfo: TPInfo?) {}
 }
