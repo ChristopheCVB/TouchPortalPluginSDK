@@ -7,8 +7,9 @@ import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper
 import com.github.ChristopheCVB.TouchPortal.Helpers.ReceivedMessageHelper
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin
 import com.google.gson.JsonObject
+import kotlin.system.exitProcess
 
-@Plugin(version = 1, colorDark = "#556677", colorLight = "#112233")
+@Plugin(version = 4000, colorDark = "#556677", colorLight = "#112233")
 class TouchPortalKotlinPlugin(args: Array<out String>?) : TouchPortalPlugin(args), TouchPortalPlugin.TouchPortalPluginListener {
     companion object {
         @JvmStatic
@@ -29,6 +30,7 @@ class TouchPortalKotlinPlugin(args: Array<out String>?) : TouchPortalPlugin(args
         }
     }
 
+    @Suppress("unused")
     enum class Categories {
         @Category(imagePath = "images/icon-24.png")
         BaseCategory
@@ -40,13 +42,12 @@ class TouchPortalKotlinPlugin(args: Array<out String>?) : TouchPortalPlugin(args
     }
 
     override fun onDisconnect(exception: Exception?) {
-        System.exit(0)
+        exitProcess(0)
     }
 
     override fun onReceive(jsonMessage: JsonObject?) {
         if (ReceivedMessageHelper.isTypeAction(jsonMessage)) {
-            val actionId = ReceivedMessageHelper.getActionId(jsonMessage)
-            when (actionId) {
+            when (ReceivedMessageHelper.getActionId(jsonMessage)) {
                 TouchPortalKotlinPluginConstants.BaseCategory.Actions.LogTime.ID -> logTime()
             }
         }

@@ -1,5 +1,13 @@
+buildscript {
+    repositories {
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+}
 plugins {
     id 'java'
+    id 'de.fuerstenau.buildconfig' version '1.1.8'
 }
 
 def versionMajor = 4
@@ -10,6 +18,16 @@ def mainClassSimpleName = 'TouchPortalPluginExample'
 def mainClassPackage = 'com.github.ChristopheCVB.TouchPortal.sample'
 group mainClassPackage
 version "${versionMajor}.${versionMinor}.${versionPatch}"
+
+buildConfig {
+    appName = project.name
+    version = project.version
+
+    clsName = 'BuildConfig'
+    packageName = project.group
+
+    buildConfigField 'int', 'VERSION_CODE', (versionMajor * 1000 + versionMinor * 100 + versionPatch) + ''
+}
 
 dependencies {
     compile project(':Library')

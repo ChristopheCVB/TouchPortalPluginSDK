@@ -24,7 +24,8 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import com.google.gson.JsonObject;
 
-@Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0")
+@SuppressWarnings("unused")
+@Plugin(version = 4000, colorDark = "#203060", colorLight = "#4070F0")
 public class TouchPortalPluginTest extends TouchPortalPlugin {
     /**
      * State and Event definition example

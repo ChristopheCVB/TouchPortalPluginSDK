@@ -28,7 +28,8 @@ import com.google.gson.JsonObject;
 
 import java.io.IOException;
 
-@Plugin(version = 1000, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
+@SuppressWarnings("unused")
+@Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
 public class TouchPortalPluginExample extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
     /**
      * State and Event definition example
