@@ -9,7 +9,7 @@ import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin
 import com.google.gson.JsonObject
 import kotlin.system.exitProcess
 
-@Plugin(version = 4000, colorDark = "#556677", colorLight = "#112233")
+@Plugin(version = 4100, colorDark = "#556677", colorLight = "#112233")
 class TouchPortalKotlinPlugin(args: Array<out String>?) : TouchPortalPlugin(args), TouchPortalPlugin.TouchPortalPluginListener {
     companion object {
         @JvmStatic
