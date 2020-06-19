@@ -102,7 +102,7 @@ public abstract class TouchPortalPlugin {
     /**
      * Executor Service for callbacks
      */
-    private final ExecutorService callbacksExecutor = Executors.newFixedThreadPool(5);
+    private final ExecutorService callbacksExecutor;
 
     /**
      * Info sent by the Touch Portal Plugin System
@@ -112,11 +112,13 @@ public abstract class TouchPortalPlugin {
     /**
      * Constructor
      *
-     * @param args String[]
+     * @param touchPortalPluginFolder String - args[1]
+     * @param parallelizeActions      boolean - Parallelize Actions execution
      */
-    protected TouchPortalPlugin(String[] args) {
-        this.touchPortalPluginFolder = args[1].trim();
+    protected TouchPortalPlugin(String touchPortalPluginFolder, boolean parallelizeActions) {
+        this.touchPortalPluginFolder = touchPortalPluginFolder;
         this.pluginClass = this.getClass();
+        this.callbacksExecutor = Executors.newFixedThreadPool(parallelizeActions ? 5 : 1);
     }
 
     /**

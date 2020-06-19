@@ -50,17 +50,17 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
     /**
      * Constructor calling super
      *
-     * @param args String[]
+     * @param touchPortalPluginFolder String
      */
-    public TouchPortalPluginExample(String[] args) {
-        super(args);
+    public TouchPortalPluginExample(String touchPortalPluginFolder) {
+        super(touchPortalPluginFolder, true);
     }
 
     public static void main(String[] args) {
         if (args != null && args.length == 2) {
             if (PluginHelper.COMMAND_START.equals(args[0])) {
                 // Initialize the Plugin
-                TouchPortalPluginExample touchPortalPluginExample = new TouchPortalPluginExample(args);
+                TouchPortalPluginExample touchPortalPluginExample = new TouchPortalPluginExample(args[1]);
                 try {
                     // Load a properties File
                     touchPortalPluginExample.loadProperties("plugin.config");

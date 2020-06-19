@@ -11,14 +11,14 @@ import kotlin.system.exitProcess
 
 @Suppress("unused")
 @Plugin(version = 4100, colorDark = "#556677", colorLight = "#112233")
-class TouchPortalKotlinPlugin(args: Array<out String>?) : TouchPortalPlugin(args), TouchPortalPlugin.TouchPortalPluginListener {
+class TouchPortalKotlinPlugin(touchPortalPluginFolder: String, parallelizeActions: Boolean) : TouchPortalPlugin(touchPortalPluginFolder, parallelizeActions), TouchPortalPlugin.TouchPortalPluginListener {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
             if (args.size == 2) {
                 if (PluginHelper.COMMAND_START == args[0]) {
                     // Initialize the Plugin
-                    val touchPortalPluginExample = TouchPortalKotlinPlugin(args)
+                    val touchPortalPluginExample = TouchPortalKotlinPlugin(args[1], true)
 
                     // Initiate the connection with the Touch Portal Plugin System
                     val connectedPairedAndListening = touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample)
