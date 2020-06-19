@@ -40,7 +40,7 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
      * @param args String[]
      */
     public TouchPortalPluginTest(String[] args) {
-        super(args);
+        super(args[1], true);
     }
 
     /**
