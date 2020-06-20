@@ -527,6 +527,7 @@ public abstract class TouchPortalPlugin {
             FileInputStream fis = new FileInputStream(this.propertiesFile.getAbsolutePath());
             this.properties = new Properties();
             this.properties.load(fis);
+            fis.close();
         }
     }
 
@@ -595,7 +596,9 @@ public abstract class TouchPortalPlugin {
      */
     public void storeProperties() throws IOException {
         if (this.properties != null) {
-            this.properties.store(new FileOutputStream(this.propertiesFile), "");
+            FileOutputStream fos = new FileOutputStream(this.propertiesFile);
+            this.properties.store(fos, "");
+            fos.close();
         }
     }
 
