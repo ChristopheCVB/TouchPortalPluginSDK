@@ -224,7 +224,6 @@ public abstract class TouchPortalPlugin {
      * @return boolean Pairing Message sent
      */
     private boolean sendPair() {
-        // Send Pairing Message
         JsonObject pairingMessage = new JsonObject();
         pairingMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_PAIR);
         pairingMessage.addProperty(SentMessageHelper.ID, PluginHelper.getPluginId(this.pluginClass));
