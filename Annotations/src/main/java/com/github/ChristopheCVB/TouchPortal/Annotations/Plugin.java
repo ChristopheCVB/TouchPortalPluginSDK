@@ -30,6 +30,8 @@ import java.lang.annotation.Target;
  * <p>
  * Target is a Class
  * </p>
+ *
+ * @see <a href="https://www.touch-portal.com/sdk/index.php?section=structure">TP Documentation: Plugin Structure</a>
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)

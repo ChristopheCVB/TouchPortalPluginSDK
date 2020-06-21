@@ -30,6 +30,8 @@ import java.lang.annotation.Target;
  * <p>
  * Target is a Method
  * </p>
+ *
+ * @see <a href="https://www.touch-portal.com/sdk/index.php?section=categories">TP Documentation: Categories</a>
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.FIELD)

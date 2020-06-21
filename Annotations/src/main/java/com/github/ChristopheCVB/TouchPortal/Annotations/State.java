@@ -30,6 +30,8 @@ import java.lang.annotation.Target;
  * <p>
  * Target is a Field
  * </p>
+ *
+ * @see <a href="https://www.touch-portal.com/sdk/index.php?section=states">TP Documentation: States</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

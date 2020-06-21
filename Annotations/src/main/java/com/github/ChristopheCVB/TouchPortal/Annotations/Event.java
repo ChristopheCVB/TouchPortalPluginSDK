@@ -30,6 +30,8 @@ import java.lang.annotation.Target;
  * <p>
  * Target is a Field
  * </p>
+ *
+ * @see <a href="https://www.touch-portal.com/sdk/index.php?section=events">TP Documentation: Events</a>
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.FIELD)

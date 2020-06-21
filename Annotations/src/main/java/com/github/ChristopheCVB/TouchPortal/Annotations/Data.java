@@ -30,6 +30,8 @@ import java.lang.annotation.Target;
  * <p>
  * Target is a Parameter
  * </p>
+ *
+ * @see <a href="https://www.touch-portal.com/sdk/index.php?section=action-data">TP Documentation: Action Data</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

@@ -30,6 +30,12 @@ import java.lang.annotation.Target;
  * <p>
  * Target is a Method
  * </p>
+ * <p>
+ * <b>If your method only has @Data annotated parameters, it will be called automatically by the SDK.</b>
+ * <i>If it is not the case, the SDK will call the TouchPortalPluginListener.onReceive(JsonObject jsonMessage) instead.</i>
+ * </p>
+ *
+ * @see <a href="https://www.touch-portal.com/sdk/index.php?section=dynamic-actions">TP Documentation: Dynamic Actions</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
