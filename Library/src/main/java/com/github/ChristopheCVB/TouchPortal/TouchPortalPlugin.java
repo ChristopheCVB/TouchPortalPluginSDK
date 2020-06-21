@@ -344,7 +344,7 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
-     * Internal Send a Message to the Touch Portal Plugin System
+     * Internal - Send a Message to the Touch Portal Plugin System
      *
      * @param message {@link JsonObject}
      * @return boolean isMessageSent
@@ -517,16 +517,16 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
-     * Internal Load the set Properties File
+     * Internal - Load the Properties File
      *
      * @throws IOException ioException
      */
     private void loadProperties() throws IOException {
         if (this.propertiesFile != null) {
-            FileInputStream fis = new FileInputStream(this.propertiesFile.getAbsolutePath());
+            FileInputStream fileInputStream = new FileInputStream(this.propertiesFile.getAbsolutePath());
             this.properties = new Properties();
-            this.properties.load(fis);
-            fis.close();
+            this.properties.load(fileInputStream);
+            fileInputStream.close();
         }
     }
 
@@ -595,9 +595,9 @@ public abstract class TouchPortalPlugin {
      */
     public void storeProperties() throws IOException {
         if (this.properties != null) {
-            FileOutputStream fos = new FileOutputStream(this.propertiesFile);
-            this.properties.store(fos, "");
-            fos.close();
+            FileOutputStream fileOutputStream = new FileOutputStream(this.propertiesFile);
+            this.properties.store(fileOutputStream, this.pluginClass.getSimpleName());
+            fileOutputStream.close();
         }
     }
 
