@@ -57,7 +57,7 @@ public class PluginHelper {
     public static final String ENTRY_TP = "entry.tp";
 
     /**
-     * Get the formatted Plugin ID
+     * Get the generated Plugin ID
      *
      * @param pluginElement Element
      * @return String pluginId
@@ -67,7 +67,7 @@ public class PluginHelper {
     }
 
     /**
-     * Get the formatted Plugin Name
+     * Get the generated Plugin Name
      *
      * @param element Element
      * @param plugin  {@link Plugin}
@@ -78,7 +78,7 @@ public class PluginHelper {
     }
 
     /**
-     * Get the formatted Plugin ID
+     * Get the generated Plugin ID
      *
      * @param pluginClass Class
      * @return pluginId

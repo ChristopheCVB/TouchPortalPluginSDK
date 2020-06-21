@@ -30,10 +30,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -68,8 +65,8 @@ public class LibraryTests {
         File testResourcesDirectory = new File("src/test/resources/");
         this.touchPortalPluginTest = new TouchPortalPluginTest(new String[]{"start", testResourcesDirectory.getAbsolutePath() + "/"});
 
-        boolean connectedPairedAndListening = this.touchPortalPluginTest.connectThenPairAndListen(this.touchPortalPluginListener);
         this.serverSocketAccept();
+        boolean connectedPairedAndListening = this.touchPortalPluginTest.connectThenPairAndListen(this.touchPortalPluginListener);
         assertTrue(connectedPairedAndListening);
     }
 
@@ -90,10 +87,6 @@ public class LibraryTests {
                 ioException.printStackTrace();
             }
         }).start();
-        try {
-            Thread.sleep(100);
-        }
-        catch (InterruptedException ignored) {}
     }
 
     @After
@@ -128,7 +121,7 @@ public class LibraryTests {
     @Test
     public void testConnection() {
         try {
-            Thread.sleep(1000);
+            Thread.sleep(500);
         }
         catch (InterruptedException e) {
             e.printStackTrace();
@@ -461,10 +454,12 @@ public class LibraryTests {
     }
 
     @Test
-    public void testEntryTP() throws IOException {
+    public void testEntryTPAndConstants() throws IOException {
         File testGeneratedResourcesDirectory = new File("build/generated/sources/annotationProcessor/java/test/resources");
 
-        JsonObject entry = JsonParser.parseString(new String(Files.readAllBytes(Paths.get(new File(testGeneratedResourcesDirectory.getAbsolutePath() + "/entry.tp").getAbsolutePath())))).getAsJsonObject();
+        BufferedReader reader = Files.newBufferedReader(Paths.get(new File(testGeneratedResourcesDirectory.getAbsolutePath() + "/entry.tp").getAbsolutePath()));
+        JsonObject entry = JsonParser.parseReader(reader).getAsJsonObject();
+        reader.close();
 
         // Plugin
         assertEquals(TouchPortalPluginTestConstants.ID, entry.get(PluginHelper.ID).getAsString());

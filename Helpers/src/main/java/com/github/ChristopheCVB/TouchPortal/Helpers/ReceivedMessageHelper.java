@@ -54,7 +54,7 @@ public class ReceivedMessageHelper {
     }
 
     /**
-     * Return true if the  received jsonMessage is an Action
+     * Return true if the received jsonMessage is an Action
      *
      * @param jsonMessage JSONObject
      * @return boolean isMessageAnAction
@@ -64,7 +64,7 @@ public class ReceivedMessageHelper {
     }
 
     /**
-     * Return true if the  received jsonMessage is a List Change
+     * Return true if the received jsonMessage is a List Change
      *
      * @param jsonMessage JSONObject
      * @return boolean isMessageAListChange
@@ -211,7 +211,7 @@ public class ReceivedMessageHelper {
      * @return Object actionDataValue
      */
     public static Object getTypedActionDataValue(JsonObject jsonMessage, Class<?> pluginClass, Method method, Parameter parameter) {
-        String parameterDataId = DataHelper.getActionDataId(pluginClass, method.getName(), parameter.getName());
+        String parameterDataId = DataHelper.getActionDataId(pluginClass, method, parameter);
         return ReceivedMessageHelper.getTypedActionDataValue(jsonMessage, parameterDataId, parameter.getParameterizedType().getTypeName());
     }
 

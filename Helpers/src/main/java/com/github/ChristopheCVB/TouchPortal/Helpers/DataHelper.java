@@ -42,7 +42,7 @@ public class DataHelper {
     protected static final String KEY_DATA = "data";
 
     /**
-     * Get the formatted Data Id
+     * Get the generated Data Id
      *
      * @param pluginElement   Element
      * @param categoryElement Element
@@ -58,7 +58,7 @@ public class DataHelper {
     }
 
     /**
-     * Get the formatted Data Label
+     * Get the generated Data Label
      *
      * @param dataElement Element
      * @param data        {@link Data}
@@ -69,7 +69,7 @@ public class DataHelper {
     }
 
     /**
-     * Get the formatted Data Id
+     * Get the generated Data Id
      *
      * @param pluginClass         Class
      * @param actionMethodName    String
@@ -92,7 +92,26 @@ public class DataHelper {
     }
 
     /**
-     * Internal Get the formatted Data Id
+     * Get the generated Data Id
+     *
+     * @param pluginClass  Class
+     * @param actionMethod Method
+     * @param parameter    Parameter
+     * @return String actionId
+     */
+    public static String getActionDataId(Class<?> pluginClass, Method actionMethod, Parameter parameter) {
+        String actionDataId = "";
+
+        if (parameter.isAnnotationPresent(Data.class)) {
+            Data data = parameter.getAnnotation(Data.class);
+            actionDataId = DataHelper._getActionDataId(ActionHelper.getActionId(pluginClass, actionMethod), data.id().isEmpty() ? parameter.getName() : data.id());
+        }
+
+        return actionDataId;
+    }
+
+    /**
+     * Internal - Get the formatted Data Id
      *
      * @param actionId String
      * @param dataId   String

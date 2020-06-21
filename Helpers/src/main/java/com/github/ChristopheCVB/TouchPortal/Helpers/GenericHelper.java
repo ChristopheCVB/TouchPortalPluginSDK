@@ -40,22 +40,24 @@ public class GenericHelper {
     protected static final String DEFAULT = "default";
 
     /**
-     * Retrieve the internal Touch Portal type according to the Java's element type
+     * Retrieve the Touch Portal type according to the Java's element type
      *
      * @param reference String
      * @param element   Element
      * @return String tpType
+     * @throws GenericHelper.TPTypeException If the Type is not supported
      */
     public static String getTouchPortalType(String reference, Element element) throws GenericHelper.TPTypeException {
         return GenericHelper.getTouchPortalType(reference, element.asType().toString());
     }
 
     /**
-     * Retrieve the internal Touch Portal type according to the Java's type
+     * Retrieve the Touch Portal type according to the Java's type
      *
      * @param reference String
      * @param rawType   String
      * @return String tpType
+     * @throws GenericHelper.TPTypeException If the Type is not supported
      */
     public static String getTouchPortalType(String reference, String rawType) throws GenericHelper.TPTypeException {
         String tpType;
@@ -106,9 +108,30 @@ public class GenericHelper {
             super(message);
         }
 
+        /**
+         * Enum representing the non All TPTypes supported
+         */
+        public enum ForAnnotation {
+            STATE,
+            EVENT
+        }
+
+        /**
+         * Builder
+         */
         public static class Builder {
+            /**
+             * Exception message
+             */
             private String message;
 
+            /**
+             * Constructor
+             *
+             * @param reference     String - Name of the element being processed
+             * @param forAnnotation {@link ForAnnotation}
+             * @param tpType        String - Desired TPType
+             */
             public Builder(String reference, ForAnnotation forAnnotation, String tpType) {
                 this.message = reference + ": The type '" + tpType + "' is not supported";
                 if (forAnnotation != null) {
@@ -124,18 +147,24 @@ public class GenericHelper {
                 }
             }
 
+            /**
+             * Constructor
+             *
+             * @param reference String - The element being processed
+             * @param rawType   String - The raw Java Type
+             */
             public Builder(String reference, String rawType) {
                 this(reference, null, rawType);
             }
 
+            /**
+             * Build the {@link TPTypeException}
+             *
+             * @return TPTypeException tpTypeException
+             */
             public TPTypeException build() {
                 return new TPTypeException(this.message);
             }
-        }
-
-        public enum ForAnnotation {
-            STATE,
-            EVENT
         }
     }
 }

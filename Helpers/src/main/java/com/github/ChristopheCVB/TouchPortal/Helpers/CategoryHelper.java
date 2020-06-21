@@ -36,7 +36,7 @@ public class CategoryHelper {
     public static final String STATES = "states";
 
     /**
-     * Get the formatted Category ID
+     * Get the generated Category ID
      *
      * @param pluginElement   Element
      * @param categoryElement Element
@@ -48,7 +48,7 @@ public class CategoryHelper {
     }
 
     /**
-     * Get the formatted Category Name
+     * Get the generated Category Name
      *
      * @param categoryElement Element
      * @param category        {@link Category}
@@ -59,7 +59,7 @@ public class CategoryHelper {
     }
 
     /**
-     * Get the formatted Category ID
+     * Get the generated Category ID
      *
      * @param pluginClass Class
      * @param categoryId  String
@@ -70,7 +70,7 @@ public class CategoryHelper {
     }
 
     /**
-     * Internal Get the formatted Category ID
+     * Internal - Get the formatted Category ID
      *
      * @param pluginId   String
      * @param categoryId String

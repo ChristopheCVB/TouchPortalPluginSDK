@@ -42,7 +42,7 @@ public class EventHelper {
     private static final String KEY_EVENT = "event";
 
     /**
-     * Get the formatted Event ID
+     * Get the generated Event ID
      *
      * @param pluginElement   Element
      * @param categoryElement Element
@@ -56,7 +56,7 @@ public class EventHelper {
     }
 
     /**
-     * Get the formatted Event Name
+     * Get the generated Event Name
      *
      * @param element Element
      * @param event   {@link Event}
@@ -67,7 +67,7 @@ public class EventHelper {
     }
 
     /**
-     * Get the formatted Event ID
+     * Get the generated Event ID
      *
      * @param pluginClass Class
      * @param categoryId  String
@@ -79,7 +79,7 @@ public class EventHelper {
     }
 
     /**
-     * Internal Get the formatted Event ID
+     * Internal - Get the formatted Event ID
      *
      * @param categoryId String
      * @param eventId    String

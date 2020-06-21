@@ -46,7 +46,7 @@ public class ActionHelper {
     protected static final String KEY_ACTION = "action";
 
     /**
-     * Get the formatted Action ID
+     * Get the generated Action ID
      *
      * @param pluginElement   Element
      * @param categoryElement Element
@@ -60,7 +60,7 @@ public class ActionHelper {
     }
 
     /**
-     * Get the formatted Action Name
+     * Get the generated Action Name
      *
      * @param actionElement Element
      * @param action        {@link Action}
@@ -71,7 +71,7 @@ public class ActionHelper {
     }
 
     /**
-     * Get the formatted Action ID
+     * Get the generated Action ID
      *
      * @param pluginClass      Class
      * @param actionMethodName String
@@ -91,7 +91,25 @@ public class ActionHelper {
     }
 
     /**
-     * Internal Get the formatted Action ID
+     * Get the generated Action ID
+     *
+     * @param pluginClass  Class
+     * @param actionMethod Method
+     * @return String actionId
+     */
+    public static String getActionId(Class<?> pluginClass, Method actionMethod) {
+        String actionId = "";
+
+        if (actionMethod.isAnnotationPresent(Action.class)) {
+            Action action = actionMethod.getDeclaredAnnotation(Action.class);
+            actionId = ActionHelper._getActionId(CategoryHelper.getCategoryId(pluginClass, action.categoryId()), (!action.id().isEmpty() ? action.id() : actionMethod.getName()));
+        }
+
+        return actionId;
+    }
+
+    /**
+     * Internal - Get the formatted Action ID
      *
      * @param categoryId  String
      * @param rawActionId String

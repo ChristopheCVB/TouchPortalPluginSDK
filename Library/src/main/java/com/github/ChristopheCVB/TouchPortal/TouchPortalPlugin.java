@@ -34,6 +34,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -41,6 +42,8 @@ import java.util.concurrent.Executors;
 
 /**
  * This is the class you need to extend in order to create a Touch Portal Plugin
+ *
+ * @see <a href="https://www.touch-portal.com/sdk/index.php">Documentation: Touch Portal SDK</a>
  */
 public abstract class TouchPortalPlugin {
     /**
@@ -139,11 +142,11 @@ public abstract class TouchPortalPlugin {
                     }
                     this.onMessage(socketMessage);
                 }
+                catch (JsonParseException ignored) {}
                 catch (IOException ioException) {
                     this.close(ioException);
                     break;
                 }
-                catch (JsonParseException ignored) {}
             }
         });
     }
@@ -174,36 +177,7 @@ public abstract class TouchPortalPlugin {
                                 boolean called = false;
                                 System.out.println("Message Received");
                                 if (messageType.equals(ReceivedMessageHelper.TYPE_ACTION)) {
-                                    String messageActionId = ReceivedMessageHelper.getActionId(jsonMessage);
-                                    if (messageActionId != null && !messageActionId.isEmpty()) {
-                                        for (Method method : this.pluginClass.getDeclaredMethods()) {
-                                            if (method.isAnnotationPresent(Action.class)) {
-                                                String methodActionId = ActionHelper.getActionId(this.pluginClass, method.getName());
-                                                if (messageActionId.equals(methodActionId)) {
-                                                    try {
-                                                        Parameter[] parameters = method.getParameters();
-                                                        Object[] arguments = new Object[parameters.length];
-                                                        for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
-                                                            Parameter parameter = parameters[parameterIndex];
-                                                            if (parameter.isAnnotationPresent(Data.class)) {
-                                                                arguments[parameterIndex] = ReceivedMessageHelper.getTypedActionDataValue(jsonMessage, this.pluginClass, method, parameter);
-                                                            }
-                                                            if (arguments[parameterIndex] == null) {
-                                                                throw new ActionMethodDataParameterException(method, parameter);
-                                                            }
-                                                        }
-                                                        method.setAccessible(true);
-                                                        method.invoke(this, arguments);
-                                                        called = true;
-                                                    }
-                                                    catch (IllegalAccessException | InvocationTargetException | SecurityException | ActionMethodDataParameterException e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
+                                    called = this.onActionReceived(jsonMessage);
                                 }
                                 if (!called) {
                                     if (this.touchPortalPluginListener != null) {
@@ -216,6 +190,39 @@ public abstract class TouchPortalPlugin {
                 }
             }
         }
+    }
+
+    private boolean onActionReceived(JsonObject jsonAction) {
+        boolean called = false;
+        String messageActionId = ReceivedMessageHelper.getActionId(jsonAction);
+        if (messageActionId != null && !messageActionId.isEmpty()) {
+            for (Method method : Arrays.stream(this.pluginClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Action.class)).toArray(Method[]::new)) {
+                String methodActionId = ActionHelper.getActionId(this.pluginClass, method);
+                if (messageActionId.equals(methodActionId)) {
+                    try {
+                        Parameter[] parameters = method.getParameters();
+                        Object[] arguments = new Object[parameters.length];
+                        for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
+                            Parameter parameter = parameters[parameterIndex];
+                            if (parameter.isAnnotationPresent(Data.class)) {
+                                arguments[parameterIndex] = ReceivedMessageHelper.getTypedActionDataValue(jsonAction, this.pluginClass, method, parameter);
+                            }
+                            if (arguments[parameterIndex] == null) {
+                                throw new ActionMethodDataParameterException(method, parameter);
+                            }
+                        }
+                        method.setAccessible(true);
+                        method.invoke(this, arguments);
+                        called = true;
+                    }
+                    catch (IllegalAccessException | InvocationTargetException | SecurityException | ActionMethodDataParameterException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+            }
+        }
+        return called;
     }
 
     /**

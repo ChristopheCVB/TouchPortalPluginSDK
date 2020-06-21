@@ -41,7 +41,7 @@ public class StateHelper {
     protected static final String KEY_STATE = "state";
 
     /**
-     * Get the formatted State ID
+     * Get the generated State ID
      *
      * @param pluginElement   Element
      * @param categoryElement Element
@@ -55,7 +55,7 @@ public class StateHelper {
     }
 
     /**
-     * Get the formatted State Desc
+     * Get the generated State Desc
      *
      * @param element Element
      * @param state   {@link State}
@@ -66,7 +66,7 @@ public class StateHelper {
     }
 
     /**
-     * Get the formatted State ID
+     * Get the generated State ID
      *
      * @param pluginClass    Class
      * @param categoryId     String
@@ -91,7 +91,7 @@ public class StateHelper {
     }
 
     /**
-     * Internal Get the formatted State ID
+     * Internal - Get the formatted State ID
      *
      * @param categoryId String
      * @param rawStateId String
