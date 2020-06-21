@@ -87,6 +87,10 @@ public class LibraryTests {
                 ioException.printStackTrace();
             }
         }).start();
+        try {
+            Thread.sleep(100);
+        }
+        catch (InterruptedException ignored) {}
     }
 
     @After
