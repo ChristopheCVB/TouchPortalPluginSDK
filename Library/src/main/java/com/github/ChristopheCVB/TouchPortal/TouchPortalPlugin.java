@@ -119,7 +119,7 @@ public abstract class TouchPortalPlugin {
      * @param parallelizeActions      boolean - Parallelize Actions execution
      */
     protected TouchPortalPlugin(String touchPortalPluginFolder, boolean parallelizeActions) {
-        this.touchPortalPluginFolder = touchPortalPluginFolder;
+        this.touchPortalPluginFolder = touchPortalPluginFolder.trim();
         this.pluginClass = this.getClass();
         this.callbacksExecutor = Executors.newFixedThreadPool(parallelizeActions ? 5 : 1);
     }
