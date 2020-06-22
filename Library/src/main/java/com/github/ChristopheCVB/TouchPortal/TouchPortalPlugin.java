@@ -103,6 +103,10 @@ public abstract class TouchPortalPlugin {
      */
     private final HashMap<String, String> currentStates = new HashMap<>();
     /**
+     * Last sent Choices HashMap (Key, Value)
+     */
+    private final HashMap<String, String[]> currentChoices = new HashMap<>();
+    /**
      * Executor Service for callbacks
      */
     private final ExecutorService callbacksExecutor;
@@ -394,16 +398,28 @@ public abstract class TouchPortalPlugin {
      * @return boolean choiceUpdateMessageSent
      */
     public boolean sendChoiceUpdate(String listId, String[] values) {
-        JsonObject choiceUpdateMessage = new JsonObject();
-        choiceUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE);
-        choiceUpdateMessage.addProperty(SentMessageHelper.ID, listId);
-        JsonArray jsonValues = new JsonArray();
-        for (String value : values) {
-            jsonValues.add(new JsonPrimitive(value));
+        boolean sent = false;
+        boolean isLastValue = false;
+        if (listId != null && !listId.isEmpty() && values != null) {
+            if (this.currentChoices.containsKey(listId) && Arrays.equals(this.currentChoices.get(listId), values)) {
+                isLastValue = true;
+            }
+            else {
+                JsonObject choiceUpdateMessage = new JsonObject();
+                choiceUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE);
+                choiceUpdateMessage.addProperty(SentMessageHelper.ID, listId);
+                JsonArray jsonValues = new JsonArray();
+                for (String value : values) {
+                    jsonValues.add(new JsonPrimitive(value));
+                }
+                choiceUpdateMessage.add(SentMessageHelper.VALUE, jsonValues);
+                sent = this.send(choiceUpdateMessage);
+                if (sent) {
+                    this.currentChoices.put(listId, values);
+                }
+            }
         }
-        choiceUpdateMessage.add(SentMessageHelper.VALUE, jsonValues);
-        boolean sent = this.send(choiceUpdateMessage);
-        System.out.println("Update Choices [" + listId + "] Sent [" + sent + "]");
+        System.out.println("Update Choices [" + listId + "] Sent [" + sent + "] Is Last Value [" + isLastValue + "]");
 
         return sent;
     }
@@ -431,17 +447,31 @@ public abstract class TouchPortalPlugin {
      * @return boolean specificChoiceUpdateMessageSent
      */
     public boolean sendSpecificChoiceUpdate(String choiceId, String instanceId, String[] values) {
-        JsonObject specificChoiceUpdateMessage = new JsonObject();
-        specificChoiceUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE);
-        specificChoiceUpdateMessage.addProperty(SentMessageHelper.ID, choiceId);
-        specificChoiceUpdateMessage.addProperty(SentMessageHelper.INSTANCE_ID, instanceId);
-        JsonArray jsonValues = new JsonArray();
-        for (String value : values) {
-            jsonValues.add(new JsonPrimitive(value));
+        boolean sent = false;
+        boolean isLastValue = false;
+        String choiceKey = choiceId + ":" + instanceId;
+        if (choiceId != null && !choiceId.isEmpty() && instanceId != null && !instanceId.isEmpty() && values != null) {
+            if (this.currentChoices.containsKey(choiceKey) && Arrays.equals(this.currentChoices.get(choiceKey), values)) {
+                isLastValue = true;
+            }
+            else {
+                JsonObject specificChoiceUpdateMessage = new JsonObject();
+                specificChoiceUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE);
+                specificChoiceUpdateMessage.addProperty(SentMessageHelper.ID, choiceId);
+                specificChoiceUpdateMessage.addProperty(SentMessageHelper.INSTANCE_ID, instanceId);
+                JsonArray jsonValues = new JsonArray();
+                for (String value : values) {
+                    jsonValues.add(new JsonPrimitive(value));
+                }
+                specificChoiceUpdateMessage.add(SentMessageHelper.VALUE, jsonValues);
+                sent = this.send(specificChoiceUpdateMessage);
+                if (sent) {
+                    this.currentChoices.put(choiceKey, values);
+                }
+            }
         }
-        specificChoiceUpdateMessage.add(SentMessageHelper.VALUE, jsonValues);
-        boolean sent = this.send(specificChoiceUpdateMessage);
-        System.out.println("Update Specific Choices [" + choiceId + "] Sent [" + sent + "]");
+
+        System.out.println("Update Specific Choices [" + choiceId + "] Sent [" + sent + "] Is Last Value [" + isLastValue + "]");
 
         return sent;
     }
@@ -484,7 +514,7 @@ public abstract class TouchPortalPlugin {
                 }
             }
         }
-        System.out.println("Update State [" + stateId + "] to Value [" + value + "] Sent [" + sent + "] Is Last Value [" + isLastValue + "]");
+        System.out.println("Update State [" + stateId + "]: Sent [" + sent + "] Is Last Value [" + isLastValue + "]" + (sent ? " to Value [" + value + "]" : ""));
 
         return sent;
     }
