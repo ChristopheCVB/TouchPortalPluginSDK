@@ -399,12 +399,8 @@ public abstract class TouchPortalPlugin {
      */
     public boolean sendChoiceUpdate(String listId, String[] values) {
         boolean sent = false;
-        boolean isLastValue = false;
         if (listId != null && !listId.isEmpty() && values != null) {
-            if (this.currentChoices.containsKey(listId) && Arrays.equals(this.currentChoices.get(listId), values)) {
-                isLastValue = true;
-            }
-            else {
+            if (!this.currentChoices.containsKey(listId) || !Arrays.equals(this.currentChoices.get(listId), values)) {
                 JsonObject choiceUpdateMessage = new JsonObject();
                 choiceUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE);
                 choiceUpdateMessage.addProperty(SentMessageHelper.ID, listId);
@@ -417,9 +413,9 @@ public abstract class TouchPortalPlugin {
                 if (sent) {
                     this.currentChoices.put(listId, values);
                 }
+                System.out.println("Update Choices [" + listId + "] Sent [" + sent + "]");
             }
         }
-        System.out.println("Update Choices [" + listId + "] Sent [" + sent + "] Is Last Value [" + isLastValue + "]");
 
         return sent;
     }
@@ -448,13 +444,9 @@ public abstract class TouchPortalPlugin {
      */
     public boolean sendSpecificChoiceUpdate(String choiceId, String instanceId, String[] values) {
         boolean sent = false;
-        boolean isLastValue = false;
         String choiceKey = choiceId + ":" + instanceId;
         if (choiceId != null && !choiceId.isEmpty() && instanceId != null && !instanceId.isEmpty() && values != null) {
-            if (this.currentChoices.containsKey(choiceKey) && Arrays.equals(this.currentChoices.get(choiceKey), values)) {
-                isLastValue = true;
-            }
-            else {
+            if (!this.currentChoices.containsKey(choiceKey) || !Arrays.equals(this.currentChoices.get(choiceKey), values)) {
                 JsonObject specificChoiceUpdateMessage = new JsonObject();
                 specificChoiceUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE);
                 specificChoiceUpdateMessage.addProperty(SentMessageHelper.ID, choiceId);
@@ -468,11 +460,9 @@ public abstract class TouchPortalPlugin {
                 if (sent) {
                     this.currentChoices.put(choiceKey, values);
                 }
+                System.out.println("Update Specific Choices [" + choiceId + "] Sent [" + sent + "]");
             }
         }
-
-        System.out.println("Update Specific Choices [" + choiceId + "] Sent [" + sent + "] Is Last Value [" + isLastValue + "]");
-
         return sent;
     }
 
@@ -498,12 +488,8 @@ public abstract class TouchPortalPlugin {
      */
     public boolean sendStateUpdate(String stateId, String value) {
         boolean sent = false;
-        boolean isLastValue = false;
         if (stateId != null && !stateId.isEmpty() && value != null && !value.isEmpty()) {
-            if (this.currentStates.containsKey(stateId) && this.currentStates.get(stateId).equals(value)) {
-                isLastValue = true;
-            }
-            else {
+            if (!this.currentStates.containsKey(stateId) || !this.currentStates.get(stateId).equals(value)) {
                 JsonObject stateUpdateMessage = new JsonObject();
                 stateUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE);
                 stateUpdateMessage.addProperty(SentMessageHelper.ID, stateId);
@@ -512,10 +498,9 @@ public abstract class TouchPortalPlugin {
                 if (sent) {
                     this.currentStates.put(stateId, value);
                 }
+                System.out.println("Update State [" + stateId + "] Sent [" + sent + "]");
             }
         }
-        System.out.println("Update State [" + stateId + "]: Sent [" + sent + "] Is Last Value [" + isLastValue + "]" + (sent ? " to Value [" + value + "]" : ""));
-
         return sent;
     }
 
