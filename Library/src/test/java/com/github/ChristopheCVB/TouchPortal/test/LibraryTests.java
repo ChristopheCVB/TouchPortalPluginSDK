@@ -539,6 +539,9 @@ public class LibraryTests {
         this.touchPortalPluginTest.removeProperty(key);
         this.touchPortalPluginTest.storeProperties();
         assertNull(this.touchPortalPluginTest.getProperty(key));
+
+        String defaultValue = "default";
+        assertEquals(defaultValue, this.touchPortalPluginTest.getProperty("does not exists", defaultValue));
     }
 
     @Test(expected = FileNotFoundException.class)
@@ -549,8 +552,8 @@ public class LibraryTests {
     @Test
     public void testPropertiesAccess() {
         // No Loaded Properties File
-        this.touchPortalPluginTest.removeProperty("non existent");
-        this.touchPortalPluginTest.getProperty("non existent");
-        this.touchPortalPluginTest.setProperty("non existent", "value");
+        assertNull(this.touchPortalPluginTest.removeProperty("non existent"));
+        assertNull(this.touchPortalPluginTest.getProperty("non existent"));
+        assertNull(this.touchPortalPluginTest.setProperty("non existent", "value"));
     }
 }

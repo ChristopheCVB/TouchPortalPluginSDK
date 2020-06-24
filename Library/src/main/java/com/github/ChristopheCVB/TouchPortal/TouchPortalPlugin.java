@@ -578,6 +578,18 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Read a property with the key and fall back to default value
+     *
+     * @param key          String
+     * @param defaultValue String
+     * @return String value
+     */
+    public String getProperty(String key, String defaultValue) {
+        String value = this.getProperty(key);
+        return value == null ? defaultValue : value;
+    }
+
+    /**
      * Set a property key to the specified value
      *
      * @param key   String
