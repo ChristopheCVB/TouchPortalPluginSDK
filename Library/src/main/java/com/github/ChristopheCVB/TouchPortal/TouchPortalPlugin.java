@@ -480,15 +480,27 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
-     * Send a State Update Message to the Touch Portal Plugin System
+     * Send a State Update Message to the Touch Portal Plugin System not allowing empty value
      *
      * @param stateId String
      * @param value   String
      * @return boolean stateUpdateMessageSent
      */
     public boolean sendStateUpdate(String stateId, String value) {
+        return this.sendStateUpdate(stateId, value, false);
+    }
+
+    /**
+     * Send a State Update Message to the Touch Portal Plugin System
+     *
+     * @param stateId         String
+     * @param value           String
+     * @param allowEmptyValue boolean
+     * @return boolean stateUpdateMessageSent
+     */
+    public boolean sendStateUpdate(String stateId, String value, boolean allowEmptyValue) {
         boolean sent = false;
-        if (stateId != null && !stateId.isEmpty() && value != null && !value.isEmpty()) {
+        if (stateId != null && !stateId.isEmpty() && value != null && (!allowEmptyValue || !value.isEmpty())) {
             if (!this.currentStates.containsKey(stateId) || !this.currentStates.get(stateId).equals(value)) {
                 JsonObject stateUpdateMessage = new JsonObject();
                 stateUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE);
