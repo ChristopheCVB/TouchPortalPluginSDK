@@ -500,7 +500,7 @@ public abstract class TouchPortalPlugin {
      */
     public boolean sendStateUpdate(String stateId, String value, boolean allowEmptyValue) {
         boolean sent = false;
-        if (stateId != null && !stateId.isEmpty() && value != null && (!allowEmptyValue || !value.isEmpty())) {
+        if (stateId != null && !stateId.isEmpty() && value != null && (allowEmptyValue || !value.isEmpty())) {
             if (!this.currentStates.containsKey(stateId) || !this.currentStates.get(stateId).equals(value)) {
                 JsonObject stateUpdateMessage = new JsonObject();
                 stateUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE);
