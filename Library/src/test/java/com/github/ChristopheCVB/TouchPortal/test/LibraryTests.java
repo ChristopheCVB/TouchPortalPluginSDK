@@ -260,6 +260,8 @@ public class LibraryTests {
     public void testSendFail() {
         this.touchPortalPluginTest.close(null);
         assertFalse(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "New Value"));
+        assertFalse(this.touchPortalPluginTest.sendChoiceUpdate("listId", null, true));
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("listId", "instanceId", null, true));
     }
 
     @Test
