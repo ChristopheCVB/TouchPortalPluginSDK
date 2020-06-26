@@ -27,8 +27,6 @@ import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
 import com.google.gson.JsonObject;
 
-import java.io.IOException;
-
 @SuppressWarnings("unused")
 @Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
 public class TouchPortalPluginExample extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
@@ -61,19 +59,14 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
             if (PluginHelper.COMMAND_START.equals(args[0])) {
                 // Initialize the Plugin
                 TouchPortalPluginExample touchPortalPluginExample = new TouchPortalPluginExample(args[1]);
-                try {
-                    // Load a properties File
-                    touchPortalPluginExample.loadProperties("plugin.config");
-                    // Get a property
-                    System.out.println(touchPortalPluginExample.getProperty("samplekey"));
-                    // Set a property
-                    touchPortalPluginExample.setProperty("samplekey", "Value set from Plugin");
-                    // Store the properties
-                    touchPortalPluginExample.storeProperties();
-                }
-                catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
+                // Load a properties File
+                touchPortalPluginExample.loadProperties("plugin.config");
+                // Get a property
+                System.out.println(touchPortalPluginExample.getProperty("samplekey"));
+                // Set a property
+                touchPortalPluginExample.setProperty("samplekey", "Value set from Plugin");
+                // Store the properties
+                touchPortalPluginExample.storeProperties();
                 // Initiate the connection with the Touch Portal Plugin System
                 boolean connectedPairedAndListening = touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample);
 

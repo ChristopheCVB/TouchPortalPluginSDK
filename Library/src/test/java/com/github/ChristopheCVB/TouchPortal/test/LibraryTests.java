@@ -30,7 +30,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -160,8 +163,8 @@ public class LibraryTests {
     public void testCloseAndReConnect() {
         this.touchPortalPluginTest.close(null);
 
-        this.serverSocketAccept();
         boolean connectedPairedAndListening = this.touchPortalPluginTest.connectThenPairAndListen(null);
+        this.serverSocketAccept();
         assertTrue(connectedPairedAndListening);
     }
 
@@ -169,8 +172,8 @@ public class LibraryTests {
     public void testConnectionNoListener() {
         this.touchPortalPluginTest.close(null);
 
-        this.serverSocketAccept();
         boolean connectedPairedAndListening = this.touchPortalPluginTest.connectThenPairAndListen(null);
+        this.serverSocketAccept();
         assertTrue(connectedPairedAndListening);
     }
 
@@ -201,14 +204,48 @@ public class LibraryTests {
     }
 
     @Test
-    public void testSendFalseStates() {
+    public void testSendStates() {
         assertFalse(this.touchPortalPluginTest.sendStateUpdate(null, null));
+        assertFalse(this.touchPortalPluginTest.sendStateUpdate("", null));
         assertFalse(this.touchPortalPluginTest.sendStateUpdate("", ""));
         assertFalse(this.touchPortalPluginTest.sendStateUpdate(null, ""));
-        assertFalse(this.touchPortalPluginTest.sendStateUpdate("", null));
         assertFalse(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, null));
         assertFalse(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, ""));
         assertFalse(this.touchPortalPluginTest.sendStateUpdate(null, "Not Null"));
+        assertTrue(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "", true));
+    }
+
+    @Test
+    public void testSendChoices() {
+        assertFalse(this.touchPortalPluginTest.sendChoiceUpdate(null, null));
+        assertFalse(this.touchPortalPluginTest.sendChoiceUpdate("", new String[0]));
+        assertFalse(this.touchPortalPluginTest.sendChoiceUpdate(null, new String[0]));
+        assertFalse(this.touchPortalPluginTest.sendChoiceUpdate("", null));
+        assertFalse(this.touchPortalPluginTest.sendChoiceUpdate("listId", null));
+        assertFalse(this.touchPortalPluginTest.sendChoiceUpdate("listId", new String[0]));
+        assertTrue(this.touchPortalPluginTest.sendChoiceUpdate("listId", new String[0], true));
+        assertFalse(this.touchPortalPluginTest.sendChoiceUpdate("listId", new String[0], true));
+        assertTrue(this.touchPortalPluginTest.sendChoiceUpdate("listId", null, true));
+        assertFalse(this.touchPortalPluginTest.sendChoiceUpdate("listId", null, true));
+    }
+
+    @Test
+    public void testSendSpecificChoices() {
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate(null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("", null, null));
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("", "", null));
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("", "", new String[0]));
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("listId", null, null));
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("listId", "", null));
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("listId", "instanceId", new String[0]));
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("listId", "instanceId", null));
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate(null, null, new String[0]));
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate(null, "instanceId", null));
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("", "instanceId", null));
+        assertTrue(this.touchPortalPluginTest.sendSpecificChoiceUpdate("listId", "instanceId", new String[0], true));
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("listId", "instanceId", new String[0], true));
+        assertTrue(this.touchPortalPluginTest.sendSpecificChoiceUpdate("listId", "instanceId", null, true));
+        assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("listId", "instanceId", null, true));
     }
 
     @Test
@@ -518,11 +555,11 @@ public class LibraryTests {
     }
 
     @Test
-    public void testProperties() throws IOException {
+    public void testProperties() {
         // Test reloadProperties without a Properties File
-        this.touchPortalPluginTest.reloadProperties();
+        assertFalse(this.touchPortalPluginTest.reloadProperties());
 
-        this.touchPortalPluginTest.loadProperties("plugin.config");
+        assertTrue(this.touchPortalPluginTest.loadProperties("plugin.config"));
         assertTrue(this.touchPortalPluginTest.getPropertiesFile().exists());
 
         assertEquals("Sample Value", this.touchPortalPluginTest.getProperty("samplekey"));
@@ -532,21 +569,21 @@ public class LibraryTests {
         this.touchPortalPluginTest.setProperty(key, value);
 
         assertEquals(value, this.touchPortalPluginTest.getProperty(key));
-        this.touchPortalPluginTest.storeProperties();
-        this.touchPortalPluginTest.reloadProperties();
+        assertTrue(this.touchPortalPluginTest.storeProperties());
+        assertTrue(this.touchPortalPluginTest.reloadProperties());
         assertEquals(value, this.touchPortalPluginTest.getProperty(key));
 
         this.touchPortalPluginTest.removeProperty(key);
-        this.touchPortalPluginTest.storeProperties();
+        assertTrue(this.touchPortalPluginTest.storeProperties());
         assertNull(this.touchPortalPluginTest.getProperty(key));
 
         String defaultValue = "default";
         assertEquals(defaultValue, this.touchPortalPluginTest.getProperty("does not exists", defaultValue));
     }
 
-    @Test(expected = FileNotFoundException.class)
-    public void testPropertiesFail() throws IOException {
-        this.touchPortalPluginTest.loadProperties("doesNot.exists");
+    @Test
+    public void testPropertiesFail() {
+        assertFalse(this.touchPortalPluginTest.loadProperties("doesNot.exists"));
     }
 
     @Test

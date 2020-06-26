@@ -266,10 +266,7 @@ public abstract class TouchPortalPlugin {
         System.out.println("Closing" + (exception != null ? " because " + exception.getMessage() : ""));
 
         if (this.touchPortalSocket != null) {
-            try {
-                this.storeProperties();
-            }
-            catch (IOException ignored) {}
+            this.storeProperties();
 
             if (this.listenerThread != null) {
                 this.listenerThread.interrupt();
@@ -391,22 +388,36 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
-     * Send a Choice Update Message to the Touch Portal Plugin System
+     * Send a Choice Update Message to the Touch Portal Plugin System without allowing empty array values
      *
      * @param listId String
-     * @param values String[]
+     * @param values String
      * @return boolean choiceUpdateMessageSent
      */
     public boolean sendChoiceUpdate(String listId, String[] values) {
+        return this.sendChoiceUpdate(listId, values, false);
+    }
+
+    /**
+     * Send a Choice Update Message to the Touch Portal Plugin System
+     *
+     * @param listId                String
+     * @param values                String[]
+     * @param allowEmptyArrayValues boolean
+     * @return boolean choiceUpdateMessageSent
+     */
+    public boolean sendChoiceUpdate(String listId, String[] values, boolean allowEmptyArrayValues) {
         boolean sent = false;
-        if (listId != null && !listId.isEmpty() && values != null) {
+        if (listId != null && !listId.isEmpty() && (allowEmptyArrayValues || (values != null && values.length > 0))) {
             if (!this.currentChoices.containsKey(listId) || !Arrays.equals(this.currentChoices.get(listId), values)) {
                 JsonObject choiceUpdateMessage = new JsonObject();
                 choiceUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE);
                 choiceUpdateMessage.addProperty(SentMessageHelper.ID, listId);
                 JsonArray jsonValues = new JsonArray();
-                for (String value : values) {
-                    jsonValues.add(new JsonPrimitive(value));
+                if (values != null) {
+                    for (String value : values) {
+                        jsonValues.add(new JsonPrimitive(value));
+                    }
                 }
                 choiceUpdateMessage.add(SentMessageHelper.VALUE, jsonValues);
                 sent = this.send(choiceUpdateMessage);
@@ -435,7 +446,7 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
-     * Send a Specific Choice Update Message to the Touch Portal Plugin System
+     * Send a Specific Choice Update Message to the Touch Portal Plugin System without allowing empty array values
      *
      * @param choiceId   String
      * @param instanceId String
@@ -443,17 +454,32 @@ public abstract class TouchPortalPlugin {
      * @return boolean specificChoiceUpdateMessageSent
      */
     public boolean sendSpecificChoiceUpdate(String choiceId, String instanceId, String[] values) {
+        return this.sendSpecificChoiceUpdate(choiceId, instanceId, values, false);
+    }
+
+    /**
+     * Send a Specific Choice Update Message to the Touch Portal Plugin System
+     *
+     * @param choiceId              String
+     * @param instanceId            String
+     * @param values                String[]
+     * @param allowEmptyArrayValues boolean
+     * @return boolean specificChoiceUpdateMessageSent
+     */
+    public boolean sendSpecificChoiceUpdate(String choiceId, String instanceId, String[] values, boolean allowEmptyArrayValues) {
         boolean sent = false;
         String choiceKey = choiceId + ":" + instanceId;
-        if (choiceId != null && !choiceId.isEmpty() && instanceId != null && !instanceId.isEmpty() && values != null) {
+        if (choiceId != null && !choiceId.isEmpty() && instanceId != null && !instanceId.isEmpty() && (allowEmptyArrayValues || (values != null && values.length > 0))) {
             if (!this.currentChoices.containsKey(choiceKey) || !Arrays.equals(this.currentChoices.get(choiceKey), values)) {
                 JsonObject specificChoiceUpdateMessage = new JsonObject();
                 specificChoiceUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CHOICE_UPDATE);
                 specificChoiceUpdateMessage.addProperty(SentMessageHelper.ID, choiceId);
                 specificChoiceUpdateMessage.addProperty(SentMessageHelper.INSTANCE_ID, instanceId);
                 JsonArray jsonValues = new JsonArray();
-                for (String value : values) {
-                    jsonValues.add(new JsonPrimitive(value));
+                if (values != null) {
+                    for (String value : values) {
+                        jsonValues.add(new JsonPrimitive(value));
+                    }
                 }
                 specificChoiceUpdateMessage.add(SentMessageHelper.VALUE, jsonValues);
                 sent = this.send(specificChoiceUpdateMessage);
@@ -543,34 +569,40 @@ public abstract class TouchPortalPlugin {
      * Loads a Properties file from the Plugin directory
      *
      * @param propertiesPluginFilePath String - Relative path of the properties File
-     * @throws IOException ioException
+     * @return boolean loaded
      */
-    public void loadProperties(String propertiesPluginFilePath) throws IOException {
+    public boolean loadProperties(String propertiesPluginFilePath) {
         this.propertiesFile = this.getResourceFile(propertiesPluginFilePath);
-        this.loadProperties();
+        return this.loadProperties();
     }
 
     /**
      * Internal - Load the Properties File
      *
-     * @throws IOException ioException
+     * @return boolean loaded
      */
-    private void loadProperties() throws IOException {
-        if (this.propertiesFile != null) {
-            FileInputStream fileInputStream = new FileInputStream(this.propertiesFile.getAbsolutePath());
-            this.properties = new Properties();
-            this.properties.load(fileInputStream);
-            fileInputStream.close();
+    private boolean loadProperties() {
+        boolean loaded = false;
+        try {
+            if (this.propertiesFile != null) {
+                FileInputStream fileInputStream = new FileInputStream(this.propertiesFile.getAbsolutePath());
+                this.properties = new Properties();
+                this.properties.load(fileInputStream);
+                fileInputStream.close();
+                loaded = true;
+            }
         }
+        catch (IOException ignored) {}
+        return loaded;
     }
 
     /**
      * Reloads the Properties File previously set
      *
-     * @throws IOException ioException
+     * @return boolean reloaded
      */
-    public void reloadProperties() throws IOException {
-        this.loadProperties();
+    public boolean reloadProperties() {
+        return this.loadProperties();
     }
 
     /**
@@ -637,14 +669,20 @@ public abstract class TouchPortalPlugin {
     /**
      * Save the current state of the Properties
      *
-     * @throws IOException ioException
+     * @return boolean stored
      */
-    public void storeProperties() throws IOException {
-        if (this.properties != null) {
-            FileOutputStream fileOutputStream = new FileOutputStream(this.propertiesFile);
-            this.properties.store(fileOutputStream, this.pluginClass.getSimpleName());
-            fileOutputStream.close();
+    public boolean storeProperties() {
+        boolean stored = false;
+        try {
+            if (this.properties != null) {
+                FileOutputStream fileOutputStream = new FileOutputStream(this.propertiesFile);
+                this.properties.store(fileOutputStream, this.pluginClass.getSimpleName());
+                fileOutputStream.close();
+                stored = true;
+            }
         }
+        catch (IOException ignored) {}
+        return stored;
     }
 
     /**
