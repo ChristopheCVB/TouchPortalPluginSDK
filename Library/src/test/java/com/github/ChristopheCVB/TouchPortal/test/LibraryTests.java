@@ -65,8 +65,8 @@ public class LibraryTests {
         File testResourcesDirectory = new File("src/test/resources/");
         this.touchPortalPluginTest = new TouchPortalPluginTest(new String[]{"start", testResourcesDirectory.getAbsolutePath() + "/"});
 
-        this.serverSocketAccept();
         boolean connectedPairedAndListening = this.touchPortalPluginTest.connectThenPairAndListen(this.touchPortalPluginListener);
+        this.serverSocketAccept();
         assertTrue(connectedPairedAndListening);
     }
 
