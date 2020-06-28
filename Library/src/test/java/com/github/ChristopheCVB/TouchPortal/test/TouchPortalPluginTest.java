@@ -72,7 +72,7 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
      * @param file File
      */
     @Action(description = "Long Description of Dummy Action with Data File", categoryId = "BaseCategory")
-    private void dummyWithDataFile(@Data File file) {
+    private void dummyWithDataFile(@Data(extensions = {"*.mp3", "*.7z"}) File file) {
         System.out.println("Action dummyWithDataFile received: file [" + file.getAbsolutePath() + "]");
     }
 

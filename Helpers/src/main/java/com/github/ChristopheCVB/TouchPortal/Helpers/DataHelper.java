@@ -38,6 +38,8 @@ public class DataHelper {
     public static final String LABEL = "label";
     public static final String DEFAULT = GenericHelper.DEFAULT;
     public static final String VALUE_CHOICES = "valueChoices";
+    public static final String EXTENSIONS = "extensions";
+    public static final String EXTENSION_FORMAT = "\\*\\.[a-zA-Z0-9]{1,}";
 
     protected static final String KEY_DATA = "data";
 

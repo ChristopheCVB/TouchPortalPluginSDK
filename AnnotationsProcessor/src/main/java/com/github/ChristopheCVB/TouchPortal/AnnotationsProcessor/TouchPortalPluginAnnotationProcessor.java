@@ -372,6 +372,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         String desiredTPType = GenericHelper.getTouchPortalType(className, dataElement);
         jsonData.addProperty(DataHelper.TYPE, desiredTPType);
         jsonData.addProperty(DataHelper.LABEL, DataHelper.getActionDataLabel(dataElement, data));
+        // Default Value
         switch (desiredTPType) {
             case GenericHelper.TP_TYPE_NUMBER:
                 double defaultValue = 0;
@@ -390,12 +391,28 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 jsonData.addProperty(DataHelper.DEFAULT, data.defaultValue());
                 break;
         }
-        if (desiredTPType.equals(DataHelper.TYPE_CHOICE)) {
-            JsonArray dataValueChoices = new JsonArray();
-            for (String valueChoice : data.valueChoices()) {
-                dataValueChoices.add(new JsonPrimitive(valueChoice));
-            }
-            jsonData.add(DataHelper.VALUE_CHOICES, dataValueChoices);
+        // Specific properties
+        switch (desiredTPType) {
+            case GenericHelper.TP_TYPE_CHOICE:
+                JsonArray dataValueChoices = new JsonArray();
+                for (String valueChoice : data.valueChoices()) {
+                    dataValueChoices.add(valueChoice);
+                }
+                jsonData.add(DataHelper.VALUE_CHOICES, dataValueChoices);
+                break;
+
+            case GenericHelper.TP_TYPE_FILE:
+                JsonArray jsonExtensions = new JsonArray();
+                for (String extension : data.extensions()) {
+                    if (extension.matches(DataHelper.EXTENSION_FORMAT)) {
+                        jsonExtensions.add(extension);
+                    }
+                    else {
+                        this.messager.printMessage(Diagnostic.Kind.ERROR, "Action Data Extension: [" + extension + "] format is not valid");
+                    }
+                }
+                jsonData.add(DataHelper.EXTENSIONS, jsonExtensions);
+                break;
         }
         if (!action.format().isEmpty()) {
             // Replace wildcards

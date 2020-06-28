@@ -77,4 +77,17 @@ public @interface Data {
      * @return String[] valueChoices
      */
     String[] valueChoices() default {};
+
+    /**
+     * Data extensions
+     * <p>
+     * Supported extensions (i.e. `{"*.txt"}`)
+     * </p>
+     * <p>
+     * Default is an empty Array, hence supporting all extensions
+     * </p>
+     *
+     * @return String[] extensions
+     */
+    String[] extensions() default {};
 }
