@@ -23,6 +23,7 @@ package com.github.ChristopheCVB.TouchPortal.Helpers;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
@@ -195,6 +196,10 @@ public class ReceivedMessageHelper {
 
                 case "java.lang.String[]":
                     argumentValue = new String[]{(String) argumentValue};
+                    break;
+
+                case "java.io.File":
+                    argumentValue = new File((String) argumentValue);
                     break;
             }
         }

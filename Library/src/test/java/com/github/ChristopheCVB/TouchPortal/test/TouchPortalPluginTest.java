@@ -24,6 +24,8 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import com.google.gson.JsonObject;
 
+import java.io.File;
+
 @SuppressWarnings("unused")
 @Plugin(version = 4000, colorDark = "#203060", colorLight = "#4070F0")
 public class TouchPortalPluginTest extends TouchPortalPlugin {
@@ -44,16 +46,6 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
     }
 
     /**
-     * Action example that contains a dynamic data text
-     *
-     * @param text String
-     */
-    @Action(description = "Long Description of Dummy Action with Data", categoryId = "BaseCategory")
-    private void dummyWithData(@Data String text, @Data Integer number) {
-        System.out.println("Action dummyWithData received: text [" + text + "] number [" + number + "]");
-    }
-
-    /**
      * Simple Action example
      *
      * @param jsonAction JSONObject
@@ -61,6 +53,27 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
     @Action(description = "Long Description of Dummy Action without Data", categoryId = "BaseCategory")
     private void dummyWithoutData(JsonObject jsonAction) {
         System.out.println("Action dummyWithoutData received [" + jsonAction + "]");
+    }
+
+    /**
+     * Action example that contains a dynamic data text and number
+     *
+     * @param text String
+     * @param number Integer
+     */
+    @Action(description = "Long Description of Dummy Action with Data Text and Number", categoryId = "BaseCategory")
+    private void dummyWithDataTextAndNumber(@Data String text, @Data Integer number) {
+        System.out.println("Action dummyWithDataTextAndNumber received: text [" + text + "] number [" + number + "]");
+    }
+
+    /**
+     * Action example that contains a dynamic data file
+     *
+     * @param file File
+     */
+    @Action(description = "Long Description of Dummy Action with Data File", categoryId = "BaseCategory")
+    private void dummyWithDataFile(@Data File file) {
+        System.out.println("Action dummyWithDataFile received: file [" + file.getAbsolutePath() + "]");
     }
 
     private enum Categories {

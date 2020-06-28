@@ -30,6 +30,7 @@ public class GenericHelper {
     public static final String TP_TYPE_NUMBER = "number";
     public static final String TP_TYPE_SWITCH = "switch";
     public static final String TP_TYPE_CHOICE = "choice";
+    public static final String TP_TYPE_FILE = "file";
 
     protected static final String ID = "id";
     protected static final String NAME = "name";
@@ -86,6 +87,10 @@ public class GenericHelper {
 
             case "java.lang.String[]":
                 tpType = GenericHelper.TP_TYPE_CHOICE;
+                break;
+
+            case "java.io.File":
+                tpType = GenericHelper.TP_TYPE_FILE;
                 break;
 
             default:

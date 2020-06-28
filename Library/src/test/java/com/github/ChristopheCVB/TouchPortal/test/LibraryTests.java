@@ -294,20 +294,41 @@ public class LibraryTests {
     }
 
     @Test
-    public void testReceiveDummyWithDataAction() throws IOException, InterruptedException {
+    public void testReceiveDummyWithDataTextAndNumberAction() throws IOException, InterruptedException {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
-        jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithData.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataTextAndNumber.ID);
         JsonArray data = new JsonArray();
         JsonObject textDataItem = new JsonObject();
-        textDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithData.Text.ID);
+        textDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataTextAndNumber.Text.ID);
         textDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_VALUE, "Text from Tests !");
         data.add(textDataItem);
         JsonObject numberDataItem = new JsonObject();
-        numberDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithData.Number.ID);
+        numberDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataTextAndNumber.Number.ID);
         numberDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_VALUE, 42);
         data.add(numberDataItem);
+        jsonMessage.add(ActionHelper.DATA, data);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
+    public void testReceiveDummyWithDataFileAction() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+        jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataFile.ID);
+        JsonArray data = new JsonArray();
+        JsonObject textDataItem = new JsonObject();
+        textDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataFile.File.ID);
+        textDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_VALUE, "/");
+        data.add(textDataItem);
         jsonMessage.add(ActionHelper.DATA, data);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
@@ -490,7 +511,7 @@ public class LibraryTests {
     public void testAnnotations() {
         assertEquals(TouchPortalPluginTestConstants.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest");
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory");
-        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithData.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory.action.dummyWithData");
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataTextAndNumber.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory.action.dummyWithDataTextAndNumber");
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithoutData.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory.action.dummyWithoutData");
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory.state.customState");
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.Events.CustomState.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory.event.customState");
@@ -517,27 +538,35 @@ public class LibraryTests {
 
         // Base Category Actions
         JsonArray baseCategoryActions = baseCategory.getAsJsonArray(CategoryHelper.ACTIONS);
-        assertEquals(2, baseCategoryActions.size());
-
-        // Base Category Action DummyWithData
-        JsonObject baseCategoryActionDummyWithData = baseCategoryActions.get(0).getAsJsonObject();
-        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithData.ID, baseCategoryActionDummyWithData.get(ActionHelper.ID).getAsString());
-
-        // Base Category Action DummyWithData Data items
-        JsonArray baseCategoryActionDummyWithDataItems = baseCategoryActionDummyWithData.getAsJsonArray(ActionHelper.DATA);
-        assertEquals(2, baseCategoryActionDummyWithDataItems.size());
-
-        // Base Category Action DummyWithData Data Text item
-        JsonObject baseCategoryActionDummyWithDataItemText = baseCategoryActionDummyWithDataItems.get(0).getAsJsonObject();
-        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithData.Text.ID, baseCategoryActionDummyWithDataItemText.get(DataHelper.ID).getAsString());
+        assertEquals(3, baseCategoryActions.size());
 
         // Base Category Action DummyWithoutData
-        JsonObject baseCategoryActionDummyWithoutData = baseCategoryActions.get(1).getAsJsonObject();
+        JsonObject baseCategoryActionDummyWithoutData = baseCategoryActions.get(0).getAsJsonObject();
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithoutData.ID, baseCategoryActionDummyWithoutData.get(ActionHelper.ID).getAsString());
 
         // Base Category Action DummyWithoutData Data items
         JsonArray baseCategoryActionDummyWithoutDataItems = baseCategoryActionDummyWithoutData.getAsJsonArray(ActionHelper.DATA);
         assertEquals(0, baseCategoryActionDummyWithoutDataItems.size());
+
+        // Base Category Action DummyWithDataTextAndNumber
+        JsonObject baseCategoryActionDummyWithData = baseCategoryActions.get(1).getAsJsonObject();
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataTextAndNumber.ID, baseCategoryActionDummyWithData.get(ActionHelper.ID).getAsString());
+
+        // Base Category Action DummyWithDataTextAndNumber Data items
+        JsonArray baseCategoryActionDummyWithDataItems = baseCategoryActionDummyWithData.getAsJsonArray(ActionHelper.DATA);
+        assertEquals(2, baseCategoryActionDummyWithDataItems.size());
+
+        // Base Category Action DummyWithData Data Text item
+        JsonObject baseCategoryActionDummyWithDataItemText = baseCategoryActionDummyWithDataItems.get(0).getAsJsonObject();
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataTextAndNumber.Text.ID, baseCategoryActionDummyWithDataItemText.get(DataHelper.ID).getAsString());
+
+        // Base Category Action DummyWithDataFile
+        JsonObject baseCategoryActionDummyWithDataFile = baseCategoryActions.get(2).getAsJsonObject();
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataFile.ID, baseCategoryActionDummyWithDataFile.get(ActionHelper.ID).getAsString());
+
+        // Base Category Action DummyWithDataFile Data items
+        JsonArray baseCategoryActionDummyWithDataFileItems = baseCategoryActionDummyWithDataFile.getAsJsonArray(ActionHelper.DATA);
+        assertEquals(1, baseCategoryActionDummyWithDataFileItems.size());
 
         // Base Category Events
         JsonArray baseCategoryEvents = baseCategory.getAsJsonArray(CategoryHelper.EVENTS);
