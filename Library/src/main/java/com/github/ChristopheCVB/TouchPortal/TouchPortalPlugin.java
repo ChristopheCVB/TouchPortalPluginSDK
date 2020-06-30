@@ -26,13 +26,12 @@ import com.github.ChristopheCVB.TouchPortal.Helpers.*;
 import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
 import com.google.gson.*;
 
+import java.awt.*;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.SocketException;
+import java.net.*;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,6 +57,10 @@ public abstract class TouchPortalPlugin {
      * Socket Server Port used by the Touch Portal Plugin System
      */
     private static final int SOCKET_PORT = 12136;
+    /**
+     * Plugin Version Property Key
+     */
+    private static final String KEY_PLUGIN_VERSION = "plugin.version";
 
     /**
      * Actual Plugin Class
@@ -702,6 +705,41 @@ public abstract class TouchPortalPlugin {
      */
     public String getLastStateValue(String stateId) {
         return this.currentStates.get(stateId);
+    }
+
+    /**
+     * Reads a Properties file and compare versions
+     *
+     * @param pluginConfigURL   String - The URL of the properties file
+     * @param pluginVersionCode long - Current Plugin Version Code
+     * @param pluginUpdateURL   String - Open a browser tab if an update is available and the value is not null
+     */
+    public boolean isUpdateAvailable(String pluginConfigURL, long pluginVersionCode, String pluginUpdateURL) {
+        boolean updateAvailable = false;
+        try {
+            Properties cloudProperties = new Properties();
+            cloudProperties.load(new URL(pluginConfigURL).openStream());
+            long lastPluginVersion = Long.parseLong(cloudProperties.getProperty(TouchPortalPlugin.KEY_PLUGIN_VERSION));
+            if (lastPluginVersion > pluginVersionCode) {
+                updateAvailable = true;
+                if (pluginUpdateURL != null && !pluginUpdateURL.isEmpty()) {
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop desktop = Desktop.getDesktop();
+                        try {
+                            desktop.browse(URI.create(pluginUpdateURL));
+                        }
+                        catch (IOException ioException) {
+                            ioException.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+        catch (NumberFormatException | IOException exception) {
+            System.out.println("Check Update failed: " + exception.getMessage());
+        }
+
+        return updateAvailable;
     }
 
     /**
