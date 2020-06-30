@@ -142,7 +142,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonConfiguration.addProperty(PluginHelper.CONFIGURATION_COLOR_DARK, plugin.colorDark());
         jsonConfiguration.addProperty(PluginHelper.CONFIGURATION_COLOR_LIGHT, plugin.colorLight());
         jsonPlugin.add(PluginHelper.CONFIGURATION, jsonConfiguration);
-        jsonPlugin.addProperty(PluginHelper.PLUGIN_START_COMMAND, "java -jar " + PluginHelper.TP_PLUGIN_FOLDER + pluginElement.getSimpleName() + "\\" + pluginElement.getSimpleName() + ".jar " + PluginHelper.COMMAND_START + " \" " + PluginHelper.TP_PLUGIN_FOLDER + " \"");
+        jsonPlugin.addProperty(PluginHelper.PLUGIN_START_COMMAND, "java -jar \"" + PluginHelper.TP_PLUGIN_FOLDER + pluginElement.getSimpleName() + "\\" + pluginElement.getSimpleName() + ".jar\" " + PluginHelper.COMMAND_START + " \" " + PluginHelper.TP_PLUGIN_FOLDER + " \"");
 
         JsonArray jsonCategories = new JsonArray();
         Set<? extends Element> categoryElements = roundEnv.getElementsAnnotatedWith(Category.class);
