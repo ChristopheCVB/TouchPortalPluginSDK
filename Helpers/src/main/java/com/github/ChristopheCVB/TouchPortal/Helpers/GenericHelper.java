@@ -31,6 +31,8 @@ public class GenericHelper {
     public static final String TP_TYPE_SWITCH = "switch";
     public static final String TP_TYPE_CHOICE = "choice";
     public static final String TP_TYPE_FILE = "file";
+    public static final String TP_TYPE_DIRECTORY = "folder";
+    public static final String TP_TYPE_COLOR = "color";
 
     protected static final String ID = "id";
     protected static final String NAME = "name";
@@ -49,18 +51,18 @@ public class GenericHelper {
      * @throws GenericHelper.TPTypeException If the Type is not supported
      */
     public static String getTouchPortalType(String reference, Element element) throws GenericHelper.TPTypeException {
-        return GenericHelper.getTouchPortalType(reference, element.asType().toString());
+        return GenericHelper.getTouchPortalType(element.asType().toString(), reference);
     }
 
     /**
      * Retrieve the Touch Portal type according to the Java's type
      *
-     * @param reference String
      * @param rawType   String
+     * @param reference String
      * @return String tpType
      * @throws GenericHelper.TPTypeException If the Type is not supported
      */
-    public static String getTouchPortalType(String reference, String rawType) throws GenericHelper.TPTypeException {
+    public static String getTouchPortalType(String rawType, String reference) throws GenericHelper.TPTypeException {
         String tpType;
         switch (rawType) {
             case "short":
@@ -79,6 +81,10 @@ public class GenericHelper {
             case "boolean":
             case "java.lang.Boolean":
                 tpType = GenericHelper.TP_TYPE_SWITCH;
+                break;
+
+            case "javafx.scene.paint.Color":
+                tpType = GenericHelper.TP_TYPE_COLOR;
                 break;
 
             case "java.lang.String":

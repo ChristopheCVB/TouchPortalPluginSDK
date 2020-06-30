@@ -81,6 +81,9 @@ public @interface Data {
     /**
      * Data extensions
      * <p>
+     * Used if the parameter type is File
+     * </p>
+     * <p>
      * Supported extensions (i.e. `{"*.txt"}`)
      * </p>
      * <p>
@@ -90,4 +93,14 @@ public @interface Data {
      * @return String[] extensions
      */
     String[] extensions() default {};
+
+    /**
+     * Data isDirectory
+     * <p>
+     * Used if the parameter type is File
+     * </p>
+     *
+     * @return boolean isDirectory
+     */
+    boolean isDirectory() default false;
 }

@@ -23,6 +23,7 @@ package com.github.ChristopheCVB.TouchPortal.test;
 import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import com.google.gson.JsonObject;
+import javafx.scene.paint.Color;
 
 import java.io.File;
 
@@ -67,13 +68,24 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
     }
 
     /**
-     * Action example that contains a dynamic data file
+     * Action example that contains a dynamic data file and directory
      *
-     * @param file File
+     * @param file      File
+     * @param directory File
      */
     @Action(description = "Long Description of Dummy Action with Data File", categoryId = "BaseCategory")
-    private void dummyWithDataFile(@Data(extensions = {"*.mp3", "*.7z"}) File file) {
-        System.out.println("Action dummyWithDataFile received: file [" + file.getAbsolutePath() + "]");
+    private void dummyWithDataFileAndDirectory(@Data(extensions = {"*.mp3", "*.7z"}) File file, @Data(isDirectory = true) File directory) {
+        System.out.println("Action dummyWithDataFileAndDirectory received: file [" + file.getAbsolutePath() + "]");
+    }
+
+    /**
+     * Action example that contains a dynamic data color
+     *
+     * @param color Color
+     */
+    @Action(description = "Long Description of Dummy Action with Data File", categoryId = "BaseCategory")
+    private void dummyWithDataColor(@Data Color color) {
+        System.out.println("Action dummyWithDataColor received: color [" + color.toString() + "]");
     }
 
     private enum Categories {

@@ -323,12 +323,17 @@ public class LibraryTests {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
-        jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataFile.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataFileAndDirectory.ID);
         JsonArray data = new JsonArray();
-        JsonObject textDataItem = new JsonObject();
-        textDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataFile.File.ID);
-        textDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_VALUE, "/");
-        data.add(textDataItem);
+        JsonObject fileDataItem = new JsonObject();
+        fileDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataFileAndDirectory.File.ID);
+        fileDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_VALUE, "/");
+        data.add(fileDataItem);
+        jsonMessage.add(ActionHelper.DATA, data);
+        JsonObject directoryDataItem = new JsonObject();
+        directoryDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataFileAndDirectory.Directory.ID);
+        directoryDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_VALUE, "/");
+        data.add(directoryDataItem);
         jsonMessage.add(ActionHelper.DATA, data);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
@@ -538,7 +543,7 @@ public class LibraryTests {
 
         // Base Category Actions
         JsonArray baseCategoryActions = baseCategory.getAsJsonArray(CategoryHelper.ACTIONS);
-        assertEquals(3, baseCategoryActions.size());
+        assertEquals(4, baseCategoryActions.size());
 
         // Base Category Action DummyWithoutData
         JsonObject baseCategoryActionDummyWithoutData = baseCategoryActions.get(0).getAsJsonObject();
@@ -560,13 +565,13 @@ public class LibraryTests {
         JsonObject baseCategoryActionDummyWithDataItemText = baseCategoryActionDummyWithDataItems.get(0).getAsJsonObject();
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataTextAndNumber.Text.ID, baseCategoryActionDummyWithDataItemText.get(DataHelper.ID).getAsString());
 
-        // Base Category Action DummyWithDataFile
-        JsonObject baseCategoryActionDummyWithDataFile = baseCategoryActions.get(2).getAsJsonObject();
-        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataFile.ID, baseCategoryActionDummyWithDataFile.get(ActionHelper.ID).getAsString());
+        // Base Category Action dummyWithData File And Directory
+        JsonObject baseCategoryActionDummyWithDataFileAndDirectory = baseCategoryActions.get(2).getAsJsonObject();
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataFileAndDirectory.ID, baseCategoryActionDummyWithDataFileAndDirectory.get(ActionHelper.ID).getAsString());
 
         // Base Category Action DummyWithDataFile Data items
-        JsonArray baseCategoryActionDummyWithDataFileItems = baseCategoryActionDummyWithDataFile.getAsJsonArray(ActionHelper.DATA);
-        assertEquals(1, baseCategoryActionDummyWithDataFileItems.size());
+        JsonArray baseCategoryActionDummyWithDataFileItems = baseCategoryActionDummyWithDataFileAndDirectory.getAsJsonArray(ActionHelper.DATA);
+        assertEquals(2, baseCategoryActionDummyWithDataFileItems.size());
 
         // Base Category Events
         JsonArray baseCategoryEvents = baseCategory.getAsJsonArray(CategoryHelper.EVENTS);

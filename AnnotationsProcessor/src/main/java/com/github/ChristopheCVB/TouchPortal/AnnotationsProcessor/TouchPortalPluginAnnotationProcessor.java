@@ -402,16 +402,21 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 break;
 
             case GenericHelper.TP_TYPE_FILE:
-                JsonArray jsonExtensions = new JsonArray();
-                for (String extension : data.extensions()) {
-                    if (extension.matches(DataHelper.EXTENSION_FORMAT)) {
-                        jsonExtensions.add(extension);
-                    }
-                    else {
-                        this.messager.printMessage(Diagnostic.Kind.ERROR, "Action Data Extension: [" + extension + "] format is not valid");
-                    }
+                if (data.isDirectory()) {
+                    jsonData.addProperty(DataHelper.TYPE, GenericHelper.TP_TYPE_DIRECTORY);
                 }
-                jsonData.add(DataHelper.EXTENSIONS, jsonExtensions);
+                else {
+                    JsonArray jsonExtensions = new JsonArray();
+                    for (String extension : data.extensions()) {
+                        if (extension.matches(DataHelper.EXTENSION_FORMAT)) {
+                            jsonExtensions.add(extension);
+                        }
+                        else {
+                            this.messager.printMessage(Diagnostic.Kind.ERROR, "Action Data Extension: [" + extension + "] format is not valid");
+                        }
+                    }
+                    jsonData.add(DataHelper.EXTENSIONS, jsonExtensions);
+                }
                 break;
         }
         if (!action.format().isEmpty()) {
