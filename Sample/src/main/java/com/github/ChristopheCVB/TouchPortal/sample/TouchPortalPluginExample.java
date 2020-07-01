@@ -27,6 +27,8 @@ import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
 import com.google.gson.JsonObject;
 
+import java.io.File;
+
 @SuppressWarnings("unused")
 @Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
 public class TouchPortalPluginExample extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
@@ -79,44 +81,74 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
     }
 
     /**
-     * Action example that contains a dynamic data text
+     * Action example with no parameter
+     */
+    @Action(description = "Long Description of Action Simple", format = "Do a simple action", categoryId = "BaseCategory")
+    private void actionSimple() {
+        System.out.println("Action actionSimple received");
+    }
+
+    /**
+     * Action example with a Data Text parameter
      *
      * @param text String
      */
     @Action(description = "Long Description of Dummy Action with Data Text", format = "Set text to {$text$}", categoryId = "BaseCategory")
-    private void dummyWithDataText(@Data String text) {
-        System.out.println("Action dummyWithDataText received: " + text);
+    private void actionWithText(@Data String text) {
+        System.out.println("Action actionWithText received: " + text);
     }
 
     /**
-     * Action example that contains a dynamic data text
-     *
-     * @param action String[]
-     */
-    @Action(description = "Long Description of Dummy Action with Data Text", format = "Do action {$action$}", categoryId = "BaseCategory")
-    private void dummyWithDataChoice(@Data(valueChoices = {"Enable", "Disable", "Toggle"}, defaultValue = "Toggle") String[] action) {
-        // The selected value is passed at index 0
-        System.out.println("Action dummyWithDataChoice received: " + action[0]);
-    }
-
-    /**
-     * Simple Action example
+     * Action example without Data but 1 parameter
+     * <p>This action will not be called automatically by the SDK</p>
      *
      * @param jsonAction JSONObject
+     * @see TouchPortalPluginExample .onReceive
      */
-    @Action(description = "Long Description of Dummy Action without Data", categoryId = "BaseCategory")
-    private void dummyWithoutData(JsonObject jsonAction) {
-        System.out.println("Action dummyWithoutData received [" + jsonAction + "]");
+    @Action(description = "Long Description of Action without Data", categoryId = "BaseCategory")
+    private void actionWithoutData(JsonObject jsonAction) {
+        System.out.println("Action actionWithoutData received [" + jsonAction + "]");
     }
 
-    @Action(description = "Long Description of Dummy Switch Action", format = "Switch to {$isOn$}", categoryId = "BaseCategory")
-    private void dummySwitchAction(@Data(defaultValue = "false") boolean isOn) {
-        System.out.println("Action dummySwitchAction received: " + isOn);
+    /**
+     * Action example with a Data Choice
+     *
+     * @param doActions String[]
+     */
+    @Action(description = "Long Description of Action with Choice", format = "Do action {$doActions$}", categoryId = "BaseCategory")
+    private void actionWithChoice(@Data(valueChoices = {"Enable", "Disable", "Toggle"}, defaultValue = "Toggle") String[] doActions) {
+        // The user selected value is passed at index 0
+        System.out.println("Action actionWithChoice received: " + doActions[0]);
     }
 
-    @Action(description = "Long Description of Dummy Action", format = "Do a dummy action", categoryId = "BaseCategory")
-    private void dummyAction() {
-        System.out.println("Action dummyAction received");
+    /**
+     * Action example with a Data Switch
+     *
+     * @param isOn boolean
+     */
+    @Action(description = "Long Description of Action with Switch", format = "Switch to {$isOn$}", categoryId = "BaseCategory")
+    private void actionWithSwitch(@Data(defaultValue = "false") boolean isOn) {
+        System.out.println("Action actionWithSwitch received: " + isOn);
+    }
+
+    /**
+     * Action example with a Data File
+     *
+     * @param file File
+     */
+    @Action(description = "Long Description of Action with File", format = "Do an action with File", categoryId = "BaseCategory")
+    private void actionWithFile(@Data File file) {
+        System.out.println("Action actionWithFile received: " + file.getAbsolutePath());
+    }
+
+    /**
+     * Action example with a Data File that is a directory
+     *
+     * @param directory File
+     */
+    @Action(description = "Long Description of Action with Directory", format = "Do an action with Directory", categoryId = "BaseCategory")
+    private void actionWithDirectory(@Data(isDirectory = true) File directory) {
+        System.out.println("Action actionWithDirectory received: " + directory.getAbsolutePath());
     }
 
     @Override
@@ -133,9 +165,9 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
             if (receivedActionId != null) {
                 //noinspection SwitchStatementWithTooFewBranches
                 switch (receivedActionId) {
-                    case TouchPortalPluginExampleConstants.BaseCategory.Actions.DummyWithoutData.ID:
+                    case TouchPortalPluginExampleConstants.BaseCategory.Actions.ActionWithoutData.ID:
                         // Manually call the action method because the parameter jsonMessage is not annotated with @Data
-                        this.dummyWithoutData(jsonMessage);
+                        this.actionWithoutData(jsonMessage);
                         break;
                 }
             }

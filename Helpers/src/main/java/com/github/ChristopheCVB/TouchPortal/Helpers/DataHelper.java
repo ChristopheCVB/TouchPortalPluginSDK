@@ -40,6 +40,7 @@ public class DataHelper {
     public static final String VALUE_CHOICES = "valueChoices";
     public static final String EXTENSIONS = "extensions";
     public static final String EXTENSION_FORMAT = "\\*\\.[a-zA-Z0-9]{1,}";
+    public static final String COLOR_FORMAT = "#[a-fA-F0-9]{8}";
 
     protected static final String KEY_DATA = "data";
 

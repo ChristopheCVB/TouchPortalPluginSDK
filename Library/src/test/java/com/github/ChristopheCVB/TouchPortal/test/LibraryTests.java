@@ -629,4 +629,11 @@ public class LibraryTests {
         assertNull(this.touchPortalPluginTest.getProperty("non existent"));
         assertNull(this.touchPortalPluginTest.setProperty("non existent", "value"));
     }
+
+    @Test
+    public void testUpdate() {
+        assertFalse(this.touchPortalPluginTest.isUpdateAvailable("", 0, ""));
+        assertFalse(this.touchPortalPluginTest.isUpdateAvailable("https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/Library/src/test/resources/TouchPortalPluginTest/plugin.config", 1, "https://github.com/ChristopheCVB/TouchPortalPluginSDK"));
+        assertTrue(this.touchPortalPluginTest.isUpdateAvailable("https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/Library/src/test/resources/TouchPortalPluginTest/plugin.config", 0, "https://github.com/ChristopheCVB/TouchPortalPluginSDK"));
+    }
 }

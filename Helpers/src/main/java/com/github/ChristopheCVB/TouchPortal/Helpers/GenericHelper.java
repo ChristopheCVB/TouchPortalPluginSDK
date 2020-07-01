@@ -83,10 +83,6 @@ public class GenericHelper {
                 tpType = GenericHelper.TP_TYPE_SWITCH;
                 break;
 
-            case "javafx.scene.paint.Color":
-                tpType = GenericHelper.TP_TYPE_COLOR;
-                break;
-
             case "java.lang.String":
                 tpType = GenericHelper.TP_TYPE_TEXT;
                 break;

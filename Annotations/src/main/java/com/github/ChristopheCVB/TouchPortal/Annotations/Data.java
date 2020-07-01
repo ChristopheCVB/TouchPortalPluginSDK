@@ -103,4 +103,14 @@ public @interface Data {
      * @return boolean isDirectory
      */
     boolean isDirectory() default false;
+
+    /**
+     * Data isColor
+     * <p>
+     * Used if the parameter type is String
+     * </p>
+     *
+     * @return boolean isColor
+     */
+    boolean isColor() default false;
 }

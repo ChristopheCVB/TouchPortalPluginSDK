@@ -418,6 +418,17 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                     jsonData.add(DataHelper.EXTENSIONS, jsonExtensions);
                 }
                 break;
+
+            case GenericHelper.TP_TYPE_TEXT:
+                if (data.isColor()) {
+                    jsonData.addProperty(DataHelper.TYPE, GenericHelper.TP_TYPE_COLOR);
+                    if (!data.defaultValue().isEmpty()) {
+                        if (!data.defaultValue().matches(DataHelper.COLOR_FORMAT)) {
+                            this.messager.printMessage(Diagnostic.Kind.ERROR, "Action Data Color Default value: [" + data.defaultValue() + "] format is not valid");
+                        }
+                    }
+                }
+                break;
         }
         if (!action.format().isEmpty()) {
             // Replace wildcards

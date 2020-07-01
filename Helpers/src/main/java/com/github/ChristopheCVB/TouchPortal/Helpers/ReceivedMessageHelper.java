@@ -22,7 +22,6 @@ package com.github.ChristopheCVB.TouchPortal.Helpers;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import javafx.scene.paint.Color;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -201,10 +200,6 @@ public class ReceivedMessageHelper {
 
                 case "java.io.File":
                     argumentValue = new File((String) argumentValue);
-                    break;
-
-                case "javafx.scene.paint.Color":
-                    argumentValue = Color.web((String) argumentValue);
                     break;
             }
         }
