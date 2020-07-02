@@ -419,12 +419,16 @@ public class LibraryTests {
     public void testReceiveInfo() throws IOException, InterruptedException {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_INFO);
-        long sdkVersion = 2;
-        long tpVersionCode = 202000;
+        String status = "paired";
+        Long sdkVersion = 2L;
         String tpVersionString = "2.2.000";
+        Long tpVersionCode = 202000L;
+        Long pluginVersion = 1L;
+        jsonMessage.addProperty(TPInfo.STATUS, status);
         jsonMessage.addProperty(TPInfo.SDK_VERSION, sdkVersion);
         jsonMessage.addProperty(TPInfo.TP_VERSION_CODE, tpVersionCode);
         jsonMessage.addProperty(TPInfo.TP_VERSION_STRING, tpVersionString);
+        jsonMessage.addProperty(TPInfo.PLUGIN_VERSION, pluginVersion);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
 
@@ -435,9 +439,11 @@ public class LibraryTests {
 
         TPInfo tpInfo = this.touchPortalPluginTest.getTPInfo();
         assertNotNull(tpInfo);
+        assertEquals(status, tpInfo.status);
         assertEquals(sdkVersion, tpInfo.sdkVersion);
         assertEquals(tpVersionCode, tpInfo.tpVersionCode);
         assertEquals(tpVersionString, tpInfo.tpVersionString);
+        assertEquals(pluginVersion, tpInfo.pluginVersion);
     }
 
     @Test
@@ -455,9 +461,11 @@ public class LibraryTests {
 
         TPInfo tpInfo = this.touchPortalPluginTest.getTPInfo();
         assertNotNull(tpInfo);
-        assertEquals(-1, tpInfo.sdkVersion);
-        assertEquals(-1, tpInfo.tpVersionCode);
+        assertNull(tpInfo.status);
+        assertNull(tpInfo.sdkVersion);
+        assertNull(tpInfo.tpVersionCode);
         assertNull(tpInfo.tpVersionString);
+        assertNull(tpInfo.pluginVersion);
     }
 
     @Test
