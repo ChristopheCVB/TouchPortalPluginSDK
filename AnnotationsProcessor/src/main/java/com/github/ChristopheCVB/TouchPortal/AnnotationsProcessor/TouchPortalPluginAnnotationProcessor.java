@@ -429,6 +429,10 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                     }
                 }
                 break;
+
+            case GenericHelper.TP_TYPE_NUMBER:
+                jsonData.addProperty(DataHelper.ALLOW_DECIMALS, GenericHelper.getTouchPortalTypeNumberAllowDecimals(dataElement.asType().toString()));
+                break;
         }
         if (!action.format().isEmpty()) {
             // Replace wildcards

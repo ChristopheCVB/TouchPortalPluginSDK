@@ -34,13 +34,13 @@ import java.lang.reflect.Parameter;
 public class DataHelper {
     public static final String ID = GenericHelper.ID;
     public static final String TYPE = GenericHelper.TYPE;
-    public static final String TYPE_CHOICE = GenericHelper.TYPE_CHOICE;
     public static final String LABEL = "label";
     public static final String DEFAULT = GenericHelper.DEFAULT;
-    public static final String VALUE_CHOICES = "valueChoices";
+    public static final String VALUE_CHOICES = GenericHelper.VALUE_CHOICES;
     public static final String EXTENSIONS = "extensions";
     public static final String EXTENSION_FORMAT = "\\*\\.[a-zA-Z0-9]{1,}";
     public static final String COLOR_FORMAT = "#[a-fA-F0-9]{8}";
+    public static final String ALLOW_DECIMALS = "allowDecimals";
 
     protected static final String KEY_DATA = "data";
 

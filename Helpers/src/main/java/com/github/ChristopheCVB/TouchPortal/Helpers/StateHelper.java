@@ -32,11 +32,11 @@ import java.lang.reflect.Field;
 public class StateHelper {
     public static final String ID = GenericHelper.ID;
     public static final String TYPE = GenericHelper.TYPE;
-    public static final String TYPE_CHOICE = "choice";
-    public static final String TYPE_TEXT = "text";
+    public static final String TYPE_CHOICE = GenericHelper.TP_TYPE_CHOICE;
+    public static final String TYPE_TEXT = GenericHelper.TP_TYPE_TEXT;
     public static final String DESC = "desc";
     public static final String DEFAULT = GenericHelper.DEFAULT;
-    public static final String VALUE_CHOICES = "valueChoices";
+    public static final String VALUE_CHOICES = GenericHelper.VALUE_CHOICES;
 
     protected static final String KEY_STATE = "state";
 

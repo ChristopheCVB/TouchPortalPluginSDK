@@ -37,10 +37,10 @@ public class GenericHelper {
     protected static final String ID = "id";
     protected static final String NAME = "name";
     protected static final String TYPE = "type";
-    protected static final String TYPE_CHOICE = "choice";
     protected static final String DESCRIPTION = "description";
     protected static final String VALUE = "value";
     protected static final String DEFAULT = "default";
+    protected static final String VALUE_CHOICES = "valueChoices";
 
     /**
      * Retrieve the Touch Portal type according to the Java's element type
@@ -99,6 +99,27 @@ public class GenericHelper {
                 throw new TPTypeException.Builder(reference, rawType).build();
         }
         return tpType;
+    }
+
+    /**
+     * Retrieve the Touch Portal type Number allow decimals
+     *
+     * @param rawType String
+     * @return boolean allowDecimals
+     */
+    public static boolean getTouchPortalTypeNumberAllowDecimals(String rawType) {
+        boolean allowDecimals = true;
+        switch (rawType) {
+            case "short":
+            case "int":
+            case "long":
+            case "java.lang.Short":
+            case "java.lang.Integer":
+            case "java.lang.Long":
+                allowDecimals = false;
+                break;
+        }
+        return allowDecimals;
     }
 
     /**

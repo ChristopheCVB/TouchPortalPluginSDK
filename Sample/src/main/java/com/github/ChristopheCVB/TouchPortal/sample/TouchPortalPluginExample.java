@@ -136,7 +136,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
      *
      * @param file File
      */
-    @Action(description = "Long Description of Action with File", format = "Do an action with File", categoryId = "BaseCategory")
+    @Action(description = "Long Description of Action with File", format = "Do an action with {$file$}", categoryId = "BaseCategory")
     private void actionWithFile(@Data File file) {
         System.out.println("Action actionWithFile received: " + file.getAbsolutePath());
     }
@@ -146,9 +146,20 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
      *
      * @param directory File
      */
-    @Action(description = "Long Description of Action with Directory", format = "Do an action with Directory", categoryId = "BaseCategory")
+    @Action(description = "Long Description of Action with Directory", format = "Do an action with {$directory$}", categoryId = "BaseCategory")
     private void actionWithDirectory(@Data(isDirectory = true) File directory) {
         System.out.println("Action actionWithDirectory received: " + directory.getAbsolutePath());
+    }
+
+    /**
+     * Action example with a Data Integer
+     *
+     * @param integerValue Integer
+     * @param doubleValue  Double
+     */
+    @Action(description = "Long Description of Action with Numbers", format = "Do an action with {$integerValue$} and {$doubleValue$}", categoryId = "BaseCategory")
+    private void actionWithNumbers(@Data Integer integerValue, @Data Double doubleValue) {
+        System.out.println("Action actionWithNumber received: " + integerValue + " and " + doubleValue);
     }
 
     @Override

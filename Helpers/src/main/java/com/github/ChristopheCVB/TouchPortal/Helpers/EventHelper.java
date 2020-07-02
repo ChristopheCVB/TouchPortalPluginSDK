@@ -35,8 +35,8 @@ public class EventHelper {
     public static final String TYPE = GenericHelper.TYPE;
     public static final String TYPE_COMMUNICATE = "communicate";
     public static final String VALUE_TYPE = "valueType";
-    public static final String VALUE_TYPE_CHOICE = GenericHelper.TYPE_CHOICE;
-    public static final String VALUE_CHOICES = "valueChoices";
+    public static final String VALUE_TYPE_CHOICE = GenericHelper.TP_TYPE_CHOICE;
+    public static final String VALUE_CHOICES = GenericHelper.VALUE_CHOICES;
     public static final String VALUE_STATE_ID = "valueStateId";
 
     private static final String KEY_EVENT = "event";
