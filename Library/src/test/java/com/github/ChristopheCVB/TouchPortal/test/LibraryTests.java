@@ -183,6 +183,14 @@ public class LibraryTests {
     }
 
     @Test
+    public void testServerSocketCloses() throws IOException, InterruptedException {
+        this.serverSocketClient.close();
+        this.serverSocket.close();
+        Thread.sleep(100);
+        assertFalse(this.touchPortalPluginTest.isConnected());
+    }
+
+    @Test
     public void testSend() {
         // Send State Update by ID from Constants
         assertTrue(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "New Value 01"));
