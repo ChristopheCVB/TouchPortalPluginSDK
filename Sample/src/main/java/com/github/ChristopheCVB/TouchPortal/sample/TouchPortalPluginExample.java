@@ -152,7 +152,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
     }
 
     /**
-     * Action example with a Data Integer
+     * Action example with a Data Integer and Double
      *
      * @param integerValue Integer
      * @param doubleValue  Double
@@ -160,6 +160,16 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
     @Action(description = "Long Description of Action with Numbers", format = "Do an action with {$integerValue$} and {$doubleValue$}", categoryId = "BaseCategory")
     private void actionWithNumbers(@Data Integer integerValue, @Data Double doubleValue) {
         System.out.println("Action actionWithNumber received: " + integerValue + " and " + doubleValue);
+    }
+
+    /**
+     * Action example with a Data Color
+     *
+     * @param color String
+     */
+    @Action(description = "Long Description of Action with Color", format = "Do an action with {$color$}", categoryId = "BaseCategory")
+    private void actionWithColor(@Data(defaultValue = "#00000000", isColor = true) String color) {
+        System.out.println("Action actionWithColor received: " + color);
     }
 
     @Override
