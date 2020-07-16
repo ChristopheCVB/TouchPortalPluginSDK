@@ -28,7 +28,11 @@ public class SentMessageHelper {
     public static final String TYPE_STATE_UPDATE = "stateUpdate";
     public static final String TYPE_PAIR = "pair";
     public static final String TYPE_CHOICE_UPDATE = "choiceUpdate";
+    public static final String TYPE_CREATE_STATE = "createState";
+    public static final String TYPE_REMOVE_STATE = "removeState";
     public static final String INSTANCE_ID = "instanceId";
     public static final String ID = GenericHelper.ID;
     public static final String VALUE = GenericHelper.VALUE;
+    public static final String DESCRIPTION = StateHelper.DESC;
+    public static final String DEFAULT_VALUE = "defaultValue";
 }

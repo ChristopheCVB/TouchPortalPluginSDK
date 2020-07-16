@@ -547,6 +547,45 @@ public abstract class TouchPortalPlugin {
         return sent;
     }
 
+    public boolean createState(String categoryId, String stateId, String description, String value) {
+        boolean sent = false;
+        if (categoryId != null && !categoryId.isEmpty() && stateId != null && !stateId.isEmpty() && description != null && !description.isEmpty() && value != null && !value.isEmpty()) {
+            stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateId);
+            if (!this.currentStates.containsKey(stateId)) {
+                JsonObject stateUpdateMessage = new JsonObject();
+                stateUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CREATE_STATE);
+                stateUpdateMessage.addProperty(SentMessageHelper.ID, stateId);
+                stateUpdateMessage.addProperty(SentMessageHelper.DESCRIPTION, description);
+                stateUpdateMessage.addProperty(SentMessageHelper.DEFAULT_VALUE, value);
+                sent = this.send(stateUpdateMessage);
+                if (sent) {
+                    this.currentStates.put(stateId, value);
+                }
+                System.out.println("Create State [" + stateId + "] Sent [" + sent + "]");
+            }
+            else {
+                sent = this.sendStateUpdate(stateId, value);
+            }
+        }
+        return sent;
+    }
+
+    public boolean removeState(String categoryId, String stateId) {
+        boolean sent = false;
+        if (categoryId != null && !categoryId.isEmpty() && stateId != null && !stateId.isEmpty()) {
+            stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateId);
+            JsonObject stateUpdateMessage = new JsonObject();
+            stateUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_REMOVE_STATE);
+            stateUpdateMessage.addProperty(SentMessageHelper.ID, stateId);
+            sent = this.send(stateUpdateMessage);
+            if (sent) {
+                this.currentStates.remove(stateId);
+            }
+            System.out.println("Remove State [" + stateId + "] Sent [" + sent + "]");
+        }
+        return sent;
+    }
+
     /**
      * Is the Plugin connected to the Touch Portal Plugin System
      *

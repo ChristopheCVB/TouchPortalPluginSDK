@@ -84,7 +84,7 @@ public class StateHelper {
             }
         }
         catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            stateId = StateHelper._getStateId(CategoryHelper.getCategoryId(pluginClass, categoryId), stateFieldName);
         }
 
         return stateId;
