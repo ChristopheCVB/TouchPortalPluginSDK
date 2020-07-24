@@ -65,8 +65,7 @@ public class LibraryTests {
         // Mock Server
         this.serverSocket = new ServerSocket(12136, 50, InetAddress.getByName("127.0.0.1"));
 
-        File testResourcesDirectory = new File("src/test/resources/");
-        this.touchPortalPluginTest = new TouchPortalPluginTest(new String[]{"start", testResourcesDirectory.getAbsolutePath() + "/"});
+        this.touchPortalPluginTest = new TouchPortalPluginTest();
 
         boolean connectedPairedAndListening = this.touchPortalPluginTest.connectThenPairAndListen(this.touchPortalPluginListener);
         this.serverSocketAccept();
@@ -580,7 +579,7 @@ public class LibraryTests {
 
     @Test
     public void testEntryTPAndConstants() throws IOException {
-        File testGeneratedResourcesDirectory = new File("build/generated/sources/annotationProcessor/java/test/resources");
+        File testGeneratedResourcesDirectory = new File("../../../../build/generated/sources/annotationProcessor/java/test/resources");
 
         BufferedReader reader = Files.newBufferedReader(Paths.get(new File(testGeneratedResourcesDirectory.getAbsolutePath() + "/entry.tp").getAbsolutePath()));
         JsonObject entry = JsonParser.parseReader(reader).getAsJsonObject();

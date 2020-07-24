@@ -74,7 +74,7 @@ public abstract class TouchPortalPlugin {
     /**
      * Touch Portal Plugin Folder passed at start command
      */
-    private final String touchPortalPluginFolder;
+    private String touchPortalPluginFolder;
     /**
      * Touch Portal Socket Client connection
      */
@@ -124,11 +124,18 @@ public abstract class TouchPortalPlugin {
     /**
      * Constructor
      *
-     * @param touchPortalPluginFolder String - args[1]
-     * @param parallelizeActions      boolean - Parallelize Actions execution
+     * @param parallelizeActions boolean - Parallelize Actions execution
      */
-    protected TouchPortalPlugin(String touchPortalPluginFolder, boolean parallelizeActions) {
-        this.touchPortalPluginFolder = touchPortalPluginFolder.trim();
+    protected TouchPortalPlugin(boolean parallelizeActions) {
+        try {
+            this.touchPortalPluginFolder = new File(".").getCanonicalPath();
+        }
+        catch (IOException ioException) {
+            this.touchPortalPluginFolder = new File(".").getAbsolutePath();
+            if (this.touchPortalPluginFolder.endsWith(".")) {
+                this.touchPortalPluginFolder = this.touchPortalPluginFolder.substring(0, this.touchPortalPluginFolder.length() - 2);
+            }
+        }
         this.pluginClass = this.getClass();
         this.callbacksExecutor = Executors.newFixedThreadPool(parallelizeActions ? 5 : 1);
     }
@@ -606,7 +613,7 @@ public abstract class TouchPortalPlugin {
      * @return File resourceFile
      */
     public File getResourceFile(String resourcePluginFilePath) {
-        return Paths.get(this.touchPortalPluginFolder + this.pluginClass.getSimpleName() + "/" + resourcePluginFilePath).toFile();
+        return Paths.get(this.touchPortalPluginFolder + "/" + resourcePluginFilePath).toFile();
     }
 
     /**

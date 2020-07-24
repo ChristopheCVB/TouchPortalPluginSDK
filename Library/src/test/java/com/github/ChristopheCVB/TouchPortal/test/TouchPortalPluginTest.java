@@ -38,11 +38,9 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
 
     /**
      * Constructor calling super
-     *
-     * @param args String[]
      */
-    public TouchPortalPluginTest(String[] args) {
-        super(args[1], true);
+    public TouchPortalPluginTest() {
+        super(true);
     }
 
     /**

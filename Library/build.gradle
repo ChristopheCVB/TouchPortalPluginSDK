@@ -22,6 +22,8 @@ compileTestJava {
     options.compilerArgs.add('-parameters')
 }
 
+test.workingDir = new File("./src/test/resources/TouchPortalPluginTest/")
+
 apply plugin: 'jacoco'
 
 jacocoTestReport {
