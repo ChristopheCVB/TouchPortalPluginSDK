@@ -30,18 +30,16 @@ Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 public class MyTouchPortalPlugin extends TouchPortalPlugin {
     /**
      * Constructor calling super
-     *
-     * @param args String[]
      */
-    public MyTouchPortalPlugin(String[] args) {
-        super(args);
+    public MyTouchPortalPlugin() {
+        super(true);
     }
 
     public static void main(String[] args) {
-        if (args != null && args.length == 2) {
+        if (args != null && args.length == 1) {
             if (PluginHelper.COMMAND_START.equals(args[0])) {
                 // Initialize your Plugin
-                MyTouchPortalPlugin myTouchPortalPlugin = new MyTouchPortalPlugin(args);
+                MyTouchPortalPlugin myTouchPortalPlugin = new MyTouchPortalPlugin();
                 // Initiate the connection with the Touch Portal Plugin System
                 boolean connectedPairedAndListening = myTouchPortalPlugin.connectThenPairAndListen(myTouchPortalPlugin);
             }
@@ -84,7 +82,7 @@ package com.github.ChristopheCVB.TouchPortal.sample;
 
 // import ...
 
-@Plugin(version = 1, colorDark = "#203060", colorLight = "#4070F0", name = "My Touch Portal Plugin")
+@Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "My Touch Portal Plugin")
 public class MyTouchPortalPlugin extends TouchPortalPlugin {
     //...
 
