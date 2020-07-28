@@ -36,16 +36,25 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
         /**
          * Category definition example
          */
-        @Category(name = "Touch Portal Plugin Example", imagePath = "images/icon-24.png")
-        BaseCategory
+        @Category(name = "Touch Portal Plugin Example Base Category", imagePath = "images/icon-24.png")
+        BaseCategory,
+        @Category(name = "Touch Portal Plugin Example Second Category", imagePath = "images/icon-24.png")
+        SecondCategory
     }
 
     /**
      * State and Event definition example
      */
-    @State(valueChoices = {"1", "2"}, defaultValue = "1")
+    @State(valueChoices = {"1", "2"}, defaultValue = "1", categoryId = "BaseCategory")
     @Event(format = "When customState becomes $val")
     private String[] customState;
+
+    /**
+     * State and Event definition example
+     */
+    @State(valueChoices = {"1", "2"}, defaultValue = "1", categoryId = "SecondCategory")
+    @Event(format = "When customState2 becomes $val")
+    private String[] customState2;
 
     /**
      * Constructor calling super

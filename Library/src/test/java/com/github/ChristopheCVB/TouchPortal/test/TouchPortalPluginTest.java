@@ -32,7 +32,7 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
     /**
      * State and Event definition example
      */
-    @State(valueChoices = {"1", "2"}, defaultValue = "1")
+    @State(valueChoices = {"1", "2"}, defaultValue = "1", categoryId = "BaseCategory")
     @Event(format = "When customState becomes $val")
     private String[] customState;
 

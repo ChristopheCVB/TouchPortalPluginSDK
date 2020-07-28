@@ -196,9 +196,13 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         JsonArray jsonStates = new JsonArray();
         Set<? extends Element> stateElements = roundEnv.getElementsAnnotatedWith(State.class);
         for (Element stateElement : stateElements) {
-            Pair<JsonObject, TypeSpec.Builder> stateResult = this.processState(roundEnv, pluginElement, plugin, categoryElement, category, stateElement);
-            jsonStates.add(stateResult.first);
-            statesTypeSpecBuilder.addType(stateResult.second.build());
+            State state = stateElement.getAnnotation(State.class);
+            String categoryId = category.id().isEmpty() ? categoryElement.getSimpleName().toString() : category.id();
+            if (categoryId.equals(state.categoryId())) {
+                Pair<JsonObject, TypeSpec.Builder> stateResult = this.processState(roundEnv, pluginElement, plugin, categoryElement, category, stateElement);
+                jsonStates.add(stateResult.first);
+                statesTypeSpecBuilder.addType(stateResult.second.build());
+            }
         }
         categoryTypeSpecBuilder.addType(statesTypeSpecBuilder.build());
         jsonCategory.add(CategoryHelper.STATES, jsonStates);
@@ -207,9 +211,13 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         JsonArray jsonEvents = new JsonArray();
         Set<? extends Element> eventElements = roundEnv.getElementsAnnotatedWith(Event.class);
         for (Element eventElement : eventElements) {
-            Pair<JsonObject, TypeSpec.Builder> eventResult = this.processEvent(roundEnv, pluginElement, plugin, categoryElement, category, eventElement);
-            jsonEvents.add(eventResult.first);
-            eventsTypeSpecBuilder.addType(eventResult.second.build());
+            State state = eventElement.getAnnotation(State.class);
+            String categoryId = category.id().isEmpty() ? categoryElement.getSimpleName().toString() : category.id();
+            if (categoryId.equals(state.categoryId())) {
+                Pair<JsonObject, TypeSpec.Builder> eventResult = this.processEvent(roundEnv, pluginElement, plugin, categoryElement, category, eventElement);
+                jsonEvents.add(eventResult.first);
+                eventsTypeSpecBuilder.addType(eventResult.second.build());
+            }
         }
         categoryTypeSpecBuilder.addType(eventsTypeSpecBuilder.build());
         jsonCategory.add(CategoryHelper.EVENTS, jsonEvents);

@@ -72,4 +72,11 @@ public @interface State {
      * @return String[] valueChoices
      */
     String[] valueChoices() default {};
+
+    /**
+     * State categoryId
+     *
+     * @return String categoryId
+     */
+    String categoryId();
 }
