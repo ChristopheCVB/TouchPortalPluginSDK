@@ -605,8 +605,7 @@ public class LibraryTests {
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithoutData.ID, baseCategoryActionDummyWithoutData.get(ActionHelper.ID).getAsString());
 
         // Base Category Action DummyWithoutData Data items
-        JsonArray baseCategoryActionDummyWithoutDataItems = baseCategoryActionDummyWithoutData.getAsJsonArray(ActionHelper.DATA);
-        assertEquals(0, baseCategoryActionDummyWithoutDataItems.size());
+        assertFalse(baseCategoryActionDummyWithoutData.has(ActionHelper.DATA));
 
         // Base Category Action DummyWithDataTextAndNumber
         JsonObject baseCategoryActionDummyWithData = baseCategoryActions.get(1).getAsJsonObject();

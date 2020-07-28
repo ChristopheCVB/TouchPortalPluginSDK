@@ -269,7 +269,9 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 actionTypeSpecBuilder.addType(actionDataResult.second.build());
             }
         }
-        jsonAction.add(ActionHelper.DATA, jsonActionData);
+        if (jsonActionData.size() > 0) {
+            jsonAction.add(ActionHelper.DATA, jsonActionData);
+        }
 
         return Pair.create(jsonAction, actionTypeSpecBuilder);
     }
