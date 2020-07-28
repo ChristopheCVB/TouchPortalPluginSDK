@@ -41,6 +41,7 @@ import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 import java.io.Writer;
+import java.lang.annotation.AnnotationFormatError;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -127,7 +128,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @return Pair<JsonObject, TypeSpec.Builder> pluginPair
      * @throws GenericHelper.TPTypeException If a used type is not Supported
      */
-    private Pair<JsonObject, TypeSpec.Builder> processPlugin(RoundEnvironment roundEnv, Element pluginElement) throws GenericHelper.TPTypeException {
+    private Pair<JsonObject, TypeSpec.Builder> processPlugin(RoundEnvironment roundEnv, Element pluginElement) throws Exception {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Plugin: " + pluginElement.getSimpleName());
         Plugin plugin = pluginElement.getAnnotation(Plugin.class);
 
@@ -166,7 +167,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @return Pair<JsonObject, TypeSpec.Builder> categoryPair
      * @throws GenericHelper.TPTypeException If a used type is not Supported
      */
-    private Pair<JsonObject, TypeSpec.Builder> processCategory(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement) throws GenericHelper.TPTypeException {
+    private Pair<JsonObject, TypeSpec.Builder> processCategory(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement) throws Exception {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Category: " + categoryElement.getSimpleName());
         Category category = categoryElement.getAnnotation(Category.class);
 
@@ -213,10 +214,15 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         for (Element eventElement : eventElements) {
             State state = eventElement.getAnnotation(State.class);
             String categoryId = category.id().isEmpty() ? categoryElement.getSimpleName().toString() : category.id();
-            if (categoryId.equals(state.categoryId())) {
-                Pair<JsonObject, TypeSpec.Builder> eventResult = this.processEvent(roundEnv, pluginElement, plugin, categoryElement, category, eventElement);
-                jsonEvents.add(eventResult.first);
-                eventsTypeSpecBuilder.addType(eventResult.second.build());
+            if (state != null) {
+                if (categoryId.equals(state.categoryId())) {
+                    Pair<JsonObject, TypeSpec.Builder> eventResult = this.processEvent(roundEnv, pluginElement, plugin, categoryElement, category, eventElement);
+                    jsonEvents.add(eventResult.first);
+                    eventsTypeSpecBuilder.addType(eventResult.second.build());
+                }
+            }
+            else {
+                throw new AnnotationFormatError("The State Annotation is missing for element " + eventElement.getSimpleName());
             }
         }
         categoryTypeSpecBuilder.addType(eventsTypeSpecBuilder.build());
@@ -236,7 +242,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param actionElement   Element
      * @return Pair<JsonObject, TypeSpec.Builder> actionPair
      */
-    private Pair<JsonObject, TypeSpec.Builder> processAction(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement) throws GenericHelper.TPTypeException {
+    private Pair<JsonObject, TypeSpec.Builder> processAction(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement) throws Exception {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Action: " + actionElement.getSimpleName());
         Action action = actionElement.getAnnotation(Action.class);
 
@@ -280,7 +286,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @return Pair<JsonObject, TypeSpec.Builder> statePair
      * @throws GenericHelper.TPTypeException If a used type is not Supported
      */
-    private Pair<JsonObject, TypeSpec.Builder> processState(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element stateElement) throws GenericHelper.TPTypeException {
+    private Pair<JsonObject, TypeSpec.Builder> processState(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element stateElement) throws Exception {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process State: " + stateElement.getSimpleName());
         State state = stateElement.getAnnotation(State.class);
 
@@ -320,7 +326,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @return Pair<JsonObject, TypeSpec.Builder> eventPair
      * @throws GenericHelper.TPTypeException If any used type is not Supported
      */
-    private Pair<JsonObject, TypeSpec.Builder> processEvent(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element eventElement) throws GenericHelper.TPTypeException {
+    private Pair<JsonObject, TypeSpec.Builder> processEvent(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element eventElement) throws Exception {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Event: " + eventElement.getSimpleName());
         State state = eventElement.getAnnotation(State.class);
         Event event = eventElement.getAnnotation(Event.class);
@@ -365,7 +371,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      * @param dataElement     Element
      * @return Pair<JsonObject, TypeSpec.Builder> dataPair
      */
-    private Pair<JsonObject, TypeSpec.Builder> processActionData(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement, Action action, JsonObject jsonAction, Element dataElement) throws GenericHelper.TPTypeException {
+    private Pair<JsonObject, TypeSpec.Builder> processActionData(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement, Action action, JsonObject jsonAction, Element dataElement) throws Exception {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Action Data: " + dataElement.getSimpleName());
         Data data = dataElement.getAnnotation(Data.class);
 
