@@ -152,7 +152,12 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
             jsonCategories.add(categoryResult.first);
             pluginTypeSpecBuilder.addType(categoryResult.second.build());
         }
-        jsonPlugin.add(PluginHelper.CATEGORIES, jsonCategories);
+        if (jsonCategories.size() > 0) {
+            jsonPlugin.add(PluginHelper.CATEGORIES, jsonCategories);
+        }
+        else {
+            throw new Exception("Category Annotation missing");
+        }
 
         return Pair.create(jsonPlugin, pluginTypeSpecBuilder);
     }
@@ -190,8 +195,10 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 actionsTypeSpecBuilder.addType(actionResult.second.build());
             }
         }
-        categoryTypeSpecBuilder.addType(actionsTypeSpecBuilder.build());
-        jsonCategory.add(CategoryHelper.ACTIONS, jsonActions);
+        if (jsonActions.size() > 0) {
+            categoryTypeSpecBuilder.addType(actionsTypeSpecBuilder.build());
+            jsonCategory.add(CategoryHelper.ACTIONS, jsonActions);
+        }
 
         TypeSpec.Builder statesTypeSpecBuilder = TypeSpec.classBuilder("States");
         JsonArray jsonStates = new JsonArray();
@@ -205,8 +212,10 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 statesTypeSpecBuilder.addType(stateResult.second.build());
             }
         }
-        categoryTypeSpecBuilder.addType(statesTypeSpecBuilder.build());
-        jsonCategory.add(CategoryHelper.STATES, jsonStates);
+        if (jsonStates.size() > 0) {
+            categoryTypeSpecBuilder.addType(statesTypeSpecBuilder.build());
+            jsonCategory.add(CategoryHelper.STATES, jsonStates);
+        }
 
         TypeSpec.Builder eventsTypeSpecBuilder = TypeSpec.classBuilder("Events");
         JsonArray jsonEvents = new JsonArray();
@@ -225,8 +234,10 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 throw new AnnotationFormatError("The State Annotation is missing for element " + eventElement.getSimpleName());
             }
         }
-        categoryTypeSpecBuilder.addType(eventsTypeSpecBuilder.build());
-        jsonCategory.add(CategoryHelper.EVENTS, jsonEvents);
+        if (jsonEvents.size() > 0) {
+            categoryTypeSpecBuilder.addType(eventsTypeSpecBuilder.build());
+            jsonCategory.add(CategoryHelper.EVENTS, jsonEvents);
+        }
 
         return Pair.create(jsonCategory, categoryTypeSpecBuilder);
     }
