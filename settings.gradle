@@ -1,8 +1,8 @@
 rootProject.name = 'TouchPortalPluginSDK'
 include 'Annotations'
+include 'Helpers'
 include 'AnnotationsProcessor'
+include 'Library'
 include 'Sample'
 include 'SampleKotlin'
-include 'Library'
-include 'Helpers'
 
