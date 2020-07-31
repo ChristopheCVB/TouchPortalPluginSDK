@@ -27,14 +27,20 @@ import com.google.gson.JsonObject;
 import java.io.File;
 
 @SuppressWarnings("unused")
-@Plugin(version = 4000, colorDark = "#203060", colorLight = "#4070F0")
+@Plugin(version = 5000, colorDark = "#203060", colorLight = "#4070F0")
 public class TouchPortalPluginTest extends TouchPortalPlugin {
     /**
      * State and Event definition example
      */
+    @State(defaultValue = "1", categoryId = "BaseCategory")
+    @Event(valueChoices = {"1", "2"}, format = "When customState becomes $val")
+    private String customState;
+
+    /**
+     * State and Event definition example
+     */
     @State(valueChoices = {"1", "2"}, defaultValue = "1", categoryId = "BaseCategory")
-    @Event(format = "When customState becomes $val")
-    private String[] customState;
+    private String[] customState2;
 
     /**
      * Constructor calling super

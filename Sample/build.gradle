@@ -10,8 +10,8 @@ plugins {
     id 'de.fuerstenau.buildconfig' version '1.1.8'
 }
 
-def versionMajor = 4
-def versionMinor = 2
+def versionMajor = 5
+def versionMinor = 0
 def versionPatch = 0
 
 def mainClassSimpleName = 'TouchPortalPluginExample'

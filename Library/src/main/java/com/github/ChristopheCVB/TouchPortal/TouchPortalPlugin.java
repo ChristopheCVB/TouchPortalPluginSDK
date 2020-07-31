@@ -187,6 +187,16 @@ public abstract class TouchPortalPlugin {
                         }
                         break;
 
+                    case ReceivedMessageHelper.TYPE_LIST_CHANGE:
+                        String actionId = ReceivedMessageHelper.getActionId(jsonMessage);
+                        String listId = ReceivedMessageHelper.getListId(jsonMessage);
+                        String listInstanceId = ReceivedMessageHelper.getListInstanceId(jsonMessage);
+                        String listValue = ReceivedMessageHelper.getListValue(jsonMessage);
+                        if (this.touchPortalPluginListener != null) {
+                            this.touchPortalPluginListener.onListChange(actionId, listId, listInstanceId, listValue);
+                        }
+                        break;
+
                     default:
                         this.callbacksExecutor.submit(() -> {
                             if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, this.pluginClass)) {
@@ -800,6 +810,16 @@ public abstract class TouchPortalPlugin {
          * @param tpInfo {@link TPInfo}
          */
         void onInfo(TPInfo tpInfo);
+
+        /**
+         * Called when a List Change Message is received
+         *
+         * @param actionId       String
+         * @param listId         String
+         * @param listInstanceId String
+         * @param value          String
+         */
+        void onListChange(String actionId, String listId, String listInstanceId, String value);
     }
 
     /**

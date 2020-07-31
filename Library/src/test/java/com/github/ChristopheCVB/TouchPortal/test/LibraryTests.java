@@ -58,6 +58,10 @@ public class LibraryTests {
         @Override
         public void onInfo(TPInfo tpInfo) {
         }
+
+        @Override
+        public void onListChange(String actionId, String listId, String listInstanceId, String value) {
+        }
     };
 
     @Before
@@ -637,7 +641,7 @@ public class LibraryTests {
 
         // Base Category States
         JsonArray baseCategoryStates = baseCategory.getAsJsonArray(CategoryHelper.STATES);
-        assertEquals(1, baseCategoryStates.size());
+        assertEquals(2, baseCategoryStates.size());
 
         // Base Category State Custom State
         JsonObject baseCategoryStateCustomState = baseCategoryStates.get(0).getAsJsonObject();

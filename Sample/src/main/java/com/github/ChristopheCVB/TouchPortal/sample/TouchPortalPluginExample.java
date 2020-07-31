@@ -45,16 +45,21 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
     /**
      * State and Event definition example
      */
-    @State(valueChoices = {"1", "2"}, defaultValue = "1", categoryId = "BaseCategory")
-    @Event(format = "When customState becomes $val")
-    private String[] customState;
+    @State(defaultValue = "1", categoryId = "BaseCategory")
+    @Event(valueChoices = {"1", "2"}, format = "When customStateWithEvent becomes $val")
+    private String customStateWithEvent;
 
     /**
-     * State and Event definition example
+     * State of type choice definition example
      */
     @State(valueChoices = {"1", "2"}, defaultValue = "1", categoryId = "SecondCategory")
-    @Event(format = "When customState2 becomes $val")
-    private String[] customState2;
+    private String[] customStateChoice;
+
+    /**
+     * State of type text definition example
+     */
+    @State(defaultValue = "Default Value", categoryId = "SecondCategory")
+    private String customStateText;
 
     /**
      * Constructor calling super
@@ -81,7 +86,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
 
                 if (connectedPairedAndListening) {
                     // Update a State with the ID from the Generated Constants Class
-                    boolean stateUpdated = touchPortalPluginExample.sendStateUpdate(TouchPortalPluginExampleConstants.BaseCategory.States.CustomState.ID, "2");
+                    boolean stateUpdated = touchPortalPluginExample.sendStateUpdate(TouchPortalPluginExampleConstants.BaseCategory.States.CustomStateWithEvent.ID, "2");
 
                     // Create a new State
                     touchPortalPluginExample.createState("BaseCategory", "createdState1", "Created State 01", System.currentTimeMillis() + "1");
@@ -213,5 +218,9 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
 
     @Override
     public void onInfo(TPInfo tpInfo) {
+    }
+
+    @Override
+    public void onListChange(String actionId, String listId, String listInstanceId, String value) {
     }
 }

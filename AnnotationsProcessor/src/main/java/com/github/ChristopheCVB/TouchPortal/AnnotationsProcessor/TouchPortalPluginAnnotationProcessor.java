@@ -318,6 +318,11 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
             throw new GenericHelper.TPTypeException.Builder(className, GenericHelper.TPTypeException.ForAnnotation.STATE, desiredTPType).build();
         }
 
+        Event event = stateElement.getAnnotation(Event.class);
+        if (event != null && !desiredTPType.equals(StateHelper.TYPE_TEXT)) {
+            throw new Exception("The type of the State Annotation for " + className + " cannot be " + desiredTPType + " because the field is also Annotated with Event. Only the type " + StateHelper.TYPE_TEXT + " is supported for a State that has an Event Annotation.");
+        }
+
         return Pair.create(jsonState, stateTypeSpecBuilder);
     }
 
@@ -338,9 +343,13 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         State state = eventElement.getAnnotation(State.class);
         Event event = eventElement.getAnnotation(Event.class);
 
-        TypeSpec.Builder eventTypeSpecBuilder = this.createEventTypeSpecBuilder(pluginElement, categoryElement, category, eventElement, event);
-
         String reference = eventElement.getEnclosingElement().getSimpleName() + "." + eventElement.getSimpleName();
+
+        if (state == null) {
+            throw new Exception("The Event Annotation on " + reference + " must be used with the State Annotation");
+        }
+
+        TypeSpec.Builder eventTypeSpecBuilder = this.createEventTypeSpecBuilder(pluginElement, categoryElement, category, eventElement, event);
 
         JsonObject jsonEvent = new JsonObject();
         jsonEvent.addProperty(EventHelper.ID, EventHelper.getEventId(pluginElement, categoryElement, category, eventElement, event));
@@ -348,13 +357,13 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonEvent.addProperty(EventHelper.NAME, EventHelper.getEventName(eventElement, event));
         jsonEvent.addProperty(EventHelper.FORMAT, event.format());
         String desiredTPType = GenericHelper.getTouchPortalType(reference, eventElement);
-        jsonEvent.addProperty(EventHelper.VALUE_TYPE, desiredTPType);
-        if (desiredTPType.equals(EventHelper.VALUE_TYPE_CHOICE)) {
-            JsonArray stateValueChoices = new JsonArray();
-            for (String valueChoice : state.valueChoices()) {
-                stateValueChoices.add(new JsonPrimitive(valueChoice));
+        if (desiredTPType.equals(StateHelper.TYPE_TEXT)) {
+            jsonEvent.addProperty(EventHelper.VALUE_TYPE, EventHelper.VALUE_TYPE_CHOICE);
+            JsonArray eventValueChoices = new JsonArray();
+            for (String valueChoice : event.valueChoices()) {
+                eventValueChoices.add(new JsonPrimitive(valueChoice));
             }
-            jsonEvent.add(EventHelper.VALUE_CHOICES, stateValueChoices);
+            jsonEvent.add(EventHelper.VALUE_CHOICES, eventValueChoices);
             jsonEvent.addProperty(EventHelper.VALUE_STATE_ID, StateHelper.getStateId(pluginElement, categoryElement, category, eventElement, state));
         }
         else {

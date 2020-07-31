@@ -47,6 +47,6 @@ class TouchPortalKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPlugin(p
     }
 
     override fun onReceive(jsonMessage: JsonObject) {}
-
+    override fun onListChange(actionId: String?, listId: String?, listInstanceId: String?, value: String?) {}
     override fun onInfo(tpInfo: TPInfo?) {}
 }

@@ -2,8 +2,8 @@ plugins {
     id 'java-library'
 }
 
-def versionMajor = 4
-def versionMinor = 2
+def versionMajor = 5
+def versionMinor = 0
 def versionPatch = 0
 
 group 'com.github.ChristopheCVB.TouchPortal.Annotations'

@@ -65,4 +65,14 @@ public @interface Event {
      * @return String format
      */
     String format();
+
+    /**
+     * State valueChoices
+     * <p>
+     * Default is an empty Array
+     * </p>
+     *
+     * @return String[] valueChoices
+     */
+    String[] valueChoices() default {};
 }
