@@ -199,10 +199,10 @@ public class LibraryTests {
         assertTrue(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "New Value 01"));
 
         // Send Choice Update by ID from Constants
-        assertTrue(this.touchPortalPluginTest.sendChoiceUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, new String[]{"New Value 02"}));
+        assertTrue(this.touchPortalPluginTest.sendChoiceUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, new String[]{"New Value 02", null}));
 
         // Send Specific Choice Update by ID from Constants
-        assertTrue(this.touchPortalPluginTest.sendSpecificChoiceUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "instanceId", new String[]{"New Value 03"}));
+        assertTrue(this.touchPortalPluginTest.sendSpecificChoiceUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "instanceId", new String[]{"New Value 03", null}));
 
         // Send State Update by Reflection Generated ID
         assertTrue(this.touchPortalPluginTest.sendStateUpdate("BaseCategory", "customState", "New Value 04"));
@@ -425,6 +425,21 @@ public class LibraryTests {
     }
 
     @Test
+    public void testReceiveListChangeNoListener() throws IOException, InterruptedException {
+        this.touchPortalPluginTest.connectThenPairAndListen(null);
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_LIST_CHANGE);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
     public void testReceiveActionNoListener() throws IOException, InterruptedException {
         this.touchPortalPluginTest.connectThenPairAndListen(null);
         JsonObject jsonMessage = new JsonObject();
@@ -457,6 +472,20 @@ public class LibraryTests {
     public void testReceiveNoMessageType() throws IOException, InterruptedException {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
+    public void testReceiveUnknownMessageType() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, "unknown");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
 
@@ -663,6 +692,7 @@ public class LibraryTests {
         this.touchPortalPluginTest.setProperty(key, value);
 
         assertEquals(value, this.touchPortalPluginTest.getProperty(key));
+        assertEquals(value, this.touchPortalPluginTest.getProperty(key, ""));
         assertTrue(this.touchPortalPluginTest.storeProperties());
         assertTrue(this.touchPortalPluginTest.reloadProperties());
         assertEquals(value, this.touchPortalPluginTest.getProperty(key));

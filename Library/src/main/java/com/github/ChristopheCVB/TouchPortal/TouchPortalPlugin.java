@@ -438,7 +438,12 @@ public abstract class TouchPortalPlugin {
                 JsonArray jsonValues = new JsonArray();
                 if (values != null) {
                     for (String value : values) {
-                        jsonValues.add(new JsonPrimitive(value));
+                        if (value == null) {
+                            jsonValues.add(JsonNull.INSTANCE);
+                        }
+                        else {
+                            jsonValues.add(new JsonPrimitive(value));
+                        }
                     }
                 }
                 choiceUpdateMessage.add(SentMessageHelper.VALUE, jsonValues);
@@ -500,7 +505,12 @@ public abstract class TouchPortalPlugin {
                 JsonArray jsonValues = new JsonArray();
                 if (values != null) {
                     for (String value : values) {
-                        jsonValues.add(new JsonPrimitive(value));
+                        if (value == null) {
+                            jsonValues.add(JsonNull.INSTANCE);
+                        }
+                        else {
+                            jsonValues.add(new JsonPrimitive(value));
+                        }
                     }
                 }
                 specificChoiceUpdateMessage.add(SentMessageHelper.VALUE, jsonValues);
