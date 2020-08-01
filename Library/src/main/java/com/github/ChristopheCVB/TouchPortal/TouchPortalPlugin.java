@@ -783,14 +783,24 @@ public abstract class TouchPortalPlugin {
      */
     public boolean isUpdateAvailable(String pluginConfigURL, long pluginVersionCode) {
         boolean updateAvailable = false;
+
+        InputStream cloudPropertiesStream = null;
         try {
             Properties cloudProperties = new Properties();
-            cloudProperties.load(new URL(pluginConfigURL).openStream());
+            cloudProperties.load(cloudPropertiesStream = new URL(pluginConfigURL).openStream());
             long lastPluginVersion = Long.parseLong(cloudProperties.getProperty(TouchPortalPlugin.KEY_PLUGIN_VERSION));
             updateAvailable = lastPluginVersion > pluginVersionCode;
         }
         catch (NumberFormatException | IOException exception) {
             System.out.println("Check Update failed: " + exception.getMessage());
+        }
+        finally {
+            if (cloudPropertiesStream != null) {
+                try {
+                    cloudPropertiesStream.close();
+                }
+                catch (IOException ignored) {}
+            }
         }
 
         return updateAvailable;
