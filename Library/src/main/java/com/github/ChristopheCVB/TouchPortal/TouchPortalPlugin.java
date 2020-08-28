@@ -25,6 +25,10 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.Data;
 import com.github.ChristopheCVB.TouchPortal.Helpers.*;
 import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
 import com.google.gson.*;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -33,7 +37,6 @@ import java.lang.reflect.Parameter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -786,10 +789,17 @@ public abstract class TouchPortalPlugin {
 
         InputStream cloudPropertiesStream = null;
         try {
-            Properties cloudProperties = new Properties();
-            cloudProperties.load(cloudPropertiesStream = new URL(pluginConfigURL).openStream());
-            long lastPluginVersion = Long.parseLong(cloudProperties.getProperty(TouchPortalPlugin.KEY_PLUGIN_VERSION));
-            updateAvailable = lastPluginVersion > pluginVersionCode;
+            OkHttpClient okHttpClient = new OkHttpClient.Builder().followRedirects(true).followSslRedirects(true).build();
+            Call call = okHttpClient.newCall(new Request.Builder().url(pluginConfigURL).build());
+            Response response = call.execute();
+            if (response.isSuccessful()) {
+                Properties cloudProperties = new Properties();
+                if (response.body() != null) {
+                    cloudProperties.load(cloudPropertiesStream = response.body().byteStream());
+                    long lastPluginVersion = Long.parseLong(cloudProperties.getProperty(TouchPortalPlugin.KEY_PLUGIN_VERSION));
+                    updateAvailable = lastPluginVersion > pluginVersionCode;
+                }
+            }
         }
         catch (NumberFormatException | IOException exception) {
             System.out.println("Check Update failed: " + exception.getMessage());
