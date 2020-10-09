@@ -801,7 +801,7 @@ public abstract class TouchPortalPlugin {
                 }
             }
         }
-        catch (NumberFormatException | IOException exception) {
+        catch (IllegalArgumentException | IOException exception) {
             System.out.println("Check Update failed: " + exception.getMessage());
         }
         finally {
