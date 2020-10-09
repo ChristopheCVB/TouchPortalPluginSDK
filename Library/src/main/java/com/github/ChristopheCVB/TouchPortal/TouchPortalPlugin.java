@@ -25,10 +25,7 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.Data;
 import com.github.ChristopheCVB.TouchPortal.Helpers.*;
 import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
 import com.google.gson.*;
-import okhttp3.Call;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -794,10 +791,12 @@ public abstract class TouchPortalPlugin {
             Response response = call.execute();
             if (response.isSuccessful()) {
                 Properties cloudProperties = new Properties();
-                if (response.body() != null) {
-                    cloudProperties.load(cloudPropertiesStream = response.body().byteStream());
+                ResponseBody responseBody = response.body();
+                if (responseBody != null) {
+                    cloudProperties.load(cloudPropertiesStream = responseBody.byteStream());
                     long lastPluginVersion = Long.parseLong(cloudProperties.getProperty(TouchPortalPlugin.KEY_PLUGIN_VERSION));
                     updateAvailable = lastPluginVersion > pluginVersionCode;
+                    responseBody.close();
                 }
             }
         }
