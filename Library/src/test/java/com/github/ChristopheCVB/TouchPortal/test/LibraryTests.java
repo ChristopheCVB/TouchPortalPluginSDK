@@ -269,40 +269,40 @@ public class LibraryTests {
 
     @Test
     public void testDynamicStates() {
-        assertFalse(this.touchPortalPluginTest.createState(null, null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState(null, null, null, null));
 
-        assertFalse(this.touchPortalPluginTest.createState("", null, null, null));
-        assertFalse(this.touchPortalPluginTest.createState(null, "", null, null));
-        assertFalse(this.touchPortalPluginTest.createState(null, null, "", null));
-        assertFalse(this.touchPortalPluginTest.createState(null, null, null, ""));
-        assertFalse(this.touchPortalPluginTest.createState("", "", "", ""));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("", null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState(null, "", null, null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState(null, null, "", null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState(null, null, null, ""));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("", "", "", ""));
 
-        assertFalse(this.touchPortalPluginTest.createState("CategoryId", null, null, null));
-        assertFalse(this.touchPortalPluginTest.createState("CategoryId", "", null, null));
-        assertFalse(this.touchPortalPluginTest.createState("CategoryId", null, "", null));
-        assertFalse(this.touchPortalPluginTest.createState("CategoryId", null, null, ""));
-        assertFalse(this.touchPortalPluginTest.createState("CategoryId", "", "", ""));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "", null, null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", null, "", null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", null, null, ""));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "", "", ""));
 
-        assertFalse(this.touchPortalPluginTest.createState("CategoryId", "SateId", null, null));
-        assertFalse(this.touchPortalPluginTest.createState("CategoryId", "SateId", "", null));
-        assertFalse(this.touchPortalPluginTest.createState("CategoryId", "SateId", null, ""));
-        assertFalse(this.touchPortalPluginTest.createState("CategoryId", "SateId", "", ""));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", null, null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "", null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", null, ""));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "", ""));
 
-        assertFalse(this.touchPortalPluginTest.createState("CategoryId", "SateId", "Dynamically Created State", null));
-        assertFalse(this.touchPortalPluginTest.createState("CategoryId", "SateId", "Dynamically Created State", ""));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", ""));
 
-        assertTrue(this.touchPortalPluginTest.createState("CategoryId", "SateId", "Dynamically Created State", "Default Value 01"));
-        assertFalse(this.touchPortalPluginTest.createState("CategoryId", "SateId", "Dynamically Created State", "Default Value 01"));
-        assertTrue(this.touchPortalPluginTest.createState("CategoryId", "SateId", "Dynamically Created State", "Default Value 02"));
+        assertTrue(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", "Default Value 01"));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", "Default Value 01"));
+        assertTrue(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", "Default Value 02"));
 
-        assertFalse(this.touchPortalPluginTest.removeState(null, null));
-        assertFalse(this.touchPortalPluginTest.removeState("", null));
-        assertFalse(this.touchPortalPluginTest.removeState(null, ""));
-        assertFalse(this.touchPortalPluginTest.removeState("", ""));
-        assertFalse(this.touchPortalPluginTest.removeState("CategoryId", null));
-        assertFalse(this.touchPortalPluginTest.removeState("CategoryId", ""));
+        assertFalse(this.touchPortalPluginTest.sendRemoveState(null, null));
+        assertFalse(this.touchPortalPluginTest.sendRemoveState("", null));
+        assertFalse(this.touchPortalPluginTest.sendRemoveState(null, ""));
+        assertFalse(this.touchPortalPluginTest.sendRemoveState("", ""));
+        assertFalse(this.touchPortalPluginTest.sendRemoveState("CategoryId", null));
+        assertFalse(this.touchPortalPluginTest.sendRemoveState("CategoryId", ""));
 
-        assertTrue(this.touchPortalPluginTest.removeState("CategoryId", "SateId"));
+        assertTrue(this.touchPortalPluginTest.sendRemoveState("CategoryId", "SateId"));
     }
 
     @Test
@@ -311,8 +311,8 @@ public class LibraryTests {
         assertFalse(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "New Value"));
         assertFalse(this.touchPortalPluginTest.sendChoiceUpdate("listId", null, true));
         assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("listId", "instanceId", null, true));
-        assertFalse(this.touchPortalPluginTest.createState("CategoryId", "SateId", "Dynamically Created State", "Default Value 01"));
-        assertFalse(this.touchPortalPluginTest.removeState("CategoryId", "SateId"));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", "Default Value 01"));
+        assertFalse(this.touchPortalPluginTest.sendRemoveState("CategoryId", "SateId"));
     }
 
     @Test

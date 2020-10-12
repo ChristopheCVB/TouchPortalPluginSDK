@@ -31,7 +31,7 @@ import java.io.File;
 
 @SuppressWarnings("unused")
 @Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
-public class TouchPortalPluginExample extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
+public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
     private enum Categories {
         /**
          * Category definition example
@@ -64,7 +64,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
     /**
      * Constructor calling super
      */
-    public TouchPortalPluginExample() {
+    public TouchPortalSamplePlugin() {
         super(true);
     }
 
@@ -72,29 +72,29 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
         if (args != null && args.length == 1) {
             if (PluginHelper.COMMAND_START.equals(args[0])) {
                 // Initialize the Plugin
-                TouchPortalPluginExample touchPortalPluginExample = new TouchPortalPluginExample();
+                TouchPortalSamplePlugin touchPortalSamplePlugin = new TouchPortalSamplePlugin();
                 // Load a properties File
-                touchPortalPluginExample.loadProperties("plugin.config");
+                touchPortalSamplePlugin.loadProperties("plugin.config");
                 // Get a property
-                System.out.println(touchPortalPluginExample.getProperty("samplekey"));
+                System.out.println(touchPortalSamplePlugin.getProperty("samplekey"));
                 // Set a property
-                touchPortalPluginExample.setProperty("samplekey", "Value set from Plugin");
+                touchPortalSamplePlugin.setProperty("samplekey", "Value set from Plugin");
                 // Store the properties
-                touchPortalPluginExample.storeProperties();
+                touchPortalSamplePlugin.storeProperties();
                 // Initiate the connection with the Touch Portal Plugin System
-                boolean connectedPairedAndListening = touchPortalPluginExample.connectThenPairAndListen(touchPortalPluginExample);
+                boolean connectedPairedAndListening = touchPortalSamplePlugin.connectThenPairAndListen(touchPortalSamplePlugin);
 
                 if (connectedPairedAndListening) {
                     // Update a State with the ID from the Generated Constants Class
-                    boolean stateUpdated = touchPortalPluginExample.sendStateUpdate(TouchPortalPluginExampleConstants.BaseCategory.States.CustomStateWithEvent.ID, "2");
+                    boolean stateUpdated = touchPortalSamplePlugin.sendStateUpdate(TouchPortalSamplePluginConstants.BaseCategory.States.CustomStateWithEvent.ID, "2");
 
                     // Create a new State
-                    touchPortalPluginExample.createState("BaseCategory", "createdState1", "Created State 01", System.currentTimeMillis() + "1");
-                    touchPortalPluginExample.createState("BaseCategory", "createdState1", "Created State 01", System.currentTimeMillis() + "2");
-                    touchPortalPluginExample.createState("BaseCategory", "createdState2", "Created State 02", System.currentTimeMillis() + "");
-                    touchPortalPluginExample.removeState("BaseCategory", "createdState2");
-                    touchPortalPluginExample.removeState("BaseCategory", "createdState1");
-                    touchPortalPluginExample.removeState("BaseCategory", "customState");
+                    touchPortalSamplePlugin.sendCreateState("BaseCategory", "createdState1", "Created State 01", System.currentTimeMillis() + "1");
+                    touchPortalSamplePlugin.sendCreateState("BaseCategory", "createdState1", "Created State 01", System.currentTimeMillis() + "2");
+                    touchPortalSamplePlugin.sendCreateState("BaseCategory", "createdState2", "Created State 02", System.currentTimeMillis() + "");
+                    touchPortalSamplePlugin.sendRemoveState("BaseCategory", "createdState2");
+                    touchPortalSamplePlugin.sendRemoveState("BaseCategory", "createdState1");
+                    touchPortalSamplePlugin.sendRemoveState("BaseCategory", "customState");
                 }
             }
         }
@@ -123,7 +123,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
      * <p>This action will not be called automatically by the SDK</p>
      *
      * @param jsonAction JSONObject
-     * @see TouchPortalPluginExample .onReceive
+     * @see TouchPortalSamplePlugin .onReceive
      */
     @Action(description = "Long Description of Action without Data", categoryId = "BaseCategory")
     private void actionWithoutData(JsonObject jsonAction) {
@@ -206,7 +206,7 @@ public class TouchPortalPluginExample extends TouchPortalPlugin implements Touch
             if (receivedActionId != null) {
                 //noinspection SwitchStatementWithTooFewBranches
                 switch (receivedActionId) {
-                    case TouchPortalPluginExampleConstants.BaseCategory.Actions.ActionWithoutData.ID:
+                    case TouchPortalSamplePluginConstants.BaseCategory.Actions.ActionWithoutData.ID:
                         // Manually call the action method because the parameter jsonMessage is not annotated with @Data
                         this.actionWithoutData(jsonMessage);
                         break;

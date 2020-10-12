@@ -397,6 +397,7 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Deprecated - Use the generated Constants Class to access IDs
      * Send a Choice Update Message to the Touch Portal Plugin System
      *
      * @param categoryId     String
@@ -404,6 +405,7 @@ public abstract class TouchPortalPlugin {
      * @param values         String[]
      * @return boolean choiceUpdateMessageSent
      */
+    @Deprecated
     public boolean sendChoiceUpdate(String categoryId, String stateFieldName, String[] values) {
         String stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateFieldName);
         return this.sendChoiceUpdate(stateId, values);
@@ -459,6 +461,7 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Deprecated - Use the generated Constants Class to access IDs
      * Send a Specific Choice Update Message to the Touch Portal Plugin System
      *
      * @param categoryId     String
@@ -467,6 +470,7 @@ public abstract class TouchPortalPlugin {
      * @param values         String[]
      * @return boolean specificChoiceUpdateMessageSent
      */
+    @Deprecated
     public boolean sendSpecificChoiceUpdate(String categoryId, String stateFieldName, String instanceId, String[] values) {
         String stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateFieldName);
         return this.sendSpecificChoiceUpdate(stateId, instanceId, values);
@@ -525,6 +529,7 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Deprecated - Use the generated Constants Class to access IDs
      * Send a State Update Message to the Touch Portal Plugin System
      *
      * @param categoryId     String
@@ -532,6 +537,7 @@ public abstract class TouchPortalPlugin {
      * @param value          String
      * @return boolean stateUpdateMessageSent
      */
+    @Deprecated
     public boolean sendStateUpdate(String categoryId, String stateFieldName, String value) {
         String stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateFieldName);
         return this.sendStateUpdate(stateId, value);
@@ -541,10 +547,10 @@ public abstract class TouchPortalPlugin {
      * Send a State Update Message to the Touch Portal Plugin System not allowing empty value
      *
      * @param stateId String
-     * @param value   String
+     * @param value   Object
      * @return boolean stateUpdateMessageSent
      */
-    public boolean sendStateUpdate(String stateId, String value) {
+    public boolean sendStateUpdate(String stateId, Object value) {
         return this.sendStateUpdate(stateId, value, false);
     }
 
@@ -552,21 +558,22 @@ public abstract class TouchPortalPlugin {
      * Send a State Update Message to the Touch Portal Plugin System
      *
      * @param stateId         String
-     * @param value           String
+     * @param value           Object
      * @param allowEmptyValue boolean
      * @return boolean stateUpdateMessageSent
      */
-    public boolean sendStateUpdate(String stateId, String value, boolean allowEmptyValue) {
+    public boolean sendStateUpdate(String stateId, Object value, boolean allowEmptyValue) {
         boolean sent = false;
-        if (stateId != null && !stateId.isEmpty() && value != null && (allowEmptyValue || !value.isEmpty())) {
+        String valueStr = value != null ? String.valueOf(value) : null;
+        if (stateId != null && !stateId.isEmpty() && valueStr != null && (allowEmptyValue || !valueStr.isEmpty())) {
             if (!this.currentStates.containsKey(stateId) || !this.currentStates.get(stateId).equals(value)) {
                 JsonObject stateUpdateMessage = new JsonObject();
                 stateUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE);
                 stateUpdateMessage.addProperty(SentMessageHelper.ID, stateId);
-                stateUpdateMessage.addProperty(SentMessageHelper.VALUE, value);
+                stateUpdateMessage.addProperty(SentMessageHelper.VALUE, valueStr);
                 sent = this.send(stateUpdateMessage);
                 if (sent) {
-                    this.currentStates.put(stateId, value);
+                    this.currentStates.put(stateId, valueStr);
                 }
                 System.out.println("Update State [" + stateId + "] Sent [" + sent + "]");
             }
@@ -574,37 +581,54 @@ public abstract class TouchPortalPlugin {
         return sent;
     }
 
-    public boolean createState(String categoryId, String stateId, String description, String value) {
+    /**
+     * Send a Create a State Message to the Touch Portal Plugin System
+     *
+     * @param categoryId  String
+     * @param stateId     String
+     * @param description String
+     * @param value       Object
+     * @return boolean stateCreateSent
+     */
+    public boolean sendCreateState(String categoryId, String stateId, String description, Object value) {
         boolean sent = false;
-        if (categoryId != null && !categoryId.isEmpty() && stateId != null && !stateId.isEmpty() && description != null && !description.isEmpty() && value != null && !value.isEmpty()) {
+        String valueStr = value != null ? String.valueOf(value) : null;
+        if (categoryId != null && !categoryId.isEmpty() && stateId != null && !stateId.isEmpty() && description != null && !description.isEmpty() && valueStr != null && !valueStr.isEmpty()) {
             stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateId);
             if (!this.currentStates.containsKey(stateId)) {
-                JsonObject stateUpdateMessage = new JsonObject();
-                stateUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CREATE_STATE);
-                stateUpdateMessage.addProperty(SentMessageHelper.ID, stateId);
-                stateUpdateMessage.addProperty(SentMessageHelper.DESCRIPTION, description);
-                stateUpdateMessage.addProperty(SentMessageHelper.DEFAULT_VALUE, value);
-                sent = this.send(stateUpdateMessage);
+                JsonObject createStateMessage = new JsonObject();
+                createStateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CREATE_STATE);
+                createStateMessage.addProperty(SentMessageHelper.ID, stateId);
+                createStateMessage.addProperty(SentMessageHelper.DESCRIPTION, description);
+                createStateMessage.addProperty(SentMessageHelper.DEFAULT_VALUE, valueStr);
+                sent = this.send(createStateMessage);
                 if (sent) {
-                    this.currentStates.put(stateId, value);
+                    this.currentStates.put(stateId, valueStr);
                 }
                 System.out.println("Create State [" + stateId + "] Sent [" + sent + "]");
             }
             else {
-                sent = this.sendStateUpdate(stateId, value);
+                sent = this.sendStateUpdate(stateId, value, true);
             }
         }
         return sent;
     }
 
-    public boolean removeState(String categoryId, String stateId) {
+    /**
+     * Send a Remove State Message to the Touch Portal Plugin System
+     *
+     * @param categoryId String
+     * @param stateId    String
+     * @return boolean removeStateSent
+     */
+    public boolean sendRemoveState(String categoryId, String stateId) {
         boolean sent = false;
         if (categoryId != null && !categoryId.isEmpty() && stateId != null && !stateId.isEmpty()) {
             stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateId);
-            JsonObject stateUpdateMessage = new JsonObject();
-            stateUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_REMOVE_STATE);
-            stateUpdateMessage.addProperty(SentMessageHelper.ID, stateId);
-            sent = this.send(stateUpdateMessage);
+            JsonObject removeStateMessage = new JsonObject();
+            removeStateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_REMOVE_STATE);
+            removeStateMessage.addProperty(SentMessageHelper.ID, stateId);
+            sent = this.send(removeStateMessage);
             if (sent) {
                 this.currentStates.remove(stateId);
             }
@@ -616,12 +640,17 @@ public abstract class TouchPortalPlugin {
     /**
      * Is the Plugin connected to the Touch Portal Plugin System
      *
-     * @return isPluginConnected
+     * @return boolean isPluginConnected
      */
     public boolean isConnected() {
         return this.touchPortalSocket != null && this.touchPortalSocket.isConnected();
     }
 
+    /**
+     * Is the Plugin listening to the Touch Portal Plugin System
+     *
+     * @return boolean isPluginListening
+     */
     public boolean isListening() {
         return this.listenerThread != null && this.listenerThread.isAlive();
     }
