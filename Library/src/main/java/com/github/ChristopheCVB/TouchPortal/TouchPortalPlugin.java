@@ -34,6 +34,7 @@ import java.lang.reflect.Parameter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -815,7 +816,8 @@ public abstract class TouchPortalPlugin {
 
         InputStream cloudPropertiesStream = null;
         try {
-            OkHttpClient okHttpClient = new OkHttpClient.Builder().followRedirects(true).followSslRedirects(true).build();
+            String pluginConfigHost = new URL(pluginConfigURL).getHost();
+            OkHttpClient okHttpClient = new OkHttpClient.Builder().hostnameVerifier((hostname, sslSession) -> hostname.contains(pluginConfigHost)).followRedirects(true).followSslRedirects(true).build();
             Call call = okHttpClient.newCall(new Request.Builder().url(pluginConfigURL).build());
             Response response = call.execute();
             if (response.isSuccessful()) {
