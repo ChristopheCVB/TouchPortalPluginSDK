@@ -27,6 +27,8 @@ import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
 import com.google.gson.*;
 import okhttp3.*;
 
+import java.awt.*;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -842,6 +844,118 @@ public abstract class TouchPortalPlugin {
         }
 
         return updateAvailable;
+    }
+
+    /**
+     * Create or get a TrayIcon
+     *
+     * @param iconPath String
+     * @param title    String
+     * @return TrayIcon trayIcon
+     */
+    public TrayIcon getSystemTrayIcon(String iconPath, String title) {
+        TrayIcon trayIcon = null;
+
+        if (SystemTray.isSupported()) {
+            SystemTray systemTray = SystemTray.getSystemTray();
+            for (TrayIcon systemTrayIcon : systemTray.getTrayIcons()) {
+                if (systemTrayIcon.getToolTip().equals(title)) {
+                    trayIcon = systemTrayIcon;
+                    break;
+                }
+            }
+            if (trayIcon == null) {
+                Dimension size = systemTray.getTrayIconSize();
+                Image icon = Toolkit.getDefaultToolkit().createImage(this.getResourceFile(iconPath).getAbsolutePath());
+                icon = icon.getScaledInstance(size.width, size.height, Image.SCALE_SMOOTH);
+                trayIcon = new TrayIcon(icon, title);
+            }
+
+            try {
+                systemTray.add(trayIcon);
+            }
+            catch (AWTException e) {
+                e.printStackTrace();
+                trayIcon = null;
+            }
+        }
+
+        return trayIcon;
+    }
+
+    /**
+     * @param trayIcon       TrayIcon
+     * @param menuItemTitle  String
+     * @param actionListener String
+     * @return MenuItem menuItem
+     */
+    public MenuItem addTrayIconMenuItem(TrayIcon trayIcon, String menuItemTitle, ActionListener actionListener) {
+        MenuItem menuItem = null;
+        if (trayIcon != null) {
+            PopupMenu popupMenu = trayIcon.getPopupMenu();
+            if (popupMenu == null) {
+                popupMenu = new PopupMenu();
+                trayIcon.setPopupMenu(popupMenu);
+            }
+            menuItem = new MenuItem(menuItemTitle);
+            popupMenu.add(menuItem);
+            popupMenu.addActionListener(actionListener);
+        }
+
+        return menuItem;
+    }
+
+    /**
+     * Remove a MenuItem
+     *
+     * @param trayIcon      TrayIcon
+     * @param menuItemTitle String
+     */
+    public void removeTrayIconMenuItem(TrayIcon trayIcon, String menuItemTitle) {
+        if (trayIcon != null) {
+            PopupMenu popupMenu = trayIcon.getPopupMenu();
+            if (popupMenu == null) {
+                popupMenu = new PopupMenu();
+                trayIcon.setPopupMenu(popupMenu);
+            }
+            MenuItem menuItem = null;
+            int menuItemIndex = -1;
+            for (int i = 0; i < popupMenu.getItemCount(); i++) {
+                MenuItem menuItem1 = popupMenu.getItem(i);
+                if (menuItem1.getLabel().equals(menuItemTitle)) {
+                    menuItem = menuItem1;
+                    menuItemIndex = i;
+                    break;
+                }
+            }
+            if (menuItem != null) {
+                popupMenu.remove(menuItem);
+                popupMenu.removeActionListener(popupMenu.getActionListeners()[menuItemIndex]);
+            }
+        }
+    }
+
+    /**
+     * Show a Notification
+     *
+     * @param trayIcon    TrayIcon
+     * @param caption     String
+     * @param text        String
+     * @param messageType TrayIcon.MessageType
+     * @return boolean notificationShown
+     */
+    public boolean showTrayIconNotification(TrayIcon trayIcon, String caption, String text, TrayIcon.MessageType messageType) {
+        boolean notificationShown = false;
+        if (trayIcon != null) {
+            try {
+                trayIcon.displayMessage(caption, text, messageType);
+                notificationShown = true;
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return notificationShown;
     }
 
     /**
