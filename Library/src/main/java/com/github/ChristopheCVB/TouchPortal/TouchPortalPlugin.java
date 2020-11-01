@@ -568,7 +568,7 @@ public abstract class TouchPortalPlugin {
         boolean sent = false;
         String valueStr = value != null ? String.valueOf(value) : null;
         if (stateId != null && !stateId.isEmpty() && valueStr != null && (allowEmptyValue || !valueStr.isEmpty())) {
-            if (!this.currentStates.containsKey(stateId) || !this.currentStates.get(stateId).equals(value)) {
+            if (!this.currentStates.containsKey(stateId) || !this.currentStates.get(stateId).equals(valueStr)) {
                 JsonObject stateUpdateMessage = new JsonObject();
                 stateUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE);
                 stateUpdateMessage.addProperty(SentMessageHelper.ID, stateId);
