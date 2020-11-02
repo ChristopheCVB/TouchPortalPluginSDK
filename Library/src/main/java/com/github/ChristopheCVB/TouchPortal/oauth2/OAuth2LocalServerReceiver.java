@@ -48,12 +48,21 @@ public class OAuth2LocalServerReceiver {
     }
 
     public void waitForCode(URI authorizationURI, OAuth2CodeListener oAuth2CodeListener) {
+        this.waitForCode(null, authorizationURI, oAuth2CodeListener);
+    }
+
+    public void waitForCode(OAuth2Browser oAuth2Browser, URI authorizationURI, OAuth2CodeListener oAuth2CodeListener) {
         try {
-            if (Desktop.isDesktopSupported()) {
-                Desktop desktop = Desktop.getDesktop();
-                if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                    desktop.browse(authorizationURI);
+            if (oAuth2Browser == null) {
+                if (Desktop.isDesktopSupported()) {
+                    Desktop desktop = Desktop.getDesktop();
+                    if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                        desktop.browse(authorizationURI);
+                    }
                 }
+            }
+            else {
+                oAuth2Browser.browse(authorizationURI);
             }
 
             HttpServer httpServer = HttpServer.create(new InetSocketAddress(this.host, this.port), 0);
@@ -159,6 +168,10 @@ public class OAuth2LocalServerReceiver {
 
     public interface OAuth2CodeListener {
         void onOAuth2Code(String oAuth2Code, String error);
+    }
+
+    public interface OAuth2Browser {
+        void browse(URI authorizationURI);
     }
 
     public static final class Builder {
