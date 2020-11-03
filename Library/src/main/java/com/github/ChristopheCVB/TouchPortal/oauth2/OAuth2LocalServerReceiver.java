@@ -167,7 +167,7 @@ public class OAuth2LocalServerReceiver {
     }
 
     public interface OAuth2CodeListener {
-        void onOAuth2Code(String oAuth2Code, String error);
+        void onOAuth2Code(String oAuth2Code, String oAuth2Error);
     }
 
     public interface OAuth2Browser {
