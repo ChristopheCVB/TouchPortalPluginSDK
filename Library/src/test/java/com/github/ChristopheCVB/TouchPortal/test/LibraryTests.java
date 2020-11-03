@@ -30,7 +30,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -724,46 +723,5 @@ public class LibraryTests {
         assertFalse(this.touchPortalPluginTest.isUpdateAvailable("", 0));
         assertFalse(this.touchPortalPluginTest.isUpdateAvailable("https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/Library/src/test/resources/TouchPortalPluginTest/plugin.config", 1));
         assertTrue(this.touchPortalPluginTest.isUpdateAvailable("https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/Library/src/test/resources/TouchPortalPluginTest/plugin.config", 0));
-    }
-
-    @Test
-    public void testSystemTray() {
-        String iconPath = "";
-        String trayIconTitle = "Test Title";
-        TrayIcon trayIcon1 = this.touchPortalPluginTest.getSystemTrayIcon(iconPath, trayIconTitle);
-        assertNotNull(trayIcon1);
-        assertEquals(trayIcon1.getToolTip(), trayIconTitle);
-
-        TrayIcon trayIcon2 = this.touchPortalPluginTest.getSystemTrayIcon(iconPath, trayIconTitle);
-        assertEquals(trayIcon1, trayIcon2);
-
-        assertNull(trayIcon1.getPopupMenu());
-        String menuItemTitle = "Menu Title";
-        MenuItem menuItem = this.touchPortalPluginTest.addTrayIconMenuItem(trayIcon1, menuItemTitle, null);
-        assertNotNull(menuItem);
-        assertEquals(1, trayIcon1.getPopupMenu().getItemCount());
-        this.touchPortalPluginTest.addTrayIconMenuItem(trayIcon1, menuItemTitle + "2", e -> {
-        });
-        assertEquals(2, trayIcon1.getPopupMenu().getItemCount());
-        boolean menuItemRemoved = this.touchPortalPluginTest.removeTrayIconMenuItem(trayIcon1, menuItemTitle + "2");
-        assertTrue(menuItemRemoved);
-        assertEquals(1, trayIcon1.getPopupMenu().getItemCount());
-        this.touchPortalPluginTest.removeTrayIconMenuItem(trayIcon1, menuItemTitle);
-        assertEquals(0, trayIcon1.getPopupMenu().getItemCount());
-
-        MenuItem noMenuItem = this.touchPortalPluginTest.addTrayIconMenuItem(null, menuItemTitle, null);
-        assertNull(noMenuItem);
-        boolean noMenuItemRemoved = this.touchPortalPluginTest.removeTrayIconMenuItem(null, menuItemTitle);
-        assertFalse(noMenuItemRemoved);
-
-        TrayIcon trayIcon3 = this.touchPortalPluginTest.getSystemTrayIcon(iconPath, trayIconTitle + "3");
-        assertNotNull(trayIcon3);
-        this.touchPortalPluginTest.removeTrayIconMenuItem(trayIcon3, menuItemTitle);
-        assertEquals(0, trayIcon3.getPopupMenu().getItemCount());
-
-        boolean notificationShown = this.touchPortalPluginTest.showTrayIconNotification(trayIcon1, "Caption", "Test", TrayIcon.MessageType.INFO);
-        assertTrue(notificationShown);
-
-        assertFalse(this.touchPortalPluginTest.showTrayIconNotification(null, null, null, null));
     }
 }

@@ -27,8 +27,6 @@ import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
 import com.google.gson.*;
 import okhttp3.*;
 
-import java.awt.*;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -844,120 +842,6 @@ public abstract class TouchPortalPlugin {
         }
 
         return updateAvailable;
-    }
-
-    /**
-     * Create or get a TrayIcon
-     *
-     * @param iconPath String
-     * @param title    String
-     * @return TrayIcon trayIcon
-     */
-    public TrayIcon getSystemTrayIcon(String iconPath, String title) {
-        TrayIcon trayIcon = null;
-
-        boolean alreadyAdded = false;
-        if (SystemTray.isSupported()) {
-            SystemTray systemTray = SystemTray.getSystemTray();
-            for (TrayIcon systemTrayIcon : systemTray.getTrayIcons()) {
-                if (systemTrayIcon.getToolTip().equals(title)) {
-                    trayIcon = systemTrayIcon;
-                    alreadyAdded = true;
-                    break;
-                }
-            }
-            if (trayIcon == null) {
-                Dimension size = systemTray.getTrayIconSize();
-                Image icon = Toolkit.getDefaultToolkit().createImage(this.getResourceFile(iconPath).getAbsolutePath());
-                icon = icon.getScaledInstance(size.width, size.height, Image.SCALE_SMOOTH);
-                trayIcon = new TrayIcon(icon, title);
-            }
-
-            if (!alreadyAdded) {
-                try {
-                    systemTray.add(trayIcon);
-                }
-                catch (AWTException e) {
-                    e.printStackTrace();
-                    trayIcon = null;
-                }
-            }
-        }
-
-        return trayIcon;
-    }
-
-    /**
-     * @param trayIcon       TrayIcon
-     * @param menuItemTitle  String
-     * @param actionListener String
-     * @return MenuItem menuItem
-     */
-    public MenuItem addTrayIconMenuItem(TrayIcon trayIcon, String menuItemTitle, ActionListener actionListener) {
-        MenuItem menuItem = null;
-        if (trayIcon != null) {
-            PopupMenu popupMenu = trayIcon.getPopupMenu();
-            if (popupMenu == null) {
-                popupMenu = new PopupMenu();
-                trayIcon.setPopupMenu(popupMenu);
-            }
-            menuItem = new MenuItem(menuItemTitle);
-            popupMenu.add(menuItem);
-            if (actionListener != null) {
-                menuItem.addActionListener(actionListener);
-            }
-        }
-
-        return menuItem;
-    }
-
-    /**
-     * Remove a MenuItem
-     *
-     * @param trayIcon      TrayIcon
-     * @param menuItemTitle String
-     * @return boolean menuItemRemoved
-     */
-    public boolean removeTrayIconMenuItem(TrayIcon trayIcon, String menuItemTitle) {
-        boolean menuItemRemoved = false;
-        if (trayIcon != null) {
-            PopupMenu popupMenu = trayIcon.getPopupMenu();
-            if (popupMenu == null) {
-                popupMenu = new PopupMenu();
-                trayIcon.setPopupMenu(popupMenu);
-            }
-            MenuItem menuItem = null;
-            for (int i = 0; i < popupMenu.getItemCount(); i++) {
-                MenuItem currentMenuItem = popupMenu.getItem(i);
-                if (currentMenuItem.getLabel().equals(menuItemTitle)) {
-                    menuItem = currentMenuItem;
-                    break;
-                }
-            }
-            if (menuItem != null) {
-                popupMenu.remove(menuItem);
-                menuItemRemoved = true;
-            }
-        }
-        return menuItemRemoved;
-    }
-
-    /**
-     * Show a Notification
-     *
-     * @param trayIcon    TrayIcon
-     * @param caption     String
-     * @param text        String
-     * @param messageType TrayIcon.MessageType
-     * @return boolean notificationShown
-     */
-    public boolean showTrayIconNotification(TrayIcon trayIcon, String caption, String text, TrayIcon.MessageType messageType) {
-        boolean notificationShown = false;
-        if (trayIcon != null) {
-            trayIcon.displayMessage(caption, text, messageType);
-            notificationShown = true;
-        }
-        return notificationShown;
     }
 
     /**
