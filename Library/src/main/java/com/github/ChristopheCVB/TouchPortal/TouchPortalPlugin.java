@@ -856,11 +856,13 @@ public abstract class TouchPortalPlugin {
     public TrayIcon getSystemTrayIcon(String iconPath, String title) {
         TrayIcon trayIcon = null;
 
+        boolean alreadyAdded = false;
         if (SystemTray.isSupported()) {
             SystemTray systemTray = SystemTray.getSystemTray();
             for (TrayIcon systemTrayIcon : systemTray.getTrayIcons()) {
                 if (systemTrayIcon.getToolTip().equals(title)) {
                     trayIcon = systemTrayIcon;
+                    alreadyAdded = true;
                     break;
                 }
             }
@@ -871,12 +873,14 @@ public abstract class TouchPortalPlugin {
                 trayIcon = new TrayIcon(icon, title);
             }
 
-            try {
-                systemTray.add(trayIcon);
-            }
-            catch (AWTException e) {
-                e.printStackTrace();
-                trayIcon = null;
+            if (!alreadyAdded) {
+                try {
+                    systemTray.add(trayIcon);
+                }
+                catch (AWTException e) {
+                    e.printStackTrace();
+                    trayIcon = null;
+                }
             }
         }
 
@@ -899,7 +903,9 @@ public abstract class TouchPortalPlugin {
             }
             menuItem = new MenuItem(menuItemTitle);
             popupMenu.add(menuItem);
-            popupMenu.addActionListener(actionListener);
+            if (actionListener != null) {
+                menuItem.addActionListener(actionListener);
+            }
         }
 
         return menuItem;
@@ -910,8 +916,10 @@ public abstract class TouchPortalPlugin {
      *
      * @param trayIcon      TrayIcon
      * @param menuItemTitle String
+     * @return boolean menuItemRemoved
      */
-    public void removeTrayIconMenuItem(TrayIcon trayIcon, String menuItemTitle) {
+    public boolean removeTrayIconMenuItem(TrayIcon trayIcon, String menuItemTitle) {
+        boolean menuItemRemoved = false;
         if (trayIcon != null) {
             PopupMenu popupMenu = trayIcon.getPopupMenu();
             if (popupMenu == null) {
@@ -919,20 +927,19 @@ public abstract class TouchPortalPlugin {
                 trayIcon.setPopupMenu(popupMenu);
             }
             MenuItem menuItem = null;
-            int menuItemIndex = -1;
             for (int i = 0; i < popupMenu.getItemCount(); i++) {
-                MenuItem menuItem1 = popupMenu.getItem(i);
-                if (menuItem1.getLabel().equals(menuItemTitle)) {
-                    menuItem = menuItem1;
-                    menuItemIndex = i;
+                MenuItem currentMenuItem = popupMenu.getItem(i);
+                if (currentMenuItem.getLabel().equals(menuItemTitle)) {
+                    menuItem = currentMenuItem;
                     break;
                 }
             }
             if (menuItem != null) {
                 popupMenu.remove(menuItem);
-                popupMenu.removeActionListener(popupMenu.getActionListeners()[menuItemIndex]);
+                menuItemRemoved = true;
             }
         }
+        return menuItemRemoved;
     }
 
     /**
@@ -947,13 +954,8 @@ public abstract class TouchPortalPlugin {
     public boolean showTrayIconNotification(TrayIcon trayIcon, String caption, String text, TrayIcon.MessageType messageType) {
         boolean notificationShown = false;
         if (trayIcon != null) {
-            try {
-                trayIcon.displayMessage(caption, text, messageType);
-                notificationShown = true;
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
+            trayIcon.displayMessage(caption, text, messageType);
+            notificationShown = true;
         }
         return notificationShown;
     }
