@@ -195,6 +195,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
     @Override
     public void onDisconnect(Exception exception) {
         // Socket connection is lost or plugin has received close message
+        System.exit(0);
     }
 
     @Override
@@ -222,5 +223,9 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
 
     @Override
     public void onListChange(String actionId, String listId, String listInstanceId, String value) {
+    }
+
+    @Override
+    public void onBroadcast(String event, String pageName) {
     }
 }
