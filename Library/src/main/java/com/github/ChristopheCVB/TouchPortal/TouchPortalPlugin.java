@@ -197,6 +197,14 @@ public abstract class TouchPortalPlugin {
                         }
                         break;
 
+                    case ReceivedMessageHelper.TYPE_BROADCAST:
+                        String event = ReceivedMessageHelper.getBroadcastEvent(jsonMessage);
+                        String pageName = ReceivedMessageHelper.getBroadcastPageName(jsonMessage);
+                        if (this.touchPortalPluginListener != null) {
+                            this.touchPortalPluginListener.onBroadcast(event, pageName);
+                        }
+                        break;
+
                     default:
                         this.callbacksExecutor.submit(() -> {
                             if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, this.pluginClass)) {
@@ -878,6 +886,14 @@ public abstract class TouchPortalPlugin {
          * @param value          String
          */
         void onListChange(String actionId, String listId, String listInstanceId, String value);
+
+        /**
+         * Called when a Broadcast Message is received
+         *
+         * @param event    String
+         * @param pageName String
+         */
+        void onBroadcast(String event, String pageName);
     }
 
     /**

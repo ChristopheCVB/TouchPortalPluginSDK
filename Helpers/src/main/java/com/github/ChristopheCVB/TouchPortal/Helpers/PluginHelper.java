@@ -42,7 +42,7 @@ public class PluginHelper {
     /**
      * Touch Portal Plugin System version
      */
-    public static final int TOUCH_PORTAL_PLUGIN_VERSION = 2;
+    public static final int TOUCH_PORTAL_PLUGIN_VERSION = 3;
     /**
      * Argument passed to the jar to start the plugin
      */

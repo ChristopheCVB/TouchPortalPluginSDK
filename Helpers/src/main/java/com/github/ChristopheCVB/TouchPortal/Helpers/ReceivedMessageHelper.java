@@ -36,6 +36,7 @@ public class ReceivedMessageHelper {
     public static final String TYPE_INFO = "info";
     public static final String TYPE_LIST_CHANGE = "listChange";
     public static final String TYPE_CLOSE_PLUGIN = "closePlugin";
+    public static final String TYPE_BROADCAST = "broadcast";
     public static final String PLUGIN_ID = "pluginId";
     public static final String ACTION_ID = "actionId";
     public static final String LIST_ID = "listId";
@@ -43,6 +44,8 @@ public class ReceivedMessageHelper {
     public static final String VALUE = GenericHelper.VALUE;
     public static final String ACTION_DATA_VALUE = GenericHelper.VALUE;
     public static final String ACTION_DATA_ID = GenericHelper.ID;
+    public static final String EVENT = "event";
+    public static final String PAGE_NAME = "pageName";
 
     /**
      * Retrieve the Type of a ReceivedMessage
@@ -254,6 +257,26 @@ public class ReceivedMessageHelper {
      */
     public static Boolean getActionDataValueBoolean(JsonObject jsonMessage, String actionDataId) {
         return "On".equals(ReceivedMessageHelper.getActionDataValue(jsonMessage, actionDataId));
+    }
+
+    /**
+     * Retrieve the Event Value from a received Message
+     *
+     * @param jsonMessage JsonObject
+     * @return String event
+     */
+    public static String getBroadcastEvent(JsonObject jsonMessage) {
+        return jsonMessage.has(ReceivedMessageHelper.EVENT) ? jsonMessage.get(ReceivedMessageHelper.EVENT).getAsString() : null;
+    }
+
+    /**
+     * Retrieve the Page Name Value from a received Message
+     *
+     * @param jsonMessage JsonObject
+     * @return String pageName
+     */
+    public static String getBroadcastPageName(JsonObject jsonMessage) {
+        return jsonMessage.has(ReceivedMessageHelper.PAGE_NAME) ? jsonMessage.get(ReceivedMessageHelper.PAGE_NAME).getAsString() : null;
     }
 
     /**
