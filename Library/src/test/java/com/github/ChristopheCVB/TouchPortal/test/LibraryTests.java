@@ -62,6 +62,10 @@ public class LibraryTests {
         @Override
         public void onListChange(String actionId, String listId, String listInstanceId, String value) {
         }
+
+        @Override
+        public void onBroadcast(String event, String pageName) {
+        }
     };
 
     @Before
@@ -598,6 +602,25 @@ public class LibraryTests {
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
+    public void testReceiveBroadcast() throws IOException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_BROADCAST);
+        jsonMessage.addProperty(ReceivedMessageHelper.EVENT, ReceivedMessageHelper.EVENT_PAGE_CHANGE);
+        jsonMessage.addProperty(ReceivedMessageHelper.PAGE_NAME, "Page ONE");
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+    }
+
+    @Test
+    public void testReceiveBroadcastMissingPropsAndNoListener() throws IOException {
+        this.touchPortalPluginTest.connectThenPairAndListen(null);
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_BROADCAST);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
     }
 
     @Test

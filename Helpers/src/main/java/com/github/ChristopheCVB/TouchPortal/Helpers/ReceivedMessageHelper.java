@@ -45,6 +45,7 @@ public class ReceivedMessageHelper {
     public static final String ACTION_DATA_VALUE = GenericHelper.VALUE;
     public static final String ACTION_DATA_ID = GenericHelper.ID;
     public static final String EVENT = "event";
+    public static final String EVENT_PAGE_CHANGE = "pageChange";
     public static final String PAGE_NAME = "pageName";
 
     /**
