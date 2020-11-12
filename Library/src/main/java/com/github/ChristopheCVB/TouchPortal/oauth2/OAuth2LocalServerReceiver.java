@@ -41,10 +41,6 @@ public class OAuth2LocalServerReceiver {
     private final int port;
     private final String callbackPath;
 
-    private OAuth2LocalServerReceiver() {
-        this(null, -1, null);
-    }
-
     private OAuth2LocalServerReceiver(String host, int port, String callbackPath) {
         this.host = host;
         this.port = port != -1 ? port : this.findOpenPort();

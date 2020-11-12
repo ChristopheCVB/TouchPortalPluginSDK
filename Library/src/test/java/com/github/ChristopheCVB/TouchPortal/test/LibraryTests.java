@@ -752,7 +752,17 @@ public class LibraryTests {
 
     @Test
     public void testOAuth2() {
-        OAuth2LocalServerReceiver oAuth2LocalServerReceiver = new OAuth2LocalServerReceiver.Builder().setHost("localhost").setPort(-1).setCallbackPath("/oauth").build();
-        oAuth2LocalServerReceiver.waitForCode(System.out::println, URI.create("https://oauth2.com/authorize"), (oAuth2Code, oAuth2Error) -> System.out.println(oAuth2Error));
+        String host = "localhost";
+        String callbackPath = "/oauth";
+        int port = -1;
+        OAuth2LocalServerReceiver.Builder builder = new OAuth2LocalServerReceiver.Builder().setHost(host).setPort(port).setCallbackPath(callbackPath);
+        assertEquals(host, builder.getHost());
+        assertEquals(callbackPath, builder.getCallbackPath());
+        assertEquals(port, builder.getPort());
+        OAuth2LocalServerReceiver oAuth2LocalServerReceiver = builder.build();
+        assertEquals(host, oAuth2LocalServerReceiver.getHost());
+        assertEquals(callbackPath, oAuth2LocalServerReceiver.getCallbackPath());
+        assertNotEquals(port, oAuth2LocalServerReceiver.getPort());
+        oAuth2LocalServerReceiver.waitForCode(System.out::println, URI.create("https://oauth.com/authorize?state=" + oAuth2LocalServerReceiver.getPort()), (oAuth2Code, oAuth2Error) -> System.out.println(oAuth2Error));
     }
 }
