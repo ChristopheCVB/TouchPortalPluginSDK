@@ -170,17 +170,26 @@ public class ReceivedMessageHelper {
             switch (parameterRawType) {
                 case "short":
                 case "java.lang.Short":
-                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue).shortValue();
+                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue);
+                    if (argumentValue != null) {
+                        argumentValue = ((Double) argumentValue).shortValue();
+                    }
                     break;
 
                 case "int":
                 case "java.lang.Integer":
-                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue).intValue();
+                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue);
+                    if (argumentValue != null) {
+                        argumentValue = ((Double) argumentValue).intValue();
+                    }
                     break;
 
                 case "float":
                 case "java.lang.Float":
-                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue).floatValue();
+                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue);
+                    if (argumentValue != null) {
+                        argumentValue = ((Double) argumentValue).floatValue();
+                    }
                     break;
 
                 case "double":
@@ -190,7 +199,10 @@ public class ReceivedMessageHelper {
 
                 case "long":
                 case "java.lang.Long":
-                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue).longValue();
+                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue);
+                    if (argumentValue != null) {
+                        argumentValue = ((Double) argumentValue).longValue();
+                    }
                     break;
 
                 case "boolean":
@@ -244,7 +256,10 @@ public class ReceivedMessageHelper {
     protected static Double getActionDataValueDouble(String actionDataValue) {
         Double actionDataValueDouble = null;
         if (actionDataValue != null) {
-            actionDataValueDouble = Double.valueOf(actionDataValue);
+            try {
+                actionDataValueDouble = Double.valueOf(actionDataValue);
+            }
+            catch (NumberFormatException ignored) {}
         }
         return actionDataValueDouble;
     }
