@@ -117,18 +117,16 @@ public class OAuth2LocalServerReceiver {
                 throw thrown;
             }
             finally {
-                if (socket != null) {
-                    if (throwable != null) {
-                        try {
-                            socket.close();
-                        }
-                        catch (Throwable suppressedThrown) {
-                            throwable.addSuppressed(suppressedThrown);
-                        }
-                    }
-                    else {
+                if (throwable != null) {
+                    try {
                         socket.close();
                     }
+                    catch (Throwable suppressedThrown) {
+                        throwable.addSuppressed(suppressedThrown);
+                    }
+                }
+                else {
+                    socket.close();
                 }
             }
 
