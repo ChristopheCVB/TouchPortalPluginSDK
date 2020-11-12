@@ -763,6 +763,6 @@ public class LibraryTests {
         assertEquals(host, oAuth2LocalServerReceiver.getHost());
         assertEquals(callbackPath, oAuth2LocalServerReceiver.getCallbackPath());
         assertNotEquals(port, oAuth2LocalServerReceiver.getPort());
-        oAuth2LocalServerReceiver.waitForCode(System.out::println, URI.create("https://oauth.com/authorize?state=" + oAuth2LocalServerReceiver.getPort()), (oAuth2Code, oAuth2Error) -> System.out.println(oAuth2Error));
+        oAuth2LocalServerReceiver.waitForCode(System.out::println, URI.create("https://authorization-server.com/authorize?state=" + oAuth2LocalServerReceiver.getPort()), (oAuth2Code, oAuth2Error) -> System.out.println(oAuth2Error));
     }
 }
