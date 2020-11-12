@@ -23,6 +23,7 @@ package com.github.ChristopheCVB.TouchPortal.test;
 import com.github.ChristopheCVB.TouchPortal.Helpers.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
+import com.github.ChristopheCVB.TouchPortal.oauth2.OAuth2LocalServerReceiver;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -37,6 +38,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -746,5 +748,11 @@ public class LibraryTests {
         assertFalse(this.touchPortalPluginTest.isUpdateAvailable("", 0));
         assertFalse(this.touchPortalPluginTest.isUpdateAvailable("https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/Library/src/test/resources/TouchPortalPluginTest/plugin.config", 1));
         assertTrue(this.touchPortalPluginTest.isUpdateAvailable("https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/Library/src/test/resources/TouchPortalPluginTest/plugin.config", 0));
+    }
+
+    @Test
+    public void testOAuth2() {
+        OAuth2LocalServerReceiver oAuth2LocalServerReceiver = new OAuth2LocalServerReceiver.Builder().setHost("localhost").setPort(-1).setCallbackPath("/oauth").build();
+        oAuth2LocalServerReceiver.waitForCode(System.out::println, URI.create("https://oauth2.com/authorize"), (oAuth2Code, oAuth2Error) -> System.out.println(oAuth2Error));
     }
 }
