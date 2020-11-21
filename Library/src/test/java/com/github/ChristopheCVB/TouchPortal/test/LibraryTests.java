@@ -417,6 +417,52 @@ public class LibraryTests {
     }
 
     @Test
+    public void testReceiveActionHoldableDownAndUp() throws IOException, InterruptedException {
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+
+        JsonObject jsonMessageHoldDown = new JsonObject();
+        jsonMessageHoldDown.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessageHoldDown.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_HOLD_DOWN);
+        jsonMessageHoldDown.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
+        out.println(jsonMessageHoldDown.toString());
+
+        Thread.sleep(150);
+
+        assertTrue(this.touchPortalPluginTest.isActionBeingHeld(TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID));
+
+        JsonObject jsonMessageHoldUp = new JsonObject();
+        jsonMessageHoldUp.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessageHoldUp.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_HOLD_UP);
+        jsonMessageHoldUp.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
+        out.println(jsonMessageHoldUp.toString());
+
+        Thread.sleep(10);
+
+        assertNull(this.touchPortalPluginTest.isActionBeingHeld(TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID));
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
+    public void testReceiveActionHoldablePress() throws IOException, InterruptedException {
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+
+        JsonObject jsonMessageHoldDown = new JsonObject();
+        jsonMessageHoldDown.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessageHoldDown.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+        jsonMessageHoldDown.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
+        out.println(jsonMessageHoldDown.toString());
+
+        Thread.sleep(10);
+
+        assertNull(this.touchPortalPluginTest.isActionBeingHeld(TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID));
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
     public void testReceiveListChange() throws IOException, InterruptedException {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
@@ -656,7 +702,7 @@ public class LibraryTests {
 
         // Base Category Actions
         JsonArray baseCategoryActions = baseCategory.getAsJsonArray(CategoryHelper.ACTIONS);
-        assertEquals(4, baseCategoryActions.size());
+        assertEquals(5, baseCategoryActions.size());
 
         // Base Category Action DummyWithoutData
         JsonObject baseCategoryActionDummyWithoutData = baseCategoryActions.get(0).getAsJsonObject();

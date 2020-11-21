@@ -91,6 +91,26 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
         System.out.println("Action dummyWithDataColor received: color [" + color + "]");
     }
 
+    @Action(name = "Hold Me!", hasHoldFunctionality = true, categoryId = "BaseCategory")
+    private void actionHoldable() {
+        Boolean isHeld = this.isActionBeingHeld(TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
+        if (isHeld != null) {
+            // Action is triggered by a Hold
+            while (isHeld != null && isHeld) {
+                System.out.println("actionHoldable has been triggered by a HOLD");
+                try {
+                    Thread.sleep(100);
+                }
+                catch (InterruptedException ignored) {}
+                isHeld = this.isActionBeingHeld(TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
+            }
+        }
+        else {
+            // Action is triggered by a Press
+            System.out.println("actionHoldable has been triggered by a Press");
+        }
+    }
+
     private enum Categories {
         /**
          * Category definition example

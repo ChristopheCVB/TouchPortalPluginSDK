@@ -197,7 +197,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
         Boolean isHeld = this.isActionBeingHeld(TouchPortalSamplePluginConstants.BaseCategory.Actions.ActionHoldable.ID);
         if (isHeld != null) {
             // Action is triggered by a Hold
-            while (isHeld) {
+            while (isHeld != null && isHeld) {
                 System.out.println("actionHoldable has been triggered by a HOLD");
                 try {
                     Thread.sleep(100);
