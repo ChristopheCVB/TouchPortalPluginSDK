@@ -72,10 +72,13 @@ public @interface Action {
 
     /**
      * Action description
+     * <p>
+     * Default is ""
+     * </p>
      *
      * @return String description
      */
-    String description();
+    String description() default "";
 
     /**
      * Action type
@@ -103,4 +106,14 @@ public @interface Action {
      * @return String categoryId
      */
     String categoryId();
+
+    /**
+     * Action hasHoldFunctionality
+     * <p>
+     * Default is false
+     * </p>
+     *
+     * @return boolean hasHoldFunctionality
+     */
+    boolean hasHoldFunctionality() default false;
 }

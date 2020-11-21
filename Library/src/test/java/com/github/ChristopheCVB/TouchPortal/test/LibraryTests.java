@@ -50,11 +50,11 @@ public class LibraryTests {
     private TouchPortalPluginTest touchPortalPluginTest;
     private final TouchPortalPlugin.TouchPortalPluginListener touchPortalPluginListener = new TouchPortalPlugin.TouchPortalPluginListener() {
         @Override
-        public void onDisconnect(Exception exception) {
+        public void onDisconnected(Exception exception) {
         }
 
         @Override
-        public void onReceive(JsonObject jsonMessage) {
+        public void onReceived(JsonObject jsonMessage) {
         }
 
         @Override
@@ -62,7 +62,7 @@ public class LibraryTests {
         }
 
         @Override
-        public void onListChange(String actionId, String listId, String listInstanceId, String value) {
+        public void onListChanged(String actionId, String listId, String listInstanceId, String value) {
         }
 
         @Override

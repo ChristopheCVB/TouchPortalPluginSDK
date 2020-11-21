@@ -258,11 +258,14 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonAction.addProperty(ActionHelper.NAME, ActionHelper.getActionName(actionElement, action));
         jsonAction.addProperty(ActionHelper.PREFIX, action.prefix());
         jsonAction.addProperty(ActionHelper.TYPE, action.type());
-        jsonAction.addProperty(ActionHelper.DESCRIPTION, action.description());
-        if (!action.format().isEmpty()) {
-            jsonAction.addProperty(ActionHelper.TRY_INLINE, true);
-            jsonAction.addProperty(ActionHelper.FORMAT, action.format());
+        if (!action.description().isEmpty()) {
+            jsonAction.addProperty(ActionHelper.DESCRIPTION, action.description());
         }
+        if (!action.format().isEmpty()) {
+            jsonAction.addProperty(ActionHelper.FORMAT, action.format());
+            jsonAction.addProperty(ActionHelper.TRY_INLINE, true);
+        }
+        jsonAction.addProperty(ActionHelper.HAS_HOLD_FUNCTIONALITY, action.hasHoldFunctionality());
 
         JsonArray jsonActionData = new JsonArray();
         Set<? extends Element> dataElements = roundEnv.getElementsAnnotatedWith(Data.class);

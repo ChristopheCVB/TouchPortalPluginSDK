@@ -192,14 +192,34 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
         System.out.println("Action actionWithColor received: " + color);
     }
 
+    @Action(name = "Hold Me!", hasHoldFunctionality = true, categoryId = "BaseCategory")
+    private void actionHoldable() {
+        Boolean isHeld = this.isActionBeingHeld(TouchPortalSamplePluginConstants.BaseCategory.Actions.ActionHoldable.ID);
+        if (isHeld != null) {
+            // Action is triggered by a Hold
+            while (isHeld) {
+                System.out.println("actionHoldable has been triggered by a HOLD");
+                try {
+                    Thread.sleep(100);
+                }
+                catch (InterruptedException ignored) {}
+                isHeld = this.isActionBeingHeld(TouchPortalSamplePluginConstants.BaseCategory.Actions.ActionHoldable.ID);
+            }
+        }
+        else {
+            // Action is triggered by a Press
+            System.out.println("actionHoldable has been triggered by a Press");
+        }
+    }
+
     @Override
-    public void onDisconnect(Exception exception) {
+    public void onDisconnected(Exception exception) {
         // Socket connection is lost or plugin has received close message
         System.exit(0);
     }
 
     @Override
-    public void onReceive(JsonObject jsonMessage) {
+    public void onReceived(JsonObject jsonMessage) {
         // Check if ReceiveMessage is an Action
         if (ReceivedMessageHelper.isTypeAction(jsonMessage)) {
             // Get the Action ID
@@ -222,7 +242,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
     }
 
     @Override
-    public void onListChange(String actionId, String listId, String listInstanceId, String value) {
+    public void onListChanged(String actionId, String listId, String listInstanceId, String value) {
     }
 
     @Override

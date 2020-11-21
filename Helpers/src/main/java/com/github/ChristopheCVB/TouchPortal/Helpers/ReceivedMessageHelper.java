@@ -33,6 +33,8 @@ import java.lang.reflect.Parameter;
 public class ReceivedMessageHelper {
     public static final String TYPE = GenericHelper.TYPE;
     public static final String TYPE_ACTION = "action";
+    public static final String TYPE_HOLD_DOWN = "down";
+    public static final String TYPE_HOLD_UP = "up";
     public static final String TYPE_INFO = "info";
     public static final String TYPE_LIST_CHANGE = "listChange";
     public static final String TYPE_CLOSE_PLUGIN = "closePlugin";

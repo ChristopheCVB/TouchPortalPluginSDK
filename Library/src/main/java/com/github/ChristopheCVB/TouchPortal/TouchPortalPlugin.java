@@ -34,6 +34,7 @@ import java.lang.reflect.Parameter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -112,6 +113,10 @@ public abstract class TouchPortalPlugin {
      */
     private final HashMap<String, String[]> currentChoices = new HashMap<>();
     /**
+     * Current Held Actions States
+     */
+    private final HashMap<String, Boolean> heldActionsStates = new HashMap<>();
+    /**
      * Executor Service for callbacks
      */
     private final ExecutorService callbacksExecutor;
@@ -150,7 +155,7 @@ public abstract class TouchPortalPlugin {
             while (true) {
                 try {
                     if (this.bufferedReader == null) {
-                        this.bufferedReader = new BufferedReader(new InputStreamReader(this.touchPortalSocket.getInputStream()));
+                        this.bufferedReader = new BufferedReader(new InputStreamReader(this.touchPortalSocket.getInputStream(), StandardCharsets.UTF_8));
                     }
                     String socketMessage = this.bufferedReader.readLine();
                     if (socketMessage == null) {
@@ -193,7 +198,7 @@ public abstract class TouchPortalPlugin {
                         String listInstanceId = ReceivedMessageHelper.getListInstanceId(jsonMessage);
                         String listValue = ReceivedMessageHelper.getListValue(jsonMessage);
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onListChange(actionId, listId, listInstanceId, listValue);
+                            this.touchPortalPluginListener.onListChanged(actionId, listId, listInstanceId, listValue);
                         }
                         break;
 
@@ -210,12 +215,22 @@ public abstract class TouchPortalPlugin {
                             if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, this.pluginClass)) {
                                 boolean called = false;
                                 System.out.println("Message Received");
-                                if (messageType.equals(ReceivedMessageHelper.TYPE_ACTION)) {
-                                    called = this.onActionReceived(jsonMessage);
+                                switch (messageType) {
+                                    case ReceivedMessageHelper.TYPE_ACTION:
+                                        called = this.onActionReceived(jsonMessage, null);
+                                        break;
+
+                                    case ReceivedMessageHelper.TYPE_HOLD_DOWN:
+                                        called = this.onActionReceived(jsonMessage, true);
+                                        break;
+
+                                    case ReceivedMessageHelper.TYPE_HOLD_UP:
+                                        called = this.onActionReceived(jsonMessage, false);
+                                        break;
                                 }
                                 if (!called) {
                                     if (this.touchPortalPluginListener != null) {
-                                        this.touchPortalPluginListener.onReceive(jsonMessage);
+                                        this.touchPortalPluginListener.onReceived(jsonMessage);
                                     }
                                 }
                             }
@@ -226,7 +241,7 @@ public abstract class TouchPortalPlugin {
         }
     }
 
-    private boolean onActionReceived(JsonObject jsonAction) {
+    private boolean onActionReceived(JsonObject jsonAction, Boolean held) {
         boolean called = false;
         String messageActionId = ReceivedMessageHelper.getActionId(jsonAction);
         if (messageActionId != null && !messageActionId.isEmpty()) {
@@ -245,8 +260,12 @@ public abstract class TouchPortalPlugin {
                                 throw new ActionMethodDataParameterException(method, parameter);
                             }
                         }
+                        this.heldActionsStates.put(messageActionId, held);
                         method.setAccessible(true);
                         method.invoke(this, arguments);
+                        if (held != null && !held) {
+                            this.heldActionsStates.remove(messageActionId);
+                        }
                         called = true;
                     }
                     catch (IllegalAccessException | InvocationTargetException | SecurityException | ActionMethodDataParameterException e) {
@@ -324,7 +343,7 @@ public abstract class TouchPortalPlugin {
             this.touchPortalSocket = null;
 
             if (this.touchPortalPluginListener != null) {
-                this.touchPortalPluginListener.onDisconnect(exception);
+                this.touchPortalPluginListener.onDisconnected(exception);
             }
         }
     }
@@ -392,7 +411,7 @@ public abstract class TouchPortalPlugin {
         if (this.isConnected()) {
             try {
                 if (this.printWriter == null) {
-                    this.printWriter = new PrintWriter(this.touchPortalSocket.getOutputStream(), true);
+                    this.printWriter = new PrintWriter(new OutputStreamWriter(this.touchPortalSocket.getOutputStream(), StandardCharsets.UTF_8), true);
                 }
                 this.printWriter.println(message);
 
@@ -853,6 +872,16 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Returns null if the Action has been triggered from a Press or true/false if it's been triggered by a Hold (Down or Up)
+     *
+     * @param actionId String
+     * @return Boolean isActionBeingHeld
+     */
+    public Boolean isActionBeingHeld(String actionId) {
+        return this.heldActionsStates.get(actionId);
+    }
+
+    /**
      * Interface Definition for Callbacks
      */
     public interface TouchPortalPluginListener {
@@ -861,14 +890,14 @@ public abstract class TouchPortalPlugin {
          *
          * @param exception {@link Exception} raised or null if disconnection comes from the close Message
          */
-        void onDisconnect(Exception exception);
+        void onDisconnected(Exception exception);
 
         /**
          * Called when receiving a message from the Touch Portal Plugin System
          *
          * @param jsonMessage {@link JsonObject}
          */
-        void onReceive(JsonObject jsonMessage);
+        void onReceived(JsonObject jsonMessage);
 
         /**
          * Called when the Info Message is received
@@ -885,7 +914,7 @@ public abstract class TouchPortalPlugin {
          * @param listInstanceId String
          * @param value          String
          */
-        void onListChange(String actionId, String listId, String listInstanceId, String value);
+        void onListChanged(String actionId, String listId, String listInstanceId, String value);
 
         /**
          * Called when a Broadcast Message is received

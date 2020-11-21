@@ -42,12 +42,12 @@ class TouchPortalKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPlugin(p
         println(System.currentTimeMillis())
     }
 
-    override fun onDisconnect(exception: Exception?) {
+    override fun onDisconnected(exception: Exception?) {
         exitProcess(0)
     }
 
-    override fun onReceive(jsonMessage: JsonObject) {}
-    override fun onListChange(actionId: String?, listId: String?, listInstanceId: String?, value: String?) {}
+    override fun onReceived(jsonMessage: JsonObject) {}
+    override fun onListChanged(actionId: String?, listId: String?, listInstanceId: String?, value: String?) {}
     override fun onInfo(tpInfo: TPInfo?) {}
     override fun onBroadcast(event: String?, pageName: String?) {}
 }
