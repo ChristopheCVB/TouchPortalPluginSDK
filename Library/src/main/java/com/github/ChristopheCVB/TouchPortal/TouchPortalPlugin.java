@@ -28,7 +28,6 @@ import com.google.gson.*;
 import okhttp3.*;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.InetAddress;
@@ -163,11 +162,11 @@ public abstract class TouchPortalPlugin {
                     }
                     this.onMessage(socketMessage);
                 }
-                catch (JsonParseException ignored) {}
                 catch (IOException ioException) {
                     this.close(ioException);
                     break;
                 }
+                catch (Exception ignored) {}
             }
         });
     }
@@ -211,30 +210,28 @@ public abstract class TouchPortalPlugin {
                         break;
 
                     default:
-                        this.callbacksExecutor.submit(() -> {
-                            if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, this.pluginClass)) {
-                                boolean called = false;
-                                System.out.println("Message Received");
-                                switch (messageType) {
-                                    case ReceivedMessageHelper.TYPE_ACTION:
-                                        called = this.onActionReceived(jsonMessage, null);
-                                        break;
+                        if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, this.pluginClass)) {
+                            boolean called = false;
+                            System.out.println("Message Received");
+                            switch (messageType) {
+                                case ReceivedMessageHelper.TYPE_ACTION:
+                                    called = this.onActionReceived(jsonMessage, null);
+                                    break;
 
-                                    case ReceivedMessageHelper.TYPE_HOLD_DOWN:
-                                        called = this.onActionReceived(jsonMessage, true);
-                                        break;
+                                case ReceivedMessageHelper.TYPE_HOLD_DOWN:
+                                    called = this.onActionReceived(jsonMessage, true);
+                                    break;
 
-                                    case ReceivedMessageHelper.TYPE_HOLD_UP:
-                                        called = this.onActionReceived(jsonMessage, false);
-                                        break;
-                                }
-                                if (!called) {
-                                    if (this.touchPortalPluginListener != null) {
-                                        this.touchPortalPluginListener.onReceived(jsonMessage);
-                                    }
+                                case ReceivedMessageHelper.TYPE_HOLD_UP:
+                                    called = this.onActionReceived(jsonMessage, false);
+                                    break;
+                            }
+                            if (!called) {
+                                if (this.touchPortalPluginListener != null) {
+                                    this.touchPortalPluginListener.onReceived(jsonMessage);
                                 }
                             }
-                        });
+                        }
                         break;
                 }
             }
@@ -261,14 +258,21 @@ public abstract class TouchPortalPlugin {
                             }
                         }
                         this.heldActionsStates.put(messageActionId, held);
-                        method.setAccessible(true);
-                        method.invoke(this, arguments);
-                        if (held != null && !held) {
-                            this.heldActionsStates.remove(messageActionId);
-                        }
+                        this.callbacksExecutor.submit(() -> {
+                            try {
+                                method.setAccessible(true);
+                                method.invoke(this, arguments);
+                                if (held == null || !held) {
+                                    this.heldActionsStates.remove(messageActionId);
+                                }
+                            }
+                            catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
                         called = true;
                     }
-                    catch (IllegalAccessException | InvocationTargetException | SecurityException | ActionMethodDataParameterException e) {
+                    catch (ActionMethodDataParameterException e) {
                         e.printStackTrace();
                     }
                     break;
