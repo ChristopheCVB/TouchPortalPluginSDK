@@ -38,6 +38,7 @@ public class PluginHelper {
     public static final String CONFIGURATION_COLOR_LIGHT = "colorLight";
     public static final String PLUGIN_START_COMMAND = "plugin_start_cmd";
     public static final String CATEGORIES = "categories";
+    public static final String SETTINGS = "settings";
 
     /**
      * Touch Portal Plugin System version

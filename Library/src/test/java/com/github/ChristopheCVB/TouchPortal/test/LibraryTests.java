@@ -696,6 +696,10 @@ public class LibraryTests {
         // Plugin
         assertEquals(TouchPortalPluginTestConstants.ID, entry.get(PluginHelper.ID).getAsString());
 
+        // Settings
+        assertEquals(TouchPortalPluginTestConstants.Settings.IpSetting.NAME, entry.get(PluginHelper.SETTINGS).getAsJsonArray().get(0).getAsJsonObject().get(SettingHelper.NAME).getAsString());
+        assertEquals(1, entry.get(PluginHelper.SETTINGS).getAsJsonArray().size());
+
         // Categories
         JsonArray jsonCategories = entry.getAsJsonArray(PluginHelper.CATEGORIES);
         assertEquals(1, jsonCategories.size());

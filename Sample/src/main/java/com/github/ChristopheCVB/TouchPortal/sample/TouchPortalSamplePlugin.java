@@ -63,6 +63,18 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
     private String customStateText;
 
     /**
+     * Setting of type text definition example
+     */
+    @Setting(name = "IP", defaultValue = "localhost", maxLength = 15)
+    private String ipSetting;
+
+    /**
+     * Setting of type number definition example
+     */
+    @Setting(name = "Update Delay", defaultValue = "10", minValue = 10, maxValue = 30)
+    private int updateDelaySetting;
+
+    /**
      * Constructor calling super
      */
     public TouchPortalSamplePlugin() {
@@ -179,7 +191,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
      * @param doubleValue  Double
      */
     @Action(description = "Long Description of Action with Numbers", format = "Do an action with {$integerValue$} and {$doubleValue$}", categoryId = "BaseCategory")
-    private void actionWithNumbers(@Data Integer integerValue, @Data Double doubleValue) {
+    private void actionWithNumbers(@Data(minValue = -1, maxValue = 42, defaultValue = "0") Integer integerValue, @Data Double doubleValue) {
         System.out.println("Action actionWithNumber received: " + integerValue + " and " + doubleValue);
     }
 

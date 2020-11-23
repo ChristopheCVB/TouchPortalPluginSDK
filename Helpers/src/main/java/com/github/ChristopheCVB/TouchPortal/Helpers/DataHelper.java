@@ -41,6 +41,8 @@ public class DataHelper {
     public static final String EXTENSION_FORMAT = "\\*\\.[a-zA-Z0-9]{1,}";
     public static final String COLOR_FORMAT = "#[a-fA-F0-9]{8}";
     public static final String ALLOW_DECIMALS = "allowDecimals";
+    public static final String MIN_VALUE = "minValue";
+    public static final String MAX_VALUE = "maxValue";
 
     protected static final String KEY_DATA = "data";
 

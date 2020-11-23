@@ -146,6 +146,19 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonPlugin.add(PluginHelper.CONFIGURATION, jsonConfiguration);
         jsonPlugin.addProperty(PluginHelper.PLUGIN_START_COMMAND, "java -jar ./" + pluginElement.getSimpleName() + ".jar " + PluginHelper.COMMAND_START);
 
+        TypeSpec.Builder settingsTypeSpecBuilder = TypeSpec.classBuilder("Settings").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        JsonArray jsonSettings = new JsonArray();
+        Set<? extends Element> settingElements = roundEnv.getElementsAnnotatedWith(Setting.class);
+        for (Element settingElement : settingElements) {
+            Pair<JsonObject, TypeSpec.Builder> settingResult = this.processSetting(settingElement);
+            jsonSettings.add(settingResult.first);
+            settingsTypeSpecBuilder.addType(settingResult.second.build());
+        }
+        if (jsonSettings.size() > 0) {
+            jsonPlugin.add(PluginHelper.SETTINGS, jsonSettings);
+        }
+        pluginTypeSpecBuilder.addType(settingsTypeSpecBuilder.build());
+
         JsonArray jsonCategories = new JsonArray();
         Set<? extends Element> categoryElements = roundEnv.getElementsAnnotatedWith(Category.class);
         for (Element categoryElement : categoryElements) {
@@ -161,6 +174,61 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         }
 
         return Pair.create(jsonPlugin, pluginTypeSpecBuilder);
+    }
+
+    /**
+     * Generates a JsonObject and a TypeSpec.Builder representing the {@link Setting}
+     *
+     * @param settingElement Element
+     * @return Pair<JsonObject, TypeSpec.Builder> statePair
+     * @throws GenericHelper.TPTypeException If a used type is not Supported
+     */
+    private Pair<JsonObject, TypeSpec.Builder> processSetting(Element settingElement) throws Exception {
+        this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Setting: " + settingElement.getSimpleName());
+        Setting setting = settingElement.getAnnotation(Setting.class);
+
+        TypeSpec.Builder settingTypeSpecBuilder = this.createSettingTypeSpecBuilder(settingElement, setting);
+
+        String className = settingElement.getEnclosingElement().getSimpleName() + "." + settingElement.getSimpleName();
+
+        JsonObject jsonSetting = new JsonObject();
+        jsonSetting.addProperty(SettingHelper.NAME, SettingHelper.getSettingName(settingElement, setting));
+        String desiredTPType = GenericHelper.getTouchPortalType(className, settingElement);
+        jsonSetting.addProperty(StateHelper.TYPE, desiredTPType);
+        jsonSetting.addProperty(StateHelper.DEFAULT, setting.defaultValue());
+        switch (desiredTPType) {
+            case SettingHelper.TYPE_TEXT:
+                if (setting.maxLength() > 0) {
+                    jsonSetting.addProperty(SettingHelper.MAX_LENGTH, setting.maxLength());
+                }
+                if (setting.isPassword()) {
+                    jsonSetting.addProperty(SettingHelper.IS_PASSWORD, true);
+                }
+                break;
+
+            case SettingHelper.TYPE_NUMBER:
+                try {
+                    double defaultValue = Double.parseDouble(setting.defaultValue());
+                    if (defaultValue < setting.minValue() || defaultValue > setting.maxValue()) {
+                        throw new GenericHelper.TPTypeException.Builder(className).defaultNotInRange().build();
+                    }
+                }
+                catch (NumberFormatException numberFormatException) {
+                    throw new GenericHelper.TPTypeException.Builder(className).defaultInvalid(setting.defaultValue()).build();
+                }
+                if (setting.minValue() > Double.NEGATIVE_INFINITY) {
+                    jsonSetting.addProperty(SettingHelper.MIN_VALUE, setting.minValue());
+                }
+                if (setting.maxValue() < Double.POSITIVE_INFINITY) {
+                    jsonSetting.addProperty(SettingHelper.MAX_VALUE, setting.maxValue());
+                }
+                break;
+
+            default:
+                throw new GenericHelper.TPTypeException.Builder(className, GenericHelper.TPTypeException.ForAnnotation.SETTING, desiredTPType).build();
+        }
+
+        return Pair.create(jsonSetting, settingTypeSpecBuilder);
     }
 
     /**
@@ -465,7 +533,22 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 break;
 
             case GenericHelper.TP_TYPE_NUMBER:
+                try {
+                    double defaultValue = jsonData.get(DataHelper.DEFAULT).getAsDouble();
+                    if (defaultValue < data.minValue() || defaultValue > data.maxValue()) {
+                        throw new GenericHelper.TPTypeException.Builder(className).defaultNotInRange().build();
+                    }
+                }
+                catch (NumberFormatException numberFormatException) {
+                    throw new GenericHelper.TPTypeException.Builder(className).defaultInvalid(data.defaultValue()).build();
+                }
                 jsonData.addProperty(DataHelper.ALLOW_DECIMALS, GenericHelper.getTouchPortalTypeNumberAllowDecimals(dataElement.asType().toString()));
+                if (data.minValue() > Double.NEGATIVE_INFINITY) {
+                    jsonData.addProperty(DataHelper.MIN_VALUE, data.minValue());
+                }
+                if (data.maxValue() < Double.POSITIVE_INFINITY) {
+                    jsonData.addProperty(DataHelper.MAX_VALUE, data.maxValue());
+                }
                 break;
         }
         if (!action.format().isEmpty()) {
@@ -568,8 +651,39 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         actionDataTypeSpecBuilder.addField(this.getStaticFinalStringArrayFieldSpec("extensions", data.extensions()));
         actionDataTypeSpecBuilder.addField(this.getStaticFinalBooleanFieldSpec("is_directory", data.isDirectory()));
         actionDataTypeSpecBuilder.addField(this.getStaticFinalBooleanFieldSpec("is_color", data.isColor()));
+        if (data.minValue() > Double.NEGATIVE_INFINITY) {
+            actionDataTypeSpecBuilder.addField(this.getStaticFinalDoubleFieldSpec("min_value", data.minValue()));
+        }
+        if (data.maxValue() < Double.POSITIVE_INFINITY) {
+            actionDataTypeSpecBuilder.addField(this.getStaticFinalDoubleFieldSpec("max_value", data.maxValue()));
+        }
 
         return actionDataTypeSpecBuilder;
+    }
+
+    /**
+     * Generates a TypeSpec.Builder with Constants for the {@link Setting}
+     *
+     * @param settingElement  Element
+     * @param setting         {@link Setting}
+     * @return TypeSpec.Builder stateTypeSpecBuilder
+     */
+    private TypeSpec.Builder createSettingTypeSpecBuilder(Element settingElement, Setting setting) {
+        String simpleClassName = settingElement.getSimpleName().toString();
+
+        TypeSpec.Builder stateTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        stateTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("name", SettingHelper.getSettingName(settingElement, setting)));
+        stateTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("default", setting.defaultValue()));
+        stateTypeSpecBuilder.addField(this.getStaticFinalDoubleFieldSpec("max_length", setting.maxLength()));
+        stateTypeSpecBuilder.addField(this.getStaticFinalBooleanFieldSpec("is_password", setting.isPassword()));
+        if (setting.minValue() > Double.NEGATIVE_INFINITY) {
+            stateTypeSpecBuilder.addField(this.getStaticFinalDoubleFieldSpec("min_value", setting.minValue()));
+        }
+        if (setting.maxValue() < Double.POSITIVE_INFINITY) {
+            stateTypeSpecBuilder.addField(this.getStaticFinalDoubleFieldSpec("max_value", setting.maxValue()));
+        }
+
+        return stateTypeSpecBuilder;
     }
 
     /**
@@ -625,6 +739,17 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      */
     private FieldSpec getStaticFinalStringFieldSpec(String fieldName, String value) {
         return FieldSpec.builder(String.class, fieldName.toUpperCase()).addModifiers(Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC).initializer("$S", value).build();
+    }
+
+    /**
+     * Internal Get a Static Final long Field initialised with value
+     *
+     * @param fieldName String
+     * @param value     long
+     * @return FieldSpec fieldSpec
+     */
+    private FieldSpec getStaticFinalDoubleFieldSpec(String fieldName, double value) {
+        return FieldSpec.builder(double.class, fieldName.toUpperCase()).addModifiers(Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC).initializer("$L", value).build();
     }
 
     /**

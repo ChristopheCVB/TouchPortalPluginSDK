@@ -141,7 +141,8 @@ public class GenericHelper {
          */
         public enum ForAnnotation {
             STATE,
-            EVENT
+            EVENT,
+            SETTING
         }
 
         /**
@@ -171,6 +172,10 @@ public class GenericHelper {
                         case EVENT:
                             this.message += " for events, only '" + EventHelper.VALUE_TYPE_CHOICE + "' is.";
                             break;
+
+                        case SETTING:
+                            this.message += " for settings, only '" + SettingHelper.TYPE_NUMBER + "' and '" + SettingHelper.TYPE_TEXT + "' are.";
+                            break;
                     }
                 }
             }
@@ -183,6 +188,27 @@ public class GenericHelper {
              */
             public Builder(String reference, String rawType) {
                 this(reference, null, rawType);
+            }
+
+            /**
+             * Constructor for default number not in range
+             *
+             * @param reference String - The element being processed
+             */
+            public Builder(String reference) {
+                this.message = reference;
+            }
+
+            public Builder defaultNotInRange() {
+                this.message += ": The specified default value is not in range of min or max";
+
+                return this;
+            }
+
+            public Builder defaultInvalid(String defaultValue) {
+                this.message += ": The specified default value is a not valid number: " + defaultValue;
+
+                return this;
             }
 
             /**

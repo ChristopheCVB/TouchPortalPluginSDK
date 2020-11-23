@@ -37,10 +37,16 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
     private String customState;
 
     /**
-     * State and Event definition example
+     * State definition example
      */
     @State(valueChoices = {"1", "2"}, defaultValue = "1", categoryId = "BaseCategory")
     private String[] customState2;
+
+    /**
+     * Setting definition example
+     */
+    @Setting(name = "IP", defaultValue = "localhost", maxLength = 15)
+    private String ipSetting;
 
     /**
      * Constructor calling super

@@ -26,96 +26,55 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Data Annotation
+ * Setting Annotation
  * <p>
- * Target is a Parameter
+ * Target is a Field
  * </p>
  *
- * @see <a href="https://www.touch-portal.com/sdk/index.php?section=action-data">TP Documentation: Action Data</a>
+ * @see <a href="https://www.touch-portal.com/sdk/index.php?section=settings">TP Documentation: Settings</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
-public @interface Data {
+@Target(ElementType.FIELD)
+public @interface Setting {
     /**
-     * Data id
+     * Setting name
      * <p>
-     * Default is Parameter Name
+     * Default is Field name
      * </p>
      *
-     * @return String id
+     * @return String Setting
      */
-    String id() default "";
+    String name() default "";
 
     /**
-     * Data label
-     * <p>
-     * Default is Parameter Name
-     * </p>
-     *
-     * @return String label
-     */
-    String label() default "";
-
-    /**
-     * Data defaultValue
-     * <p>
-     * 0 for number
-     * false for switch
-     * "" (empty String) otherwise
-     * </p>
+     * Setting defaultValue
      *
      * @return String defaultValue
      */
-    String defaultValue() default "";
+    String defaultValue();
 
     /**
-     * Data valueChoices
+     * Setting maxLength
      * <p>
-     * Default is empty Array
+     * Used if the parameter type is text
      * </p>
      *
-     * @return String[] valueChoices
+     * @return double maxLength
      */
-    String[] valueChoices() default {};
+    double maxLength() default 0;
 
     /**
-     * Data extensions
+     * Setting isPassword
      * <p>
-     * Used if the parameter type is File
-     * </p>
-     * <p>
-     * Supported extensions (i.e. `{"*.txt"}`)
-     * </p>
-     * <p>
-     * Default is an empty Array, hence supporting all extensions
+     * Used if the parameter type is text
      * </p>
      *
-     * @return String[] extensions
+     * @return boolean isPassword
      */
-    String[] extensions() default {};
+    boolean isPassword() default false;
 
     /**
-     * Data isDirectory
-     * <p>
-     * Used if the parameter type is File
-     * </p>
-     *
-     * @return boolean isDirectory
-     */
-    boolean isDirectory() default false;
-
-    /**
-     * Data isColor
-     * <p>
-     * Used if the parameter type is String
-     * </p>
-     *
-     * @return boolean isColor
-     */
-    boolean isColor() default false;
-
-    /**
-     * Data minValue
+     * Setting minValue
      * <p>
      * Used if the parameter type is number
      * </p>
@@ -125,7 +84,7 @@ public @interface Data {
     double minValue() default Double.NEGATIVE_INFINITY;
 
     /**
-     * Data maxValue
+     * Setting maxValue
      * <p>
      * Used if the parameter type is number
      * </p>
