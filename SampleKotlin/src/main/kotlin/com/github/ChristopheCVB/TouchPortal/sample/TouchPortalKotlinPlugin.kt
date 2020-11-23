@@ -7,6 +7,7 @@ import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin
 import com.github.ChristopheCVB.TouchPortal.model.TPInfo
 import com.google.gson.JsonObject
+import java.util.*
 import kotlin.system.exitProcess
 
 @Suppress("unused")
@@ -50,4 +51,5 @@ class TouchPortalKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPlugin(p
     override fun onListChanged(actionId: String?, listId: String?, listInstanceId: String?, value: String?) {}
     override fun onInfo(tpInfo: TPInfo?) {}
     override fun onBroadcast(event: String?, pageName: String?) {}
+    override fun onSettings(settings: HashMap<String, String>?) {}
 }

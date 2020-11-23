@@ -24,6 +24,7 @@ import com.github.ChristopheCVB.TouchPortal.Helpers.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
 import com.github.ChristopheCVB.TouchPortal.oauth2.OAuth2LocalServerReceiver;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -41,6 +42,7 @@ import java.net.Socket;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
@@ -67,6 +69,10 @@ public class LibraryTests {
 
         @Override
         public void onBroadcast(String event, String pageName) {
+        }
+
+        @Override
+        public void onSettings(HashMap<String, String> settings) {
         }
     };
 
@@ -549,18 +555,16 @@ public class LibraryTests {
 
     @Test
     public void testReceiveInfo() throws IOException, InterruptedException {
-        JsonObject jsonMessage = new JsonObject();
+        TPInfo sentTPInfo = new TPInfo();
+        sentTPInfo.status = "paired";
+        sentTPInfo.sdkVersion = 2L;
+        sentTPInfo.tpVersionString = "2.2.000";
+        sentTPInfo.tpVersionCode = 202000L;
+        sentTPInfo.pluginVersion = 1L;
+
+        JsonObject jsonMessage = new Gson().toJsonTree(sentTPInfo).getAsJsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_INFO);
-        String status = "paired";
-        Long sdkVersion = 2L;
-        String tpVersionString = "2.2.000";
-        Long tpVersionCode = 202000L;
-        Long pluginVersion = 1L;
-        jsonMessage.addProperty(TPInfo.STATUS, status);
-        jsonMessage.addProperty(TPInfo.SDK_VERSION, sdkVersion);
-        jsonMessage.addProperty(TPInfo.TP_VERSION_CODE, tpVersionCode);
-        jsonMessage.addProperty(TPInfo.TP_VERSION_STRING, tpVersionString);
-        jsonMessage.addProperty(TPInfo.PLUGIN_VERSION, pluginVersion);
+
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
 
@@ -569,13 +573,13 @@ public class LibraryTests {
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
 
-        TPInfo tpInfo = this.touchPortalPluginTest.getTPInfo();
-        assertNotNull(tpInfo);
-        assertEquals(status, tpInfo.status);
-        assertEquals(sdkVersion, tpInfo.sdkVersion);
-        assertEquals(tpVersionCode, tpInfo.tpVersionCode);
-        assertEquals(tpVersionString, tpInfo.tpVersionString);
-        assertEquals(pluginVersion, tpInfo.pluginVersion);
+        TPInfo receivedTPInfo = this.touchPortalPluginTest.getTPInfo();
+        assertNotNull(receivedTPInfo);
+        assertEquals(sentTPInfo.status, receivedTPInfo.status);
+        assertEquals(sentTPInfo.sdkVersion, receivedTPInfo.sdkVersion);
+        assertEquals(sentTPInfo.tpVersionCode, receivedTPInfo.tpVersionCode);
+        assertEquals(sentTPInfo.tpVersionString, receivedTPInfo.tpVersionString);
+        assertEquals(sentTPInfo.pluginVersion, receivedTPInfo.pluginVersion);
     }
 
     @Test

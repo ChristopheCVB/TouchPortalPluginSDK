@@ -27,7 +27,7 @@ import com.google.gson.JsonObject;
 import java.io.File;
 
 @SuppressWarnings("unused")
-@Plugin(version = 5000, colorDark = "#203060", colorLight = "#4070F0")
+@Plugin(version = 6000, colorDark = "#203060", colorLight = "#4070F0")
 public class TouchPortalPluginTest extends TouchPortalPlugin {
     /**
      * State and Event definition example

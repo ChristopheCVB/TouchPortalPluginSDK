@@ -27,6 +27,7 @@ import com.google.auto.service.AutoService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
@@ -183,7 +184,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonCategory.addProperty(CategoryHelper.NAME, CategoryHelper.getCategoryName(categoryElement, category));
         jsonCategory.addProperty(CategoryHelper.IMAGE_PATH, PluginHelper.TP_PLUGIN_FOLDER + pluginElement.getSimpleName() + "/" + category.imagePath());
 
-        TypeSpec.Builder actionsTypeSpecBuilder = TypeSpec.classBuilder("Actions");
+        TypeSpec.Builder actionsTypeSpecBuilder = TypeSpec.classBuilder("Actions").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         JsonArray jsonActions = new JsonArray();
         Set<? extends Element> actionElements = roundEnv.getElementsAnnotatedWith(Action.class);
         for (Element actionElement : actionElements) {
@@ -198,7 +199,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         categoryTypeSpecBuilder.addType(actionsTypeSpecBuilder.build());
         jsonCategory.add(CategoryHelper.ACTIONS, jsonActions);
 
-        TypeSpec.Builder statesTypeSpecBuilder = TypeSpec.classBuilder("States");
+        TypeSpec.Builder statesTypeSpecBuilder = TypeSpec.classBuilder("States").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         JsonArray jsonStates = new JsonArray();
         Set<? extends Element> stateElements = roundEnv.getElementsAnnotatedWith(State.class);
         for (Element stateElement : stateElements) {
@@ -213,7 +214,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         categoryTypeSpecBuilder.addType(statesTypeSpecBuilder.build());
         jsonCategory.add(CategoryHelper.STATES, jsonStates);
 
-        TypeSpec.Builder eventsTypeSpecBuilder = TypeSpec.classBuilder("Events");
+        TypeSpec.Builder eventsTypeSpecBuilder = TypeSpec.classBuilder("Events").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         JsonArray jsonEvents = new JsonArray();
         Set<? extends Element> eventElements = roundEnv.getElementsAnnotatedWith(Event.class);
         for (Element eventElement : eventElements) {
@@ -489,7 +490,9 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         TypeSpec.Builder pluginTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName));
         pluginTypeSpecBuilder.addModifiers(Modifier.PUBLIC);
 
-        pluginTypeSpecBuilder.addField(FieldSpec.builder(String.class, "ID").addModifiers(Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC).initializer("$S", PluginHelper.getPluginId(pluginElement)).build());
+        pluginTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("id", PluginHelper.getPluginId(pluginElement)));
+        pluginTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("name", plugin.name()));
+        pluginTypeSpecBuilder.addField(this.getStaticFinalLongFieldSpec("version", plugin.version()));
 
         return pluginTypeSpecBuilder;
     }
@@ -505,10 +508,12 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     private TypeSpec.Builder createCategoryTypeSpecBuilder(Element pluginElement, Element categoryElement, Category category) {
         String simpleClassName = category.id().isEmpty() ? categoryElement.getSimpleName().toString() : category.id();
 
-        TypeSpec.Builder categoryTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName));
+        TypeSpec.Builder categoryTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         categoryTypeSpecBuilder.addModifiers(Modifier.PUBLIC);
 
         categoryTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("id", CategoryHelper.getCategoryId(pluginElement, categoryElement, category)));
+        categoryTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("name", category.name()));
+        categoryTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("image_path", category.imagePath()));
 
         return categoryTypeSpecBuilder;
     }
@@ -526,10 +531,16 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     private TypeSpec.Builder createActionTypeSpecBuilder(Element pluginElement, Element categoryElement, Category category, Element actionElement, Action action) {
         String simpleClassName = action.id().isEmpty() ? actionElement.getSimpleName().toString() : action.id();
 
-        TypeSpec.Builder actionTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName));
+        TypeSpec.Builder actionTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         actionTypeSpecBuilder.addModifiers(Modifier.PUBLIC);
 
         actionTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("id", ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action)));
+        actionTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("name", ActionHelper.getActionName(actionElement, action)));
+        actionTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("prefix", action.prefix()));
+        actionTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("description", action.description()));
+        actionTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("type", action.type()));
+        actionTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("format", action.format()));
+        actionTypeSpecBuilder.addField(this.getStaticFinalBooleanFieldSpec("has_hold_functionality", action.hasHoldFunctionality()));
 
         return actionTypeSpecBuilder;
     }
@@ -549,8 +560,14 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     private TypeSpec.Builder createActionDataTypeSpecBuilder(Element pluginElement, Element categoryElement, Category category, Element actionElement, Action action, Element dataElement, Data data) {
         String simpleClassName = data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id();
 
-        TypeSpec.Builder actionDataTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName));
+        TypeSpec.Builder actionDataTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         actionDataTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("id", DataHelper.getActionDataId(pluginElement, categoryElement, category, actionElement, action, dataElement, data)));
+        actionDataTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("label", DataHelper.getActionDataLabel(dataElement, data)));
+        actionDataTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("default_value", data.defaultValue()));
+        actionDataTypeSpecBuilder.addField(this.getStaticFinalStringArrayFieldSpec("value_choices", data.valueChoices()));
+        actionDataTypeSpecBuilder.addField(this.getStaticFinalStringArrayFieldSpec("extensions", data.extensions()));
+        actionDataTypeSpecBuilder.addField(this.getStaticFinalBooleanFieldSpec("is_directory", data.isDirectory()));
+        actionDataTypeSpecBuilder.addField(this.getStaticFinalBooleanFieldSpec("is_color", data.isColor()));
 
         return actionDataTypeSpecBuilder;
     }
@@ -568,8 +585,11 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     private TypeSpec.Builder createStateTypeSpecBuilder(Element pluginElement, Element categoryElement, Category category, Element stateElement, State state) {
         String simpleClassName = state.id().isEmpty() ? stateElement.getSimpleName().toString() : state.id();
 
-        TypeSpec.Builder stateTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName));
+        TypeSpec.Builder stateTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         stateTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("id", StateHelper.getStateId(pluginElement, categoryElement, category, stateElement, state)));
+        stateTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("desc", StateHelper.getStateDesc(stateElement, state)));
+        stateTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("default_value", state.defaultValue()));
+        stateTypeSpecBuilder.addField(this.getStaticFinalStringArrayFieldSpec("value_choices", state.valueChoices()));
 
         return stateTypeSpecBuilder;
     }
@@ -587,8 +607,11 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     private TypeSpec.Builder createEventTypeSpecBuilder(Element pluginElement, Element categoryElement, Category category, Element eventElement, Event event) {
         String simpleClassName = event.id().isEmpty() ? eventElement.getSimpleName().toString() : event.id();
 
-        TypeSpec.Builder eventTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName));
+        TypeSpec.Builder eventTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         eventTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("id", EventHelper.getEventId(pluginElement, categoryElement, category, eventElement, event)));
+        eventTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("name", EventHelper.getEventName(eventElement, event)));
+        eventTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("format", event.format()));
+        eventTypeSpecBuilder.addField(this.getStaticFinalStringArrayFieldSpec("value_choices", event.valueChoices()));
 
         return eventTypeSpecBuilder;
     }
@@ -602,5 +625,40 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
      */
     private FieldSpec getStaticFinalStringFieldSpec(String fieldName, String value) {
         return FieldSpec.builder(String.class, fieldName.toUpperCase()).addModifiers(Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC).initializer("$S", value).build();
+    }
+
+    /**
+     * Internal Get a Static Final long Field initialised with value
+     *
+     * @param fieldName String
+     * @param value     long
+     * @return FieldSpec fieldSpec
+     */
+    private FieldSpec getStaticFinalLongFieldSpec(String fieldName, long value) {
+        return FieldSpec.builder(long.class, fieldName.toUpperCase()).addModifiers(Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC).initializer("$L", value).build();
+    }
+
+    /**
+     * Internal Get a Static Final boolean Field initialised with value
+     *
+     * @param fieldName String
+     * @param value     boolean
+     * @return FieldSpec fieldSpec
+     */
+    private FieldSpec getStaticFinalBooleanFieldSpec(String fieldName, boolean value) {
+        return FieldSpec.builder(boolean.class, fieldName.toUpperCase()).addModifiers(Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC).initializer("$L", value).build();
+    }
+
+    /**
+     * Internal Get a Static Final boolean Field initialised with value
+     *
+     * @param fieldName String
+     * @param values    String[]
+     * @return FieldSpec fieldSpec
+     */
+    private FieldSpec getStaticFinalStringArrayFieldSpec(String fieldName, String[] values) {
+        ArrayTypeName stringArray = ArrayTypeName.of(String.class);
+        String literal = "{\"" + String.join("\",\"", values) + "\"}";
+        return FieldSpec.builder(String[].class, fieldName.toUpperCase()).addModifiers(Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC).initializer("new $1T $2L", stringArray, literal).build();
     }
 }

@@ -21,11 +21,13 @@
 package com.github.ChristopheCVB.TouchPortal.Helpers;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.HashMap;
 
 /**
  * Touch Portal Plugin Received Message Helper
@@ -39,6 +41,7 @@ public class ReceivedMessageHelper {
     public static final String TYPE_LIST_CHANGE = "listChange";
     public static final String TYPE_CLOSE_PLUGIN = "closePlugin";
     public static final String TYPE_BROADCAST = "broadcast";
+    public static final String TYPE_SETTINGS = "settings";
     public static final String PLUGIN_ID = "pluginId";
     public static final String ACTION_ID = "actionId";
     public static final String LIST_ID = "listId";
@@ -49,6 +52,7 @@ public class ReceivedMessageHelper {
     public static final String EVENT = "event";
     public static final String EVENT_PAGE_CHANGE = "pageChange";
     public static final String PAGE_NAME = "pageName";
+    public static final String SETTINGS = "settings";
 
     /**
      * Retrieve the Type of a ReceivedMessage
@@ -295,6 +299,26 @@ public class ReceivedMessageHelper {
      */
     public static String getBroadcastPageName(JsonObject jsonMessage) {
         return jsonMessage.has(ReceivedMessageHelper.PAGE_NAME) ? jsonMessage.get(ReceivedMessageHelper.PAGE_NAME).getAsString() : null;
+    }
+
+    /**
+     * Retrieve the Settings from a received Message
+     *
+     * @param jsonMessage JsonObject
+     * @return HashMap<String, String> settings
+     */
+    public static HashMap<String, String> getSettings(JsonObject jsonMessage) {
+        HashMap<String, String> settings = new HashMap<>();
+
+        if (jsonMessage.has(ReceivedMessageHelper.SETTINGS)) {
+            JsonArray jsonSettings = jsonMessage.get(ReceivedMessageHelper.SETTINGS).getAsJsonArray();
+            for (JsonElement jsonSettingElement : jsonSettings) {
+                JsonObject jsonSetting = jsonSettingElement.getAsJsonObject();
+                jsonSetting.keySet().forEach(key -> settings.put(key, jsonSetting.get(key).getAsString()));
+            }
+        }
+
+        return settings;
     }
 
     /**

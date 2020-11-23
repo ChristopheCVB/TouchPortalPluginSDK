@@ -209,6 +209,13 @@ public abstract class TouchPortalPlugin {
                         }
                         break;
 
+                    case ReceivedMessageHelper.TYPE_SETTINGS:
+                        HashMap<String, String> settings = ReceivedMessageHelper.getSettings(jsonMessage);
+                        if (this.touchPortalPluginListener != null) {
+                            this.touchPortalPluginListener.onSettings(settings);
+                        }
+                        break;
+
                     default:
                         if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, this.pluginClass)) {
                             boolean called = false;
@@ -927,6 +934,13 @@ public abstract class TouchPortalPlugin {
          * @param pageName String
          */
         void onBroadcast(String event, String pageName);
+
+        /**
+         * Called when a Settings Message is received
+         *
+         * @param settings HashMap&lt;String, String&gt;
+         */
+        void onSettings(HashMap<String, String> settings);
     }
 
     /**

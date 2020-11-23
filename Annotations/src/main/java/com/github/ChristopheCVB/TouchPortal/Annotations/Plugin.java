@@ -49,9 +49,9 @@ public @interface Plugin {
     /**
      * Plugin version
      *
-     * @return String version
+     * @return long version
      */
-    int version();
+    long version();
 
     /**
      * Plugin colorDark
