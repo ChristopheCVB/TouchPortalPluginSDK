@@ -17,7 +17,7 @@ public class TPInfo {
 
     public static TPInfo from(JsonObject jsonInfoMessage) {
         TPInfo tpInfo = new Gson().fromJson(jsonInfoMessage, TPInfo.class);
-        tpInfo.settings = ReceivedMessageHelper.getSettings(jsonInfoMessage);
+        tpInfo.settings = ReceivedMessageHelper.getSettings(jsonInfoMessage.get(ReceivedMessageHelper.SETTINGS));
 
         return tpInfo;
     }

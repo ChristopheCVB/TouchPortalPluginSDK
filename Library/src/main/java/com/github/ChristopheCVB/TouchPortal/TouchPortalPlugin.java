@@ -248,7 +248,7 @@ public abstract class TouchPortalPlugin {
     }
 
     private void onSettingsReceived(JsonObject settingsMessage) {
-        HashMap<String, String> settings = ReceivedMessageHelper.getSettings(settingsMessage);
+        HashMap<String, String> settings = ReceivedMessageHelper.getSettings(settingsMessage.get(ReceivedMessageHelper.VALUES));
 
         this.updateSettingFields(settings);
 

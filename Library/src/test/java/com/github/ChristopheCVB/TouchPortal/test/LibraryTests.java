@@ -700,7 +700,7 @@ public class LibraryTests {
 
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_SETTINGS);
-        jsonMessage.add(ReceivedMessageHelper.SETTINGS, jsonSettings);
+        jsonMessage.add(ReceivedMessageHelper.VALUES, jsonSettings);
 
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());

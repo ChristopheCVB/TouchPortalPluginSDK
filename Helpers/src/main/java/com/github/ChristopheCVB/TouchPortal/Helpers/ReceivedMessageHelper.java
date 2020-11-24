@@ -53,6 +53,7 @@ public class ReceivedMessageHelper {
     public static final String EVENT_PAGE_CHANGE = "pageChange";
     public static final String PAGE_NAME = "pageName";
     public static final String SETTINGS = "settings";
+    public static final String VALUES = "values";
 
     /**
      * Retrieve the Type of a ReceivedMessage
@@ -326,14 +327,14 @@ public class ReceivedMessageHelper {
     /**
      * Retrieve the Settings from a received Message
      *
-     * @param jsonMessage JsonObject
+     * @param jsonSettingsElement JsonElement
      * @return HashMap<String, String> settings
      */
-    public static HashMap<String, String> getSettings(JsonObject jsonMessage) {
+    public static HashMap<String, String> getSettings(JsonElement jsonSettingsElement) {
         HashMap<String, String> settings = new HashMap<>();
 
-        if (jsonMessage.has(ReceivedMessageHelper.SETTINGS) && jsonMessage.get(ReceivedMessageHelper.SETTINGS).isJsonArray()) {
-            JsonArray jsonSettings = jsonMessage.get(ReceivedMessageHelper.SETTINGS).getAsJsonArray();
+        if (jsonSettingsElement != null) {
+            JsonArray jsonSettings = jsonSettingsElement.getAsJsonArray();
             for (JsonElement jsonSettingElement : jsonSettings) {
                 JsonObject jsonSetting = jsonSettingElement.getAsJsonObject();
                 jsonSetting.keySet().forEach(key -> settings.put(key, jsonSetting.get(key).getAsString()));
