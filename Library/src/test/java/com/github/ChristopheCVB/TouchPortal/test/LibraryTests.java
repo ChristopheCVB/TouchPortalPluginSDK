@@ -561,9 +561,17 @@ public class LibraryTests {
         sentTPInfo.tpVersionString = "2.2.000";
         sentTPInfo.tpVersionCode = 202000L;
         sentTPInfo.pluginVersion = 1L;
+        sentTPInfo.settings = new HashMap<>();
+        sentTPInfo.settings.put("IP", "localhost");
+
+        JsonArray jsonSettings = new JsonArray();
+        JsonObject jsonSettingIP = new JsonObject();
+        jsonSettingIP.addProperty("IP", "localhost");
+        jsonSettings.add(jsonSettingIP);
 
         JsonObject jsonMessage = new Gson().toJsonTree(sentTPInfo).getAsJsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_INFO);
+        jsonMessage.add(ReceivedMessageHelper.SETTINGS, jsonSettings);
 
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
@@ -580,6 +588,7 @@ public class LibraryTests {
         assertEquals(sentTPInfo.tpVersionCode, receivedTPInfo.tpVersionCode);
         assertEquals(sentTPInfo.tpVersionString, receivedTPInfo.tpVersionString);
         assertEquals(sentTPInfo.pluginVersion, receivedTPInfo.pluginVersion);
+        assertEquals(sentTPInfo.settings, receivedTPInfo.settings);
     }
 
     @Test
@@ -676,6 +685,36 @@ public class LibraryTests {
     }
 
     @Test
+    public void testReceiveSettings() throws IOException, InterruptedException {
+        JsonArray jsonSettings = new JsonArray();
+
+        JsonObject jsonSettingIP = new JsonObject();
+        String newIPSetting = "192.168.0.1";
+        jsonSettingIP.addProperty(TouchPortalPluginTestConstants.Settings.IpSetting.NAME, newIPSetting);
+        jsonSettings.add(jsonSettingIP);
+
+        JsonObject jsonSettingOther = new JsonObject();
+        String newOtherSetting = "9";
+        jsonSettingOther.addProperty(TouchPortalPluginTestConstants.Settings.OtherSetting.NAME, newOtherSetting);
+        jsonSettings.add(jsonSettingOther);
+
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_SETTINGS);
+        jsonMessage.add(ReceivedMessageHelper.SETTINGS, jsonSettings);
+
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+
+        assertEquals(this.touchPortalPluginTest.ipSetting, newIPSetting);
+        assertEquals(this.touchPortalPluginTest.otherSetting, Double.valueOf(newOtherSetting).floatValue(), 0);
+    }
+
+    @Test
     public void testAnnotations() {
         assertEquals(TouchPortalPluginTestConstants.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest");
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory");
@@ -698,7 +737,7 @@ public class LibraryTests {
 
         // Settings
         assertEquals(TouchPortalPluginTestConstants.Settings.IpSetting.NAME, entry.get(PluginHelper.SETTINGS).getAsJsonArray().get(0).getAsJsonObject().get(SettingHelper.NAME).getAsString());
-        assertEquals(1, entry.get(PluginHelper.SETTINGS).getAsJsonArray().size());
+        assertEquals(2, entry.get(PluginHelper.SETTINGS).getAsJsonArray().size());
 
         // Categories
         JsonArray jsonCategories = entry.getAsJsonArray(PluginHelper.CATEGORIES);

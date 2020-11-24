@@ -45,8 +45,14 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
     /**
      * Setting definition example
      */
-    @Setting(name = "IP", defaultValue = "localhost", maxLength = 15)
-    private String ipSetting;
+    @Setting(name = "IP Address", defaultValue = "localhost", maxLength = 15)
+    String ipSetting = "localhost";
+
+    /**
+     * Setting definition example
+     */
+    @Setting(defaultValue = "0", minValue = 0, maxValue = 10)
+    float otherSetting = 0;
 
     /**
      * Constructor calling super

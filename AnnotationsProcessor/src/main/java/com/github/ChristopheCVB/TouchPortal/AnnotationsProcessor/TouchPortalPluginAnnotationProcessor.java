@@ -194,8 +194,8 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         JsonObject jsonSetting = new JsonObject();
         jsonSetting.addProperty(SettingHelper.NAME, SettingHelper.getSettingName(settingElement, setting));
         String desiredTPType = GenericHelper.getTouchPortalType(className, settingElement);
-        jsonSetting.addProperty(StateHelper.TYPE, desiredTPType);
-        jsonSetting.addProperty(StateHelper.DEFAULT, setting.defaultValue());
+        jsonSetting.addProperty(SettingHelper.TYPE, desiredTPType);
+        jsonSetting.addProperty(SettingHelper.DEFAULT, setting.defaultValue());
         switch (desiredTPType) {
             case SettingHelper.TYPE_TEXT:
                 if (setting.maxLength() > 0) {
@@ -225,7 +225,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 break;
 
             default:
-                throw new GenericHelper.TPTypeException.Builder(className, GenericHelper.TPTypeException.ForAnnotation.SETTING, desiredTPType).build();
+                throw new GenericHelper.TPTypeException.Builder(className).typeUnsupported(desiredTPType).forAnnotation(GenericHelper.TPTypeException.ForAnnotation.SETTING).build();
         }
 
         return Pair.create(jsonSetting, settingTypeSpecBuilder);
@@ -387,7 +387,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
             jsonState.add(StateHelper.VALUE_CHOICES, stateValueChoices);
         }
         else if (!desiredTPType.equals(StateHelper.TYPE_TEXT)) {
-            throw new GenericHelper.TPTypeException.Builder(className, GenericHelper.TPTypeException.ForAnnotation.STATE, desiredTPType).build();
+            throw new GenericHelper.TPTypeException.Builder(className).typeUnsupported(desiredTPType).forAnnotation(GenericHelper.TPTypeException.ForAnnotation.STATE).build();
         }
 
         Event event = stateElement.getAnnotation(Event.class);
@@ -439,7 +439,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
             jsonEvent.addProperty(EventHelper.VALUE_STATE_ID, StateHelper.getStateId(pluginElement, categoryElement, category, eventElement, state));
         }
         else {
-            throw new GenericHelper.TPTypeException.Builder(reference, GenericHelper.TPTypeException.ForAnnotation.EVENT, desiredTPType).build();
+            throw new GenericHelper.TPTypeException.Builder(reference).typeUnsupported(desiredTPType).forAnnotation(GenericHelper.TPTypeException.ForAnnotation.EVENT).build();
         }
 
         return Pair.create(jsonEvent, eventTypeSpecBuilder);

@@ -23,6 +23,7 @@ package com.github.ChristopheCVB.TouchPortal.Helpers;
 import com.github.ChristopheCVB.TouchPortal.Annotations.Setting;
 
 import javax.lang.model.element.Element;
+import java.lang.reflect.Field;
 
 /**
  * Touch Portal Plugin State Helper
@@ -39,13 +40,34 @@ public class SettingHelper {
     public static final String MAX_VALUE = "maxValue";
 
     /**
-     * Get the generated State Name
+     * Get the generated Setting Name
      *
      * @param settingElement Element
      * @param setting        {@link Setting}
      * @return String settingName
      */
     public static String getSettingName(Element settingElement, Setting setting) {
-        return setting.name().isEmpty() ? settingElement.getSimpleName().toString() : setting.name();
+        return SettingHelper._getSettingName(setting.name().isEmpty() ? settingElement.getSimpleName().toString() : setting.name());
+    }
+
+    /**
+     * Get the generated Setting Name
+     *
+     * @param settingField Field
+     * @param setting      {@link Setting}
+     * @return String settingName
+     */
+    public static String getSettingName(Field settingField, Setting setting) {
+        return SettingHelper._getSettingName(setting.name().isEmpty() ? settingField.getName() : setting.name());
+    }
+
+    /**
+     * Internal - Get the generated Setting Name
+     *
+     * @param rawName String
+     * @return String settingName
+     */
+    private static String _getSettingName(String rawName) {
+        return rawName;
     }
 }

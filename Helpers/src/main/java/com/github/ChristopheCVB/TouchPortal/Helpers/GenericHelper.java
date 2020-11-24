@@ -96,7 +96,7 @@ public class GenericHelper {
                 break;
 
             default:
-                throw new TPTypeException.Builder(reference, rawType).build();
+                throw new TPTypeException.Builder(reference).typeUnsupported(rawType).build();
         }
         return tpType;
     }
@@ -157,12 +157,31 @@ public class GenericHelper {
             /**
              * Constructor
              *
-             * @param reference     String - Name of the element being processed
-             * @param forAnnotation {@link ForAnnotation}
-             * @param tpType        String - Desired TPType
+             * @param reference String - The full element name being processed
              */
-            public Builder(String reference, ForAnnotation forAnnotation, String tpType) {
-                this.message = reference + ": The type '" + tpType + "' is not supported";
+            public Builder(String reference) {
+                this.message = reference;
+            }
+
+            /**
+             * Specify the error being type related
+             *
+             * @param type String
+             * @return Builder builder
+             */
+            public Builder typeUnsupported(String type) {
+                this.message += ": The type '" + type + "' is not supported";
+
+                return this;
+            }
+
+            /**
+             * Specify the error being annotation related
+             *
+             * @param forAnnotation {@link ForAnnotation}
+             * @return Builder builder
+             */
+            public Builder forAnnotation(ForAnnotation forAnnotation) {
                 if (forAnnotation != null) {
                     switch (forAnnotation) {
                         case STATE:
@@ -178,33 +197,27 @@ public class GenericHelper {
                             break;
                     }
                 }
+
+                return this;
             }
 
             /**
-             * Constructor
+             * Specify the error being default value range related
              *
-             * @param reference String - The element being processed
-             * @param rawType   String - The raw Java Type
+             * @return Builder builder
              */
-            public Builder(String reference, String rawType) {
-                this(reference, null, rawType);
-            }
-
-            /**
-             * Constructor for default number not in range
-             *
-             * @param reference String - The element being processed
-             */
-            public Builder(String reference) {
-                this.message = reference;
-            }
-
             public Builder defaultNotInRange() {
                 this.message += ": The specified default value is not in range of min or max";
 
                 return this;
             }
 
+            /**
+             * Specify the error being default value related
+             *
+             * @param defaultValue String
+             * @return Builder builder
+             */
             public Builder defaultInvalid(String defaultValue) {
                 this.message += ": The specified default value is a not valid number: " + defaultValue;
 

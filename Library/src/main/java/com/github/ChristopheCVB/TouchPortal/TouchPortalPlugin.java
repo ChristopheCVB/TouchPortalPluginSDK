@@ -22,12 +22,14 @@ package com.github.ChristopheCVB.TouchPortal;
 
 import com.github.ChristopheCVB.TouchPortal.Annotations.Action;
 import com.github.ChristopheCVB.TouchPortal.Annotations.Data;
+import com.github.ChristopheCVB.TouchPortal.Annotations.Setting;
 import com.github.ChristopheCVB.TouchPortal.Helpers.*;
 import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
 import com.google.gson.*;
 import okhttp3.*;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.InetAddress;
@@ -186,6 +188,9 @@ public abstract class TouchPortalPlugin {
 
                     case ReceivedMessageHelper.TYPE_INFO:
                         this.tpInfo = TPInfo.from(jsonMessage);
+
+                        this.updateSettingFields(this.tpInfo.settings);
+
                         if (this.touchPortalPluginListener != null) {
                             this.touchPortalPluginListener.onInfo(this.tpInfo);
                         }
@@ -210,10 +215,7 @@ public abstract class TouchPortalPlugin {
                         break;
 
                     case ReceivedMessageHelper.TYPE_SETTINGS:
-                        HashMap<String, String> settings = ReceivedMessageHelper.getSettings(jsonMessage);
-                        if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onSettings(settings);
-                        }
+                        this.onSettingsReceived(jsonMessage);
                         break;
 
                     default:
@@ -245,11 +247,40 @@ public abstract class TouchPortalPlugin {
         }
     }
 
+    private void onSettingsReceived(JsonObject settingsMessage) {
+        HashMap<String, String> settings = ReceivedMessageHelper.getSettings(settingsMessage);
+
+        this.updateSettingFields(settings);
+
+        if (this.touchPortalPluginListener != null) {
+            this.touchPortalPluginListener.onSettings(settings);
+        }
+    }
+
+    private void updateSettingFields(HashMap<String, String> settings) {
+        Field[] pluginSettingFields = Arrays.stream(this.pluginClass.getDeclaredFields()).filter(field -> field.isAnnotationPresent(Setting.class)).toArray(Field[]::new);
+        for (String settingName : settings.keySet()) {
+            for (Field pluginSettingField : pluginSettingFields) {
+                Setting setting = pluginSettingField.getAnnotation(Setting.class);
+                String fieldSettingName = SettingHelper.getSettingName(pluginSettingField, setting);
+                if (settingName.equals(fieldSettingName)) {
+                    try {
+                        pluginSettingField.setAccessible(true);
+                        pluginSettingField.set(this, ReceivedMessageHelper.getTypedValue(pluginSettingField.getType().getName(), settings.get(settingName)));
+                    }
+                    catch (Exception ignored) {}
+                    break;
+                }
+            }
+        }
+    }
+
     private boolean onActionReceived(JsonObject jsonAction, Boolean held) {
         boolean called = false;
         String messageActionId = ReceivedMessageHelper.getActionId(jsonAction);
         if (messageActionId != null && !messageActionId.isEmpty()) {
-            for (Method method : Arrays.stream(this.pluginClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Action.class)).toArray(Method[]::new)) {
+            Method[] pluginActionMethods = Arrays.stream(this.pluginClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Action.class)).toArray(Method[]::new);
+            for (Method method : pluginActionMethods) {
                 String methodActionId = ActionHelper.getActionId(this.pluginClass, method);
                 if (messageActionId.equals(methodActionId)) {
                     try {

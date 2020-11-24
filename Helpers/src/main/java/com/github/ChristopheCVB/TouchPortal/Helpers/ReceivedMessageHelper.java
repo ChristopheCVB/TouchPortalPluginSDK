@@ -171,12 +171,24 @@ public class ReceivedMessageHelper {
      * @return Object actionDataValue
      */
     protected static Object getTypedActionDataValue(JsonObject jsonMessage, String parameterDataId, String parameterRawType) {
-        Object argumentValue = ReceivedMessageHelper.getActionDataValue(jsonMessage, parameterDataId);
-        if (argumentValue != null) {
-            switch (parameterRawType) {
+        String argumentValue = ReceivedMessageHelper.getActionDataValue(jsonMessage, parameterDataId);
+        return ReceivedMessageHelper.getTypedValue(parameterRawType, argumentValue);
+    }
+
+    /**
+     * Retrieve an Action Data Value from a received Message for a specific Parameter
+     *
+     * @param rawType  String
+     * @param rawValue String
+     * @return Object typedValue
+     */
+    public static Object getTypedValue(String rawType, String rawValue) {
+        Object argumentValue = rawValue;
+        if (rawValue != null) {
+            switch (rawType) {
                 case "short":
                 case "java.lang.Short":
-                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue);
+                    argumentValue = ReceivedMessageHelper.getValueAsDouble(rawValue);
                     if (argumentValue != null) {
                         argumentValue = ((Double) argumentValue).shortValue();
                     }
@@ -184,7 +196,7 @@ public class ReceivedMessageHelper {
 
                 case "int":
                 case "java.lang.Integer":
-                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue);
+                    argumentValue = ReceivedMessageHelper.getValueAsDouble(rawValue);
                     if (argumentValue != null) {
                         argumentValue = ((Double) argumentValue).intValue();
                     }
@@ -192,7 +204,7 @@ public class ReceivedMessageHelper {
 
                 case "float":
                 case "java.lang.Float":
-                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue);
+                    argumentValue = ReceivedMessageHelper.getValueAsDouble(rawValue);
                     if (argumentValue != null) {
                         argumentValue = ((Double) argumentValue).floatValue();
                     }
@@ -200,12 +212,12 @@ public class ReceivedMessageHelper {
 
                 case "double":
                 case "java.lang.Double":
-                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue);
+                    argumentValue = ReceivedMessageHelper.getValueAsDouble(rawValue);
                     break;
 
                 case "long":
                 case "java.lang.Long":
-                    argumentValue = ReceivedMessageHelper.getActionDataValueDouble((String) argumentValue);
+                    argumentValue = ReceivedMessageHelper.getValueAsDouble(rawValue);
                     if (argumentValue != null) {
                         argumentValue = ((Double) argumentValue).longValue();
                     }
@@ -213,7 +225,7 @@ public class ReceivedMessageHelper {
 
                 case "boolean":
                 case "java.lang.Boolean":
-                    argumentValue = ReceivedMessageHelper.getActionDataValueBoolean(jsonMessage, parameterDataId);
+                    argumentValue = ReceivedMessageHelper.getValueAsBoolean(rawValue);
                     break;
 
                 case "java.lang.String[]":
@@ -250,24 +262,24 @@ public class ReceivedMessageHelper {
      * @return Double dataValueDouble
      */
     public static Double getActionDataValueDouble(JsonObject jsonMessage, String actionDataId) {
-        return ReceivedMessageHelper.getActionDataValueDouble(ReceivedMessageHelper.getActionDataValue(jsonMessage, actionDataId));
+        return ReceivedMessageHelper.getValueAsDouble(ReceivedMessageHelper.getActionDataValue(jsonMessage, actionDataId));
     }
 
     /**
      * Retrieve an Action Data Value from a received Message as a Double
      *
-     * @param actionDataValue String
-     * @return Double dataValueDouble
+     * @param rawValue String
+     * @return Double valueDouble
      */
-    protected static Double getActionDataValueDouble(String actionDataValue) {
-        Double actionDataValueDouble = null;
-        if (actionDataValue != null) {
+    protected static Double getValueAsDouble(String rawValue) {
+        Double valueDouble = null;
+        if (rawValue != null) {
             try {
-                actionDataValueDouble = Double.valueOf(actionDataValue);
+                valueDouble = Double.valueOf(rawValue);
             }
             catch (NumberFormatException ignored) {}
         }
-        return actionDataValueDouble;
+        return valueDouble;
     }
 
     /**
@@ -278,7 +290,17 @@ public class ReceivedMessageHelper {
      * @return Double dataValueLong
      */
     public static Boolean getActionDataValueBoolean(JsonObject jsonMessage, String actionDataId) {
-        return "On".equals(ReceivedMessageHelper.getActionDataValue(jsonMessage, actionDataId));
+        return ReceivedMessageHelper.getValueAsBoolean(ReceivedMessageHelper.getActionDataValue(jsonMessage, actionDataId));
+    }
+
+    /**
+     * Retrieve an Action Data Value from a received Message as a Boolean
+     *
+     * @param rawValue String
+     * @return Boolean valueBoolean
+     */
+    public static Boolean getValueAsBoolean(String rawValue) {
+        return "On".equals(rawValue);
     }
 
     /**
