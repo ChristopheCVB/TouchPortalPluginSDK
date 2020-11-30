@@ -716,14 +716,27 @@ public abstract class TouchPortalPlugin {
         return sent;
     }
 
+    /**
+     * Send an Action Data Update
+     *
+     * @param instanceId   String
+     * @param actionDataId String
+     * @param properties   HashMap&lt;String, Integer&gt;
+     * @return boolean actionDataUpdateSent
+     */
     public boolean sendActionDataUpdate(String instanceId, String actionDataId, HashMap<String, Integer> properties) {
         boolean sent = false;
 
         if (instanceId != null && !instanceId.isEmpty() && actionDataId != null && !actionDataId.isEmpty() && properties != null && !properties.isEmpty()) {
             JsonObject actionDataUpdate = new JsonObject();
+            actionDataUpdate.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_ACTION_DATA_UPDATE);
+            actionDataUpdate.addProperty(SentMessageHelper.INSTANCE_ID, instanceId);
+            JsonObject actionDataUpdateDataObject = new JsonObject();
+            actionDataUpdateDataObject.addProperty(SentMessageHelper.ID, actionDataId);
             for (String property : properties.keySet()) {
-                actionDataUpdate.addProperty(property, properties.get(property));
+                actionDataUpdateDataObject.addProperty(property, properties.get(property));
             }
+            actionDataUpdate.add(SentMessageHelper.DATA, actionDataUpdateDataObject);
 
             sent = this.send(actionDataUpdate);
             System.out.println("Action Data Update [" + actionDataId + "] Sent [" + sent + "]");
