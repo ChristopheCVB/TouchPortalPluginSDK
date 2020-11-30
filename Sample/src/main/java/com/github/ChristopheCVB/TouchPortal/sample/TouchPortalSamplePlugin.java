@@ -24,11 +24,13 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper;
 import com.github.ChristopheCVB.TouchPortal.Helpers.ReceivedMessageHelper;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
-import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
+import com.github.ChristopheCVB.TouchPortal.model.TPBroadcastMessage;
+import com.github.ChristopheCVB.TouchPortal.model.TPInfoMessage;
+import com.github.ChristopheCVB.TouchPortal.model.TPListChangeMessage;
+import com.github.ChristopheCVB.TouchPortal.model.TPSettingsMessage;
 import com.google.gson.JsonObject;
 
 import java.io.File;
-import java.util.HashMap;
 
 @SuppressWarnings("unused")
 @Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
@@ -251,18 +253,18 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
     }
 
     @Override
-    public void onInfo(TPInfo tpInfo) {
+    public void onInfo(TPInfoMessage tpInfoMessage) {
     }
 
     @Override
-    public void onListChanged(String actionId, String listId, String listInstanceId, String value) {
+    public void onListChanged(TPListChangeMessage tpListChangeMessage) {
     }
 
     @Override
-    public void onBroadcast(String event, String pageName) {
+    public void onBroadcast(TPBroadcastMessage tpBroadcastMessage) {
     }
 
     @Override
-    public void onSettings(HashMap<String, String> settings) {
+    public void onSettings(TPSettingsMessage tpSettingsMessage) {
     }
 }

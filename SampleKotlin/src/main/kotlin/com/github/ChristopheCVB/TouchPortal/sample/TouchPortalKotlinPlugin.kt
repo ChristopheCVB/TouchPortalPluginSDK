@@ -5,9 +5,11 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.Category
 import com.github.ChristopheCVB.TouchPortal.Annotations.Plugin
 import com.github.ChristopheCVB.TouchPortal.Helpers.PluginHelper
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin
-import com.github.ChristopheCVB.TouchPortal.model.TPInfo
+import com.github.ChristopheCVB.TouchPortal.model.TPBroadcastMessage
+import com.github.ChristopheCVB.TouchPortal.model.TPInfoMessage
+import com.github.ChristopheCVB.TouchPortal.model.TPListChangeMessage
+import com.github.ChristopheCVB.TouchPortal.model.TPSettingsMessage
 import com.google.gson.JsonObject
-import java.util.*
 import kotlin.system.exitProcess
 
 @Suppress("unused")
@@ -48,8 +50,8 @@ class TouchPortalKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPlugin(p
     }
 
     override fun onReceived(jsonMessage: JsonObject) {}
-    override fun onListChanged(actionId: String?, listId: String?, listInstanceId: String?, value: String?) {}
-    override fun onInfo(tpInfo: TPInfo?) {}
-    override fun onBroadcast(event: String?, pageName: String?) {}
-    override fun onSettings(settings: HashMap<String, String>?) {}
+    override fun onListChanged(tpListChangeMessage: TPListChangeMessage) {}
+    override fun onInfo(tpInfoMessage: TPInfoMessage?) {}
+    override fun onBroadcast(tpBroadcastMessage: TPBroadcastMessage) {}
+    override fun onSettings(tpSettingsMessage: TPSettingsMessage) {}
 }

@@ -90,6 +90,9 @@ public class OAuth2LocalServerReceiver {
                     httpExchange.getResponseHeaders().add("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
                     httpExchange.sendResponseHeaders(204, -1);
                 }
+                else {
+                    httpExchange.sendResponseHeaders(404, -1);
+                }
             });
             httpServer.start();
         }

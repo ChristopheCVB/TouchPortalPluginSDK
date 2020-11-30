@@ -24,7 +24,8 @@ import com.github.ChristopheCVB.TouchPortal.Annotations.Action;
 import com.github.ChristopheCVB.TouchPortal.Annotations.Data;
 import com.github.ChristopheCVB.TouchPortal.Annotations.Setting;
 import com.github.ChristopheCVB.TouchPortal.Helpers.*;
-import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
+import com.github.ChristopheCVB.TouchPortal.model.*;
+import com.github.ChristopheCVB.TouchPortal.model.deserializer.TPMessageDeserializer;
 import com.google.gson.*;
 import okhttp3.*;
 
@@ -123,9 +124,13 @@ public abstract class TouchPortalPlugin {
     private final ExecutorService callbacksExecutor;
 
     /**
+     * Internal Gson Serializer/Deserializer
+     */
+    private Gson gson;
+    /**
      * Info sent by the Touch Portal Plugin System
      */
-    private TPInfo tpInfo;
+    private TPInfoMessage tpInfoMessage;
 
     /**
      * Constructor
@@ -158,6 +163,18 @@ public abstract class TouchPortalPlugin {
                     if (this.bufferedReader == null) {
                         this.bufferedReader = new BufferedReader(new InputStreamReader(this.touchPortalSocket.getInputStream(), StandardCharsets.UTF_8));
                     }
+                    if (this.gson == null) {
+                        TPMessageDeserializer tpMessageDeserializer = new TPMessageDeserializer();
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_CLOSE_PLUGIN, TPClosePluginMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_INFO, TPInfoMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_LIST_CHANGE, TPListChangeMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_BROADCAST, TPBroadcastMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_SETTINGS, TPSettingsMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_ACTION, TPActionMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_HOLD_DOWN, TPActionMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_HOLD_UP, TPActionMessage.class);
+                        this.gson = new GsonBuilder().registerTypeAdapter(TPMessage.class, tpMessageDeserializer).create();
+                    }
                     String socketMessage = this.bufferedReader.readLine();
                     if (socketMessage == null) {
                         throw new SocketException("Server Socket Closed");
@@ -175,64 +192,62 @@ public abstract class TouchPortalPlugin {
 
     private void onMessage(String socketMessage) throws SocketException, JsonParseException {
         if (!socketMessage.isEmpty()) {
-            final JsonElement jsonElement = JsonParser.parseString(socketMessage);
-            if (!jsonElement.isJsonObject()) {
-                throw new JsonParseException("Received Message is not a JsonObject");
-            }
-            final JsonObject jsonMessage = jsonElement.getAsJsonObject();
-            final String messageType = ReceivedMessageHelper.getType(jsonMessage);
-            if (messageType != null) {
-                switch (messageType) {
+            TPMessage tpMessage = this.gson.fromJson(socketMessage, TPMessage.class);
+            if (tpMessage != null && tpMessage.type != null) {
+                switch (tpMessage.type) {
                     case ReceivedMessageHelper.TYPE_CLOSE_PLUGIN:
                         throw new SocketException("Close Message Received");
 
                     case ReceivedMessageHelper.TYPE_INFO:
-                        this.tpInfo = TPInfo.from(jsonMessage);
+                        this.tpInfoMessage = (TPInfoMessage) tpMessage;
 
-                        this.updateSettingFields(this.tpInfo.settings);
+                        this.updateSettingFields(this.tpInfoMessage.settings);
 
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onInfo(this.tpInfo);
+                            this.touchPortalPluginListener.onInfo(this.tpInfoMessage);
                         }
                         break;
 
                     case ReceivedMessageHelper.TYPE_LIST_CHANGE:
-                        String actionId = ReceivedMessageHelper.getActionId(jsonMessage);
-                        String listId = ReceivedMessageHelper.getListId(jsonMessage);
-                        String listInstanceId = ReceivedMessageHelper.getListInstanceId(jsonMessage);
-                        String listValue = ReceivedMessageHelper.getListValue(jsonMessage);
+                        TPListChangeMessage listChangeMessage = (TPListChangeMessage) tpMessage;
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onListChanged(actionId, listId, listInstanceId, listValue);
+                            this.touchPortalPluginListener.onListChanged(listChangeMessage);
                         }
                         break;
 
                     case ReceivedMessageHelper.TYPE_BROADCAST:
-                        String event = ReceivedMessageHelper.getBroadcastEvent(jsonMessage);
-                        String pageName = ReceivedMessageHelper.getBroadcastPageName(jsonMessage);
+                        TPBroadcastMessage tpBroadcastMessage = (TPBroadcastMessage) tpMessage;
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onBroadcast(event, pageName);
+                            this.touchPortalPluginListener.onBroadcast(tpBroadcastMessage);
                         }
                         break;
 
                     case ReceivedMessageHelper.TYPE_SETTINGS:
-                        this.onSettingsReceived(jsonMessage);
+                        TPSettingsMessage tpSettingsMessage = (TPSettingsMessage) tpMessage;
+
+                        this.updateSettingFields(tpSettingsMessage.settings);
+
+                        if (this.touchPortalPluginListener != null) {
+                            this.touchPortalPluginListener.onSettings(tpSettingsMessage);
+                        }
                         break;
 
                     default:
-                        if (ReceivedMessageHelper.isMessageForPlugin(jsonMessage, this.pluginClass)) {
+                        JsonObject jsonMessage = JsonParser.parseString(socketMessage).getAsJsonObject();
+                        TPActionMessage tpActionMessage = (TPActionMessage) tpMessage;
+                        if (this.pluginClass.getName().equals(tpActionMessage.pluginId)) {
                             boolean called = false;
-                            System.out.println("Message Received");
-                            switch (messageType) {
+                            switch (tpMessage.type) {
                                 case ReceivedMessageHelper.TYPE_ACTION:
-                                    called = this.onActionReceived(jsonMessage, null);
+                                    called = this.onActionReceived(tpActionMessage, jsonMessage, null);
                                     break;
 
                                 case ReceivedMessageHelper.TYPE_HOLD_DOWN:
-                                    called = this.onActionReceived(jsonMessage, true);
+                                    called = this.onActionReceived(tpActionMessage, jsonMessage, true);
                                     break;
 
                                 case ReceivedMessageHelper.TYPE_HOLD_UP:
-                                    called = this.onActionReceived(jsonMessage, false);
+                                    called = this.onActionReceived(tpActionMessage, jsonMessage, false);
                                     break;
                             }
                             if (!called) {
@@ -244,16 +259,6 @@ public abstract class TouchPortalPlugin {
                         break;
                 }
             }
-        }
-    }
-
-    private void onSettingsReceived(JsonObject settingsMessage) {
-        HashMap<String, String> settings = ReceivedMessageHelper.getSettings(settingsMessage.get(ReceivedMessageHelper.VALUES));
-
-        this.updateSettingFields(settings);
-
-        if (this.touchPortalPluginListener != null) {
-            this.touchPortalPluginListener.onSettings(settings);
         }
     }
 
@@ -275,33 +280,38 @@ public abstract class TouchPortalPlugin {
         }
     }
 
-    private boolean onActionReceived(JsonObject jsonAction, Boolean held) {
+    private boolean onActionReceived(TPActionMessage tpActionMessage, JsonObject jsonAction, Boolean held) {
         boolean called = false;
-        String messageActionId = ReceivedMessageHelper.getActionId(jsonAction);
-        if (messageActionId != null && !messageActionId.isEmpty()) {
+        if (tpActionMessage.actionId != null && !tpActionMessage.actionId.isEmpty()) {
             Method[] pluginActionMethods = Arrays.stream(this.pluginClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Action.class)).toArray(Method[]::new);
             for (Method method : pluginActionMethods) {
                 String methodActionId = ActionHelper.getActionId(this.pluginClass, method);
-                if (messageActionId.equals(methodActionId)) {
+                if (tpActionMessage.actionId.equals(methodActionId)) {
                     try {
                         Parameter[] parameters = method.getParameters();
                         Object[] arguments = new Object[parameters.length];
                         for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
                             Parameter parameter = parameters[parameterIndex];
                             if (parameter.isAnnotationPresent(Data.class)) {
-                                arguments[parameterIndex] = ReceivedMessageHelper.getTypedActionDataValue(jsonAction, this.pluginClass, method, parameter);
+                                arguments[parameterIndex] = tpActionMessage.getTypedDataValue(this.pluginClass, method, parameter);
+                            }
+                            else if (parameter.getType().isAssignableFrom(JsonObject.class)) {
+                                arguments[parameterIndex] = jsonAction;
+                            }
+                            else if (parameter.getType().isAssignableFrom(TPActionMessage.class)) {
+                                arguments[parameterIndex] = tpActionMessage;
                             }
                             if (arguments[parameterIndex] == null) {
                                 throw new ActionMethodDataParameterException(method, parameter);
                             }
                         }
-                        this.heldActionsStates.put(messageActionId, held);
+                        this.heldActionsStates.put(tpActionMessage.actionId, held);
                         this.callbacksExecutor.submit(() -> {
                             try {
                                 method.setAccessible(true);
                                 method.invoke(this, arguments);
                                 if (held == null || !held) {
-                                    this.heldActionsStates.remove(messageActionId);
+                                    this.heldActionsStates.remove(tpActionMessage.actionId);
                                 }
                             }
                             catch (Exception e) {
@@ -341,8 +351,8 @@ public abstract class TouchPortalPlugin {
      *
      * @return TPInfo tpInfo
      */
-    public TPInfo getTPInfo() {
-        return this.tpInfo;
+    public TPInfoMessage getTPInfo() {
+        return this.tpInfoMessage;
     }
 
     /**
@@ -706,6 +716,22 @@ public abstract class TouchPortalPlugin {
         return sent;
     }
 
+    public boolean sendActionDataUpdate(String instanceId, String actionDataId, HashMap<String, Integer> properties) {
+        boolean sent = false;
+
+        if (instanceId != null && !instanceId.isEmpty() && actionDataId != null && !actionDataId.isEmpty() && properties != null && !properties.isEmpty()) {
+            JsonObject actionDataUpdate = new JsonObject();
+            for (String property : properties.keySet()) {
+                actionDataUpdate.addProperty(property, properties.get(property));
+            }
+
+            sent = this.send(actionDataUpdate);
+            System.out.println("Action Data Update [" + actionDataId + "] Sent [" + sent + "]");
+        }
+
+        return sent;
+    }
+
     /**
      * Is the Plugin connected to the Touch Portal Plugin System
      *
@@ -944,34 +970,30 @@ public abstract class TouchPortalPlugin {
         /**
          * Called when the Info Message is received
          *
-         * @param tpInfo {@link TPInfo}
+         * @param tpInfoMessage {@link TPInfoMessage}
          */
-        void onInfo(TPInfo tpInfo);
+        void onInfo(TPInfoMessage tpInfoMessage);
 
         /**
          * Called when a List Change Message is received
          *
-         * @param actionId       String
-         * @param listId         String
-         * @param listInstanceId String
-         * @param value          String
+         * @param tpListChangeMessage TPListChangeMessage
          */
-        void onListChanged(String actionId, String listId, String listInstanceId, String value);
+        void onListChanged(TPListChangeMessage tpListChangeMessage);
 
         /**
          * Called when a Broadcast Message is received
          *
-         * @param event    String
-         * @param pageName String
+         * @param tpBroadcastMessage TPBroadcastMessage
          */
-        void onBroadcast(String event, String pageName);
+        void onBroadcast(TPBroadcastMessage tpBroadcastMessage);
 
         /**
          * Called when a Settings Message is received
          *
-         * @param settings HashMap&lt;String, String&gt;
+         * @param tpSettingsMessage TPSettingsMessage
          */
-        void onSettings(HashMap<String, String> settings);
+        void onSettings(TPSettingsMessage tpSettingsMessage);
     }
 
     /**

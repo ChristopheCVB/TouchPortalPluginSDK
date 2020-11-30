@@ -99,17 +99,17 @@ public class DataHelper {
     /**
      * Get the generated Data Id
      *
-     * @param pluginClass  Class
-     * @param actionMethod Method
-     * @param parameter    Parameter
+     * @param pluginClass           Class
+     * @param actionMethod          Method
+     * @param actionMethodParameter Parameter
      * @return String actionId
      */
-    public static String getActionDataId(Class<?> pluginClass, Method actionMethod, Parameter parameter) {
+    public static String getActionDataId(Class<?> pluginClass, Method actionMethod, Parameter actionMethodParameter) {
         String actionDataId = "";
 
-        if (parameter.isAnnotationPresent(Data.class)) {
-            Data data = parameter.getAnnotation(Data.class);
-            actionDataId = DataHelper._getActionDataId(ActionHelper.getActionId(pluginClass, actionMethod), data.id().isEmpty() ? parameter.getName() : data.id());
+        if (actionMethodParameter.isAnnotationPresent(Data.class)) {
+            Data data = actionMethodParameter.getAnnotation(Data.class);
+            actionDataId = DataHelper._getActionDataId(ActionHelper.getActionId(pluginClass, actionMethod), data.id().isEmpty() ? actionMethodParameter.getName() : data.id());
         }
 
         return actionDataId;

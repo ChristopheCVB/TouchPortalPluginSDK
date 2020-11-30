@@ -22,6 +22,7 @@ package com.github.ChristopheCVB.TouchPortal.test;
 
 import com.github.ChristopheCVB.TouchPortal.Annotations.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
+import com.github.ChristopheCVB.TouchPortal.model.TPActionMessage;
 import com.google.gson.JsonObject;
 
 import java.io.File;
@@ -66,15 +67,25 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
      *
      * @param jsonAction JSONObject
      */
-    @Action(description = "Long Description of Dummy Action without Data", categoryId = "BaseCategory")
-    private void dummyWithoutData(JsonObject jsonAction) {
+    @Action(description = "Long Description of Dummy Action with JsonObject", categoryId = "BaseCategory")
+    private void dummyWithJsonObject(JsonObject jsonAction) {
         System.out.println("Action dummyWithoutData received [" + jsonAction + "]");
+    }
+
+    /**
+     * Simple Action example
+     *
+     * @param tpActionMessage TPActionMessage
+     */
+    @Action(description = "Long Description of Dummy Action with TPActionMessage", categoryId = "BaseCategory")
+    private void dummyWithTPActionMessage(TPActionMessage tpActionMessage) {
+        System.out.println("Action dummyWithoutData received [" + tpActionMessage + "]");
     }
 
     /**
      * Action example that contains a dynamic data text and number
      *
-     * @param text String
+     * @param text   String
      * @param number Integer
      */
     @Action(description = "Long Description of Dummy Action with Data Text and Number", categoryId = "BaseCategory")
@@ -88,7 +99,7 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
      * @param file      File
      * @param directory File
      */
-    @Action(description = "Long Description of Dummy Action with Data File", categoryId = "BaseCategory")
+    @Action(description = "Long Description of Dummy Action with Data File and Directory", categoryId = "BaseCategory")
     private void dummyWithDataFileAndDirectory(@Data(extensions = {"*.mp3", "*.7z"}) File file, @Data(isDirectory = true) File directory) {
         System.out.println("Action dummyWithDataFileAndDirectory received: file [" + file.getAbsolutePath() + "]");
     }
@@ -96,11 +107,21 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
     /**
      * Action example that contains a dynamic data color
      *
-     * @param color Color
+     * @param color String
      */
-    @Action(description = "Long Description of Dummy Action with Data File", categoryId = "BaseCategory")
+    @Action(description = "Long Description of Dummy Action with Data Color", categoryId = "BaseCategory")
     private void dummyWithDataColor(@Data(isColor = true, defaultValue = "#000000FF") String color) {
         System.out.println("Action dummyWithDataColor received: color [" + color + "]");
+    }
+
+    /**
+     * Action example that contains a parameter
+     *
+     * @param value String
+     */
+    @Action(description = "Long Description of Dummy Action with Param", categoryId = "BaseCategory")
+    private void dummyWithParam(String value) {
+        // This is not automatically called
     }
 
     @Action(name = "Hold Me!", hasHoldFunctionality = true, categoryId = "BaseCategory")

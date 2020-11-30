@@ -22,12 +22,19 @@ package com.github.ChristopheCVB.TouchPortal.test;
 
 import com.github.ChristopheCVB.TouchPortal.Helpers.*;
 import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
-import com.github.ChristopheCVB.TouchPortal.model.TPInfo;
+import com.github.ChristopheCVB.TouchPortal.model.TPBroadcastMessage;
+import com.github.ChristopheCVB.TouchPortal.model.TPInfoMessage;
+import com.github.ChristopheCVB.TouchPortal.model.TPListChangeMessage;
+import com.github.ChristopheCVB.TouchPortal.model.TPSettingsMessage;
 import com.github.ChristopheCVB.TouchPortal.oauth2.OAuth2LocalServerReceiver;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import okhttp3.Call;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,19 +67,19 @@ public class LibraryTests {
         }
 
         @Override
-        public void onInfo(TPInfo tpInfo) {
+        public void onInfo(TPInfoMessage tpInfoMessage) {
         }
 
         @Override
-        public void onListChanged(String actionId, String listId, String listInstanceId, String value) {
+        public void onListChanged(TPListChangeMessage tpListChangeMessage) {
         }
 
         @Override
-        public void onBroadcast(String event, String pageName) {
+        public void onBroadcast(TPBroadcastMessage tpBroadcastMessage) {
         }
 
         @Override
-        public void onSettings(HashMap<String, String> settings) {
+        public void onSettings(TPSettingsMessage tpSettingsMessage) {
         }
     };
 
@@ -272,6 +279,24 @@ public class LibraryTests {
     }
 
     @Test
+    public void testSendActionDataUpdate() {
+        HashMap<String, Integer> props = new HashMap<>();
+        assertFalse(this.touchPortalPluginTest.sendActionDataUpdate(null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendActionDataUpdate("", null, null));
+        assertFalse(this.touchPortalPluginTest.sendActionDataUpdate("", "", null));
+        assertFalse(this.touchPortalPluginTest.sendActionDataUpdate("", "", props));
+        assertFalse(this.touchPortalPluginTest.sendActionDataUpdate("listId", null, null));
+        assertFalse(this.touchPortalPluginTest.sendActionDataUpdate("listId", "", null));
+        assertFalse(this.touchPortalPluginTest.sendActionDataUpdate("listId", "instanceId", props));
+        assertFalse(this.touchPortalPluginTest.sendActionDataUpdate("listId", "instanceId", null));
+        assertFalse(this.touchPortalPluginTest.sendActionDataUpdate(null, null, props));
+        assertFalse(this.touchPortalPluginTest.sendActionDataUpdate(null, "instanceId", null));
+        assertFalse(this.touchPortalPluginTest.sendActionDataUpdate("", "instanceId", null));
+        props.put(DataHelper.MIN_VALUE, -1);
+        assertTrue(this.touchPortalPluginTest.sendActionDataUpdate("listId", "instanceId", props));
+    }
+
+    @Test
     public void testLastStateValue() {
         String stateValue = System.currentTimeMillis() + "";
         assertTrue(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, stateValue));
@@ -408,11 +433,41 @@ public class LibraryTests {
     }
 
     @Test
-    public void testReceiveDummyWithoutDataAction() throws IOException, InterruptedException {
+    public void testReceiveDummyDummyWithJsonObject() throws IOException, InterruptedException {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
-        jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithoutData.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithJsonObject.ID);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
+    public void testReceiveDummyDummyWithTPActionMessage() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+        jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithTPActionMessage.ID);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
+    public void testReceiveDummyDummyWithParam() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+        jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithParam.ID);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage.toString());
 
@@ -442,7 +497,7 @@ public class LibraryTests {
         jsonMessageHoldUp.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
         out.println(jsonMessageHoldUp.toString());
 
-        Thread.sleep(10);
+        Thread.sleep(150);
 
         assertNull(this.touchPortalPluginTest.isActionBeingHeld(TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID));
 
@@ -555,21 +610,21 @@ public class LibraryTests {
 
     @Test
     public void testReceiveInfo() throws IOException, InterruptedException {
-        TPInfo sentTPInfo = new TPInfo();
-        sentTPInfo.status = "paired";
-        sentTPInfo.sdkVersion = 2L;
-        sentTPInfo.tpVersionString = "2.2.000";
-        sentTPInfo.tpVersionCode = 202000L;
-        sentTPInfo.pluginVersion = 1L;
-        sentTPInfo.settings = new HashMap<>();
-        sentTPInfo.settings.put("IP", "localhost");
+        TPInfoMessage sentTPInfoMessage = new TPInfoMessage();
+        sentTPInfoMessage.status = "paired";
+        sentTPInfoMessage.sdkVersion = 2L;
+        sentTPInfoMessage.tpVersionString = "2.2.000";
+        sentTPInfoMessage.tpVersionCode = 202000L;
+        sentTPInfoMessage.pluginVersion = 1L;
+        sentTPInfoMessage.settings = new HashMap<>();
+        sentTPInfoMessage.settings.put("IP", "localhost");
 
         JsonArray jsonSettings = new JsonArray();
         JsonObject jsonSettingIP = new JsonObject();
         jsonSettingIP.addProperty("IP", "localhost");
         jsonSettings.add(jsonSettingIP);
 
-        JsonObject jsonMessage = new Gson().toJsonTree(sentTPInfo).getAsJsonObject();
+        JsonObject jsonMessage = new Gson().toJsonTree(sentTPInfoMessage).getAsJsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_INFO);
         jsonMessage.add(ReceivedMessageHelper.SETTINGS, jsonSettings);
 
@@ -581,14 +636,14 @@ public class LibraryTests {
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
 
-        TPInfo receivedTPInfo = this.touchPortalPluginTest.getTPInfo();
-        assertNotNull(receivedTPInfo);
-        assertEquals(sentTPInfo.status, receivedTPInfo.status);
-        assertEquals(sentTPInfo.sdkVersion, receivedTPInfo.sdkVersion);
-        assertEquals(sentTPInfo.tpVersionCode, receivedTPInfo.tpVersionCode);
-        assertEquals(sentTPInfo.tpVersionString, receivedTPInfo.tpVersionString);
-        assertEquals(sentTPInfo.pluginVersion, receivedTPInfo.pluginVersion);
-        assertEquals(sentTPInfo.settings, receivedTPInfo.settings);
+        TPInfoMessage receivedTPInfoMessage = this.touchPortalPluginTest.getTPInfo();
+        assertNotNull(receivedTPInfoMessage);
+        assertEquals(sentTPInfoMessage.status, receivedTPInfoMessage.status);
+        assertEquals(sentTPInfoMessage.sdkVersion, receivedTPInfoMessage.sdkVersion);
+        assertEquals(sentTPInfoMessage.tpVersionCode, receivedTPInfoMessage.tpVersionCode);
+        assertEquals(sentTPInfoMessage.tpVersionString, receivedTPInfoMessage.tpVersionString);
+        assertEquals(sentTPInfoMessage.pluginVersion, receivedTPInfoMessage.pluginVersion);
+        assertEquals(sentTPInfoMessage.settings, receivedTPInfoMessage.settings);
     }
 
     @Test
@@ -604,13 +659,13 @@ public class LibraryTests {
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
 
-        TPInfo tpInfo = this.touchPortalPluginTest.getTPInfo();
-        assertNotNull(tpInfo);
-        assertNull(tpInfo.status);
-        assertNull(tpInfo.sdkVersion);
-        assertNull(tpInfo.tpVersionCode);
-        assertNull(tpInfo.tpVersionString);
-        assertNull(tpInfo.pluginVersion);
+        TPInfoMessage tpInfoMessage = this.touchPortalPluginTest.getTPInfo();
+        assertNotNull(tpInfoMessage);
+        assertNull(tpInfoMessage.status);
+        assertNull(tpInfoMessage.sdkVersion);
+        assertNull(tpInfoMessage.tpVersionCode);
+        assertNull(tpInfoMessage.tpVersionString);
+        assertNull(tpInfoMessage.pluginVersion);
     }
 
     @Test
@@ -715,11 +770,26 @@ public class LibraryTests {
     }
 
     @Test
+    public void testReceiveSettingsNoListener() throws IOException, InterruptedException {
+        this.touchPortalPluginTest.connectThenPairAndListen(null);
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_SETTINGS);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
     public void testAnnotations() {
         assertEquals(TouchPortalPluginTestConstants.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest");
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory");
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataTextAndNumber.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory.action.dummyWithDataTextAndNumber");
-        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithoutData.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory.action.dummyWithoutData");
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithJsonObject.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory.action.dummyWithJsonObject");
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory.state.customState");
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.Events.CustomState.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory.event.customState");
     }
@@ -749,17 +819,17 @@ public class LibraryTests {
 
         // Base Category Actions
         JsonArray baseCategoryActions = baseCategory.getAsJsonArray(CategoryHelper.ACTIONS);
-        assertEquals(5, baseCategoryActions.size());
+        assertEquals(7, baseCategoryActions.size());
 
         // Base Category Action DummyWithoutData
         JsonObject baseCategoryActionDummyWithoutData = baseCategoryActions.get(0).getAsJsonObject();
-        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithoutData.ID, baseCategoryActionDummyWithoutData.get(ActionHelper.ID).getAsString());
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithJsonObject.ID, baseCategoryActionDummyWithoutData.get(ActionHelper.ID).getAsString());
 
         // Base Category Action DummyWithoutData Data items
         assertFalse(baseCategoryActionDummyWithoutData.has(ActionHelper.DATA));
 
         // Base Category Action DummyWithDataTextAndNumber
-        JsonObject baseCategoryActionDummyWithData = baseCategoryActions.get(1).getAsJsonObject();
+        JsonObject baseCategoryActionDummyWithData = baseCategoryActions.get(2).getAsJsonObject();
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataTextAndNumber.ID, baseCategoryActionDummyWithData.get(ActionHelper.ID).getAsString());
 
         // Base Category Action DummyWithDataTextAndNumber Data items
@@ -771,7 +841,7 @@ public class LibraryTests {
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataTextAndNumber.Text.ID, baseCategoryActionDummyWithDataItemText.get(DataHelper.ID).getAsString());
 
         // Base Category Action dummyWithData File And Directory
-        JsonObject baseCategoryActionDummyWithDataFileAndDirectory = baseCategoryActions.get(2).getAsJsonObject();
+        JsonObject baseCategoryActionDummyWithDataFileAndDirectory = baseCategoryActions.get(3).getAsJsonObject();
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataFileAndDirectory.ID, baseCategoryActionDummyWithDataFileAndDirectory.get(ActionHelper.ID).getAsString());
 
         // Base Category Action DummyWithDataFile Data items
@@ -844,7 +914,7 @@ public class LibraryTests {
     }
 
     @Test
-    public void testOAuth2() {
+    public void testOAuth2() throws IOException {
         String host = "localhost";
         String callbackPath = "/oauth";
         int port = -1;
@@ -856,6 +926,16 @@ public class LibraryTests {
         assertEquals(host, oAuth2LocalServerReceiver.getHost());
         assertEquals(callbackPath, oAuth2LocalServerReceiver.getCallbackPath());
         assertNotEquals(port, oAuth2LocalServerReceiver.getPort());
-        oAuth2LocalServerReceiver.waitForCode(System.out::println, URI.create("https://authorization-server.com/authorize?state=" + oAuth2LocalServerReceiver.getPort()), (oAuth2Code, oAuth2Error) -> System.out.println(oAuth2Error));
+        oAuth2LocalServerReceiver.waitForCode(System.out::println, URI.create("https://authorization-server.com/authorize?state=" + oAuth2LocalServerReceiver.getPort()), (oAuth2Code, oAuth2Error) -> System.out.println("Code: " + oAuth2Code + " Error: " + oAuth2Error));
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
+
+        Call callbackOptions = okHttpClient.newCall(new Request.Builder().url("http://localhost:" + oAuth2LocalServerReceiver.getPort() + oAuth2LocalServerReceiver.getCallbackPath() + "?code=CODE").method("OPTIONS", null).build());
+        Response responseOptions = callbackOptions.execute();
+        assertTrue(responseOptions.isSuccessful());
+
+        Call callbackGet = okHttpClient.newCall(new Request.Builder().url("http://localhost:" + oAuth2LocalServerReceiver.getPort() + oAuth2LocalServerReceiver.getCallbackPath() + "?code=CODE").build());
+        Response responseGet = callbackGet.execute();
+        assertTrue(responseGet.isSuccessful());
     }
 }

@@ -333,7 +333,7 @@ public class ReceivedMessageHelper {
     public static HashMap<String, String> getSettings(JsonElement jsonSettingsElement) {
         HashMap<String, String> settings = new HashMap<>();
 
-        if (jsonSettingsElement != null) {
+        if (jsonSettingsElement != null && jsonSettingsElement.isJsonArray()) {
             JsonArray jsonSettings = jsonSettingsElement.getAsJsonArray();
             for (JsonElement jsonSettingElement : jsonSettings) {
                 JsonObject jsonSetting = jsonSettingElement.getAsJsonObject();
