@@ -724,7 +724,7 @@ public abstract class TouchPortalPlugin {
      * @param properties   HashMap&lt;String, Integer&gt;
      * @return boolean actionDataUpdateSent
      */
-    public boolean sendActionDataUpdate(String instanceId, String actionDataId, HashMap<String, Integer> properties) {
+    public boolean sendActionDataUpdate(String instanceId, String actionDataId, HashMap<String, Number> properties) {
         boolean sent = false;
 
         if (instanceId != null && !instanceId.isEmpty() && actionDataId != null && !actionDataId.isEmpty() && properties != null && !properties.isEmpty()) {

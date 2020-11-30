@@ -280,7 +280,7 @@ public class LibraryTests {
 
     @Test
     public void testSendActionDataUpdate() {
-        HashMap<String, Integer> props = new HashMap<>();
+        HashMap<String, Number> props = new HashMap<>();
         assertFalse(this.touchPortalPluginTest.sendActionDataUpdate(null, null, null));
         assertFalse(this.touchPortalPluginTest.sendActionDataUpdate("", null, null));
         assertFalse(this.touchPortalPluginTest.sendActionDataUpdate("", "", null));
