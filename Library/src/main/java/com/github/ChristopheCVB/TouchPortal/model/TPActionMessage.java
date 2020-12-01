@@ -18,7 +18,7 @@ public class TPActionMessage extends TPMessage {
     }
 
     public Object getTypedDataValue(Class<?> pluginClass, Method actionMethod, Parameter actionMethodParameter) {
-        return this.getTypedDataValue(actionMethodParameter.getType().getName(), DataHelper.getActionDataId(pluginClass, actionMethod, actionMethodParameter));
+        return this.getTypedDataValue(actionMethodParameter.getParameterizedType().getTypeName(), DataHelper.getActionDataId(pluginClass, actionMethod, actionMethodParameter));
     }
 
     public Object getTypedDataValue(String actionDataType, String actionDataId) {
