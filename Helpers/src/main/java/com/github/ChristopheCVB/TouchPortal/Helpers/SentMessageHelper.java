@@ -30,7 +30,7 @@ public class SentMessageHelper {
     public static final String TYPE_CHOICE_UPDATE = "choiceUpdate";
     public static final String TYPE_CREATE_STATE = "createState";
     public static final String TYPE_REMOVE_STATE = "removeState";
-    public static final String TYPE_ACTION_DATA_UPDATE = "actionDataUpdate";
+    public static final String TYPE_ACTION_DATA_UPDATE = "updateActionData";
     public static final String INSTANCE_ID = "instanceId";
     public static final String ID = GenericHelper.ID;
     public static final String VALUE = GenericHelper.VALUE;

@@ -733,6 +733,7 @@ public abstract class TouchPortalPlugin {
             actionDataUpdate.addProperty(SentMessageHelper.INSTANCE_ID, instanceId);
             JsonObject actionDataUpdateDataObject = new JsonObject();
             actionDataUpdateDataObject.addProperty(SentMessageHelper.ID, actionDataId);
+            actionDataUpdateDataObject.addProperty(DataHelper.TYPE, GenericHelper.TP_TYPE_NUMBER);
             for (String property : properties.keySet()) {
                 actionDataUpdateDataObject.addProperty(property, properties.get(property));
             }
