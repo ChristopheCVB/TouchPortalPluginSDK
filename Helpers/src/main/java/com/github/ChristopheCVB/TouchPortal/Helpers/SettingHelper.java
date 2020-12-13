@@ -38,6 +38,7 @@ public class SettingHelper {
     public static final String IS_PASSWORD = "isPassword";
     public static final String MIN_VALUE = "minValue";
     public static final String MAX_VALUE = "maxValue";
+    public static final String IS_READ_ONLY = "readOnly";
 
     /**
      * Get the generated Setting Name

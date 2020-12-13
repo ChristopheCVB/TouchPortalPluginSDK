@@ -196,6 +196,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         String desiredTPType = GenericHelper.getTouchPortalType(className, settingElement);
         jsonSetting.addProperty(SettingHelper.TYPE, desiredTPType);
         jsonSetting.addProperty(SettingHelper.DEFAULT, setting.defaultValue());
+        jsonSetting.addProperty(SettingHelper.IS_READ_ONLY, setting.isReadOnly());
         switch (desiredTPType) {
             case SettingHelper.TYPE_TEXT:
                 if (setting.maxLength() > 0) {

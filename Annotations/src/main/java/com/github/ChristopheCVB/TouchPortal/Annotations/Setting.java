@@ -92,4 +92,11 @@ public @interface Setting {
      * @return double maxValue
      */
     double maxValue() default Double.POSITIVE_INFINITY;
+
+    /**
+     * Setting readOnly
+     *
+     * @return boolean isReadOnly
+     */
+    boolean isReadOnly() default false;
 }
