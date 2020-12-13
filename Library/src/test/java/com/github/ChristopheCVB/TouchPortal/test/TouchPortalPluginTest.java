@@ -44,16 +44,22 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
     private String[] customState2;
 
     /**
-     * Setting definition example
+     * Setting definition example for text
      */
     @Setting(name = "IP Address", defaultValue = "localhost", maxLength = 15)
     String ipSetting = "localhost";
 
     /**
-     * Setting definition example
+     * Setting definition example for number
      */
     @Setting(defaultValue = "0", minValue = 0, maxValue = 10)
     float otherSetting = 0;
+
+    /**
+     * Setting definition example for read only text
+     */
+    @Setting(defaultValue = "This is not editable by the user", isReadOnly = true)
+    String readOnlySetting = "This is not editable by the user";
 
     /**
      * Constructor calling super

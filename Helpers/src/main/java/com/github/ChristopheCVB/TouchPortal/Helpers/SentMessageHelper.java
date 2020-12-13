@@ -31,10 +31,12 @@ public class SentMessageHelper {
     public static final String TYPE_CREATE_STATE = "createState";
     public static final String TYPE_REMOVE_STATE = "removeState";
     public static final String TYPE_ACTION_DATA_UPDATE = "updateActionData";
+    public static final String TYPE_SETTING_UPDATE = "settingUpdate";
     public static final String INSTANCE_ID = "instanceId";
     public static final String ID = GenericHelper.ID;
     public static final String VALUE = GenericHelper.VALUE;
     public static final String DATA = "data";
+    public static final String NAME = "name";
     public static final String DESCRIPTION = StateHelper.DESC;
     public static final String DEFAULT_VALUE = "defaultValue";
 }

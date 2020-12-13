@@ -747,6 +747,34 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Send a Setting Update Message to the Touch Portal Plugin System
+     *
+     * @param settingName     String
+     * @param value           String
+     * @param allowEmptyValue boolean
+     * @return boolean settingUpdateMessageSent
+     */
+    public boolean sendSettingUpdate(String settingName, String value, boolean allowEmptyValue) {
+        boolean sent = false;
+        if (settingName != null && !settingName.isEmpty() && value != null && (allowEmptyValue || !value.isEmpty())) {
+            if (this.tpInfoMessage != null && this.tpInfoMessage.settings.containsKey(settingName) && !this.tpInfoMessage.settings.get(settingName).equals(value)) {
+                JsonObject settingUpdateMessage = new JsonObject();
+                settingUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_SETTING_UPDATE);
+                JsonObject settingUpdateData = new JsonObject();
+                settingUpdateData.addProperty(SentMessageHelper.NAME, settingName);
+                settingUpdateData.addProperty(SentMessageHelper.VALUE, value);
+                settingUpdateMessage.add(SentMessageHelper.DATA, settingUpdateData);
+                sent = this.send(settingUpdateMessage);
+                if (sent) {
+                    this.tpInfoMessage.settings.put(settingName, value);
+                }
+                System.out.println("Update Setting [" + settingName + "] Sent [" + sent + "]");
+            }
+        }
+        return sent;
+    }
+
+    /**
      * Is the Plugin connected to the Touch Portal Plugin System
      *
      * @return boolean isPluginConnected

@@ -612,9 +612,9 @@ public class LibraryTests {
     public void testReceiveInfo() throws IOException, InterruptedException {
         TPInfoMessage sentTPInfoMessage = new TPInfoMessage();
         sentTPInfoMessage.status = "paired";
-        sentTPInfoMessage.sdkVersion = 2L;
-        sentTPInfoMessage.tpVersionString = "2.2.000";
-        sentTPInfoMessage.tpVersionCode = 202000L;
+        sentTPInfoMessage.sdkVersion = 3L;
+        sentTPInfoMessage.tpVersionString = "2.3.000";
+        sentTPInfoMessage.tpVersionCode = 203000L;
         sentTPInfoMessage.pluginVersion = 1L;
         sentTPInfoMessage.settings = new HashMap<>();
         sentTPInfoMessage.settings.put("IP", "localhost");
@@ -785,6 +785,50 @@ public class LibraryTests {
     }
 
     @Test
+    public void testSendSettingUpdate() throws IOException, InterruptedException {
+        assertFalse(this.touchPortalPluginTest.sendSettingUpdate("DOES NOT EXISTS", "VALUE", false));
+
+        TPInfoMessage sentTPInfoMessage = new TPInfoMessage();
+        sentTPInfoMessage.status = "paired";
+        sentTPInfoMessage.sdkVersion = 3L;
+        sentTPInfoMessage.tpVersionString = "2.3.000";
+        sentTPInfoMessage.tpVersionCode = 203000L;
+        sentTPInfoMessage.pluginVersion = 1L;
+
+        JsonArray jsonSettings = new JsonArray();
+        JsonObject jsonSettingReadOnly = new JsonObject();
+        jsonSettingReadOnly.addProperty(TouchPortalPluginTestConstants.Settings.ReadOnlySetting.NAME, TouchPortalPluginTestConstants.Settings.ReadOnlySetting.DEFAULT);
+        jsonSettings.add(jsonSettingReadOnly);
+
+        JsonObject jsonMessage = new Gson().toJsonTree(sentTPInfoMessage).getAsJsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_INFO);
+        jsonMessage.add(ReceivedMessageHelper.SETTINGS, jsonSettings);
+
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage.toString());
+
+        Thread.sleep(10);
+
+        assertFalse(this.touchPortalPluginTest.sendSettingUpdate(null, null, false));
+        assertFalse(this.touchPortalPluginTest.sendSettingUpdate("", null, false));
+        assertFalse(this.touchPortalPluginTest.sendSettingUpdate(null, "", false));
+        assertFalse(this.touchPortalPluginTest.sendSettingUpdate("", "", false));
+        assertFalse(this.touchPortalPluginTest.sendSettingUpdate("DOES NOT EXISTS", "", false));
+        assertFalse(this.touchPortalPluginTest.sendSettingUpdate("DOES NOT EXISTS", null, false));
+        assertFalse(this.touchPortalPluginTest.sendSettingUpdate("DOES NOT EXISTS", "", true));
+        assertFalse(this.touchPortalPluginTest.sendSettingUpdate("DOES NOT EXISTS", "VALUE", false));
+        assertFalse(this.touchPortalPluginTest.sendSettingUpdate("DOES NOT EXISTS", "VALUE", true));
+        assertFalse(this.touchPortalPluginTest.sendSettingUpdate(TouchPortalPluginTestConstants.Settings.ReadOnlySetting.NAME, "", false));
+        assertTrue(this.touchPortalPluginTest.sendSettingUpdate(TouchPortalPluginTestConstants.Settings.ReadOnlySetting.NAME, "", true));
+        assertTrue(this.touchPortalPluginTest.sendSettingUpdate(TouchPortalPluginTestConstants.Settings.ReadOnlySetting.NAME, "New value", false));
+        assertFalse(this.touchPortalPluginTest.sendSettingUpdate(TouchPortalPluginTestConstants.Settings.ReadOnlySetting.NAME, "New value", false));
+
+        this.touchPortalPluginTest.close(null);
+
+        assertFalse(this.touchPortalPluginTest.sendSettingUpdate(TouchPortalPluginTestConstants.Settings.ReadOnlySetting.NAME, "New value 2", false));
+    }
+
+    @Test
     public void testAnnotations() {
         assertEquals(TouchPortalPluginTestConstants.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest");
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.ID, "com.github.ChristopheCVB.TouchPortal.test.TouchPortalPluginTest.BaseCategory");
@@ -807,7 +851,7 @@ public class LibraryTests {
 
         // Settings
         assertEquals(TouchPortalPluginTestConstants.Settings.IpSetting.NAME, entry.get(PluginHelper.SETTINGS).getAsJsonArray().get(0).getAsJsonObject().get(SettingHelper.NAME).getAsString());
-        assertEquals(2, entry.get(PluginHelper.SETTINGS).getAsJsonArray().size());
+        assertEquals(3, entry.get(PluginHelper.SETTINGS).getAsJsonArray().size());
 
         // Categories
         JsonArray jsonCategories = entry.getAsJsonArray(PluginHelper.CATEGORIES);
