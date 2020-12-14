@@ -8,7 +8,7 @@
 
 This Project is an SDK to create a Touch Portal Plugin using Java or Kotlin and Gradle
 
-The Touch Portal Plugin documentation can be found [here](https://www.touch-portal.com/sdk)
+The Touch Portal Plugin documentation can be found [here](https://www.touch-portal.com/api)
 
 ## Documentation
 
