@@ -760,10 +760,8 @@ public abstract class TouchPortalPlugin {
             if (this.tpInfoMessage != null && this.tpInfoMessage.settings.containsKey(settingName) && !this.tpInfoMessage.settings.get(settingName).equals(value)) {
                 JsonObject settingUpdateMessage = new JsonObject();
                 settingUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_SETTING_UPDATE);
-                JsonObject settingUpdateData = new JsonObject();
-                settingUpdateData.addProperty(SentMessageHelper.NAME, settingName);
-                settingUpdateData.addProperty(SentMessageHelper.VALUE, value);
-                settingUpdateMessage.add(SentMessageHelper.DATA, settingUpdateData);
+                settingUpdateMessage.addProperty(SentMessageHelper.NAME, settingName);
+                settingUpdateMessage.addProperty(SentMessageHelper.VALUE, value);
                 sent = this.send(settingUpdateMessage);
                 if (sent) {
                     this.tpInfoMessage.settings.put(settingName, value);
