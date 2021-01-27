@@ -32,8 +32,15 @@ import java.net.ServerSocket;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class OAuth2LocalServerReceiver {
+    /**
+     * Logger
+     */
+    private final static Logger LOGGER = Logger.getLogger(OAuth2LocalServerReceiver.class.getName());
+
     private static final String LOCALHOST = "localhost";
     private static final String CALLBACK_PATH = "/oauth2";
 
@@ -97,7 +104,7 @@ public class OAuth2LocalServerReceiver {
             httpServer.start();
         }
         catch (IOException e) {
-            e.printStackTrace();
+            OAuth2LocalServerReceiver.LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 

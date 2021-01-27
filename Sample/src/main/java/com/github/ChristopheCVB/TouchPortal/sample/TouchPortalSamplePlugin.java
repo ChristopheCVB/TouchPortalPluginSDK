@@ -31,10 +31,16 @@ import com.github.ChristopheCVB.TouchPortal.model.TPSettingsMessage;
 import com.google.gson.JsonObject;
 
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
 @Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
 public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
+    /**
+     * Logger
+     */
+    private final static Logger LOGGER = Logger.getLogger(TouchPortalSamplePlugin.class.getName());
     private enum Categories {
         /**
          * Category definition example
@@ -81,6 +87,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
      */
     public TouchPortalSamplePlugin() {
         super(true);
+        Logger sdkLogger = Logger.getLogger(TouchPortalPlugin.class.getName());
     }
 
     public static void main(String[] args) {
@@ -91,7 +98,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
                 // Load a properties File
                 touchPortalSamplePlugin.loadProperties("plugin.config");
                 // Get a property
-                System.out.println(touchPortalSamplePlugin.getProperty("samplekey"));
+                TouchPortalSamplePlugin.LOGGER.log(Level.INFO, touchPortalSamplePlugin.getProperty("samplekey"));
                 // Set a property
                 touchPortalSamplePlugin.setProperty("samplekey", "Value set from Plugin");
                 // Store the properties
@@ -120,7 +127,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
      */
     @Action(description = "Long Description of Action Simple", format = "Do a simple action", categoryId = "BaseCategory")
     private void actionSimple() {
-        System.out.println("Action actionSimple received");
+        TouchPortalSamplePlugin.LOGGER.log(Level.INFO, "Action actionSimple received");
     }
 
     /**
@@ -130,7 +137,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
      */
     @Action(description = "Long Description of Dummy Action with Data Text", format = "Set text to {$text$}", categoryId = "BaseCategory")
     private void actionWithText(@Data String text) {
-        System.out.println("Action actionWithText received: " + text);
+        TouchPortalSamplePlugin.LOGGER.log(Level.INFO, "Action actionWithText received: " + text);
     }
 
     /**
@@ -142,7 +149,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
      */
     @Action(description = "Long Description of Action without Data", categoryId = "BaseCategory")
     private void actionWithoutData(JsonObject jsonAction) {
-        System.out.println("Action actionWithoutData received [" + jsonAction + "]");
+        TouchPortalSamplePlugin.LOGGER.log(Level.INFO, "Action actionWithoutData received [" + jsonAction + "]");
     }
 
     /**
@@ -153,7 +160,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
     @Action(description = "Long Description of Action with Choice", format = "Do action {$doActions$}", categoryId = "BaseCategory")
     private void actionWithChoice(@Data(valueChoices = {"Enable", "Disable", "Toggle"}, defaultValue = "Toggle") String[] doActions) {
         // The user selected value is passed at index 0
-        System.out.println("Action actionWithChoice received: " + doActions[0]);
+        TouchPortalSamplePlugin.LOGGER.log(Level.INFO, "Action actionWithChoice received: " + doActions[0]);
     }
 
     /**
@@ -163,7 +170,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
      */
     @Action(description = "Long Description of Action with Switch", format = "Switch to {$isOn$}", categoryId = "BaseCategory")
     private void actionWithSwitch(@Data(defaultValue = "false") boolean isOn) {
-        System.out.println("Action actionWithSwitch received: " + isOn);
+        TouchPortalSamplePlugin.LOGGER.log(Level.INFO, "Action actionWithSwitch received: " + isOn);
     }
 
     /**
@@ -173,7 +180,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
      */
     @Action(description = "Long Description of Action with File", format = "Do an action with {$file$}", categoryId = "BaseCategory")
     private void actionWithFile(@Data File file) {
-        System.out.println("Action actionWithFile received: " + file.getAbsolutePath());
+        TouchPortalSamplePlugin.LOGGER.log(Level.INFO, "Action actionWithFile received: " + file.getAbsolutePath());
     }
 
     /**
@@ -183,7 +190,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
      */
     @Action(description = "Long Description of Action with Directory", format = "Do an action with {$directory$}", categoryId = "BaseCategory")
     private void actionWithDirectory(@Data(isDirectory = true) File directory) {
-        System.out.println("Action actionWithDirectory received: " + directory.getAbsolutePath());
+        TouchPortalSamplePlugin.LOGGER.log(Level.INFO, "Action actionWithDirectory received: " + directory.getAbsolutePath());
     }
 
     /**
@@ -194,7 +201,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
      */
     @Action(description = "Long Description of Action with Numbers", format = "Do an action with {$integerValue$} and {$doubleValue$}", categoryId = "BaseCategory")
     private void actionWithNumbers(@Data(minValue = -1, maxValue = 42, defaultValue = "0") Integer integerValue, @Data Double doubleValue) {
-        System.out.println("Action actionWithNumber received: " + integerValue + " and " + doubleValue);
+        TouchPortalSamplePlugin.LOGGER.log(Level.INFO, "Action actionWithNumber received: " + integerValue + " and " + doubleValue);
     }
 
     /**
@@ -204,7 +211,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
      */
     @Action(description = "Long Description of Action with Color", format = "Do an action with {$color$}", categoryId = "BaseCategory")
     private void actionWithColor(@Data(defaultValue = "#00000000", isColor = true) String color) {
-        System.out.println("Action actionWithColor received: " + color);
+        TouchPortalSamplePlugin.LOGGER.log(Level.INFO, "Action actionWithColor received: " + color);
     }
 
     @Action(name = "Hold Me!", hasHoldFunctionality = true, categoryId = "BaseCategory")
@@ -213,7 +220,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
         if (isHeld != null) {
             // Action is triggered by a Hold
             while (isHeld != null && isHeld) {
-                System.out.println("actionHoldable has been triggered by a HOLD");
+                TouchPortalSamplePlugin.LOGGER.log(Level.INFO, "actionHoldable has been triggered by a HOLD");
                 try {
                     Thread.sleep(100);
                 }
@@ -223,7 +230,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
         }
         else {
             // Action is triggered by a Press
-            System.out.println("actionHoldable has been triggered by a Press");
+            TouchPortalSamplePlugin.LOGGER.log(Level.INFO, "actionHoldable has been triggered by a Press");
         }
     }
 

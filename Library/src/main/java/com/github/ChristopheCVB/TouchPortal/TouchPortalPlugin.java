@@ -43,6 +43,8 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This is the class you need to extend in order to create a Touch Portal Plugin
@@ -50,6 +52,10 @@ import java.util.concurrent.Executors;
  * @see <a href="https://www.touch-portal.com/sdk/index.php">Documentation: Touch Portal SDK</a>
  */
 public abstract class TouchPortalPlugin {
+    /**
+     * Logger
+     */
+    private final static Logger LOGGER = Logger.getLogger(TouchPortalPlugin.class.getName());
     /**
      * Touch Portal Plugin SDK Version
      */
@@ -315,13 +321,13 @@ public abstract class TouchPortalPlugin {
                                 }
                             }
                             catch (Exception e) {
-                                e.printStackTrace();
+                                TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Action method could not be invoked", e);
                             }
                         });
                         called = true;
                     }
                     catch (ActionMethodDataParameterException e) {
-                        e.printStackTrace();
+                        TouchPortalPlugin.LOGGER.log(Level.WARNING, e.getMessage(), e);
                     }
                     break;
                 }
@@ -341,7 +347,7 @@ public abstract class TouchPortalPlugin {
         pairingMessage.addProperty(SentMessageHelper.ID, PluginHelper.getPluginId(this.pluginClass));
 
         boolean paired = this.send(pairingMessage);
-        System.out.println("Pairing Message Sent");
+        TouchPortalPlugin.LOGGER.log(Level.INFO, "Pairing Message Sent");
 
         return paired;
     }
@@ -364,7 +370,7 @@ public abstract class TouchPortalPlugin {
      * @param exception Exception
      */
     public synchronized void close(Exception exception) {
-        System.out.println("Closing" + (exception != null ? " because " + exception.getMessage() : ""));
+        TouchPortalPlugin.LOGGER.log(Level.INFO, "Closing" + (exception != null ? " because " + exception.getMessage() : ""));
 
         if (this.touchPortalSocket != null) {
             this.storeProperties();
@@ -407,7 +413,7 @@ public abstract class TouchPortalPlugin {
      * @return boolean pluginIsConnectedAndPaired
      */
     private boolean connectThenPair() {
-        System.out.println("connectingAndPairing");
+        TouchPortalPlugin.LOGGER.log(Level.INFO, "connectingAndPairing");
         boolean connectedAndPaired = this.isConnected();
 
         if (!connectedAndPaired) {
@@ -427,7 +433,7 @@ public abstract class TouchPortalPlugin {
      * @return boolean Started listening
      */
     private boolean listen() {
-        System.out.println("Start listening");
+        TouchPortalPlugin.LOGGER.log(Level.INFO, "Start listening");
         if (this.listenerThread == null) {
             this.listenerThread = this.createListenerThread();
         }
@@ -532,7 +538,7 @@ public abstract class TouchPortalPlugin {
                 if (sent) {
                     this.currentChoices.put(listId, values);
                 }
-                System.out.println("Update Choices [" + listId + "] Sent [" + sent + "]");
+                TouchPortalPlugin.LOGGER.log(Level.INFO, "Update Choices [" + listId + "] Sent [" + sent + "]");
             }
         }
 
@@ -601,7 +607,7 @@ public abstract class TouchPortalPlugin {
                 if (sent) {
                     this.currentChoices.put(choiceKey, values);
                 }
-                System.out.println("Update Specific Choices [" + choiceId + "] Sent [" + sent + "]");
+                TouchPortalPlugin.LOGGER.log(Level.INFO, "Update Specific Choices [" + choiceId + "] Sent [" + sent + "]");
             }
         }
         return sent;
@@ -654,7 +660,7 @@ public abstract class TouchPortalPlugin {
                 if (sent) {
                     this.currentStates.put(stateId, valueStr);
                 }
-                System.out.println("Update State [" + stateId + "] Sent [" + sent + "]");
+                TouchPortalPlugin.LOGGER.log(Level.INFO, "Update State [" + stateId + "] Sent [" + sent + "]");
             }
         }
         return sent;
@@ -684,7 +690,7 @@ public abstract class TouchPortalPlugin {
                 if (sent) {
                     this.currentStates.put(stateId, valueStr);
                 }
-                System.out.println("Create State [" + stateId + "] Sent [" + sent + "]");
+                TouchPortalPlugin.LOGGER.info("Create State [" + stateId + "] Sent [" + sent + "]");
             }
             else {
                 sent = this.sendStateUpdate(stateId, value, true);
@@ -711,7 +717,7 @@ public abstract class TouchPortalPlugin {
             if (sent) {
                 this.currentStates.remove(stateId);
             }
-            System.out.println("Remove State [" + stateId + "] Sent [" + sent + "]");
+            TouchPortalPlugin.LOGGER.log(Level.INFO, "Remove State [" + stateId + "] Sent [" + sent + "]");
         }
         return sent;
     }
@@ -740,7 +746,7 @@ public abstract class TouchPortalPlugin {
             actionDataUpdate.add(SentMessageHelper.DATA, actionDataUpdateDataObject);
 
             sent = this.send(actionDataUpdate);
-            System.out.println("Action Data Update [" + actionDataId + "] Sent [" + sent + "]");
+            TouchPortalPlugin.LOGGER.log(Level.INFO, "Action Data Update [" + actionDataId + "] Sent [" + sent + "]");
         }
 
         return sent;
@@ -766,7 +772,7 @@ public abstract class TouchPortalPlugin {
                 if (sent) {
                     this.tpInfoMessage.settings.put(settingName, value);
                 }
-                System.out.println("Update Setting [" + settingName + "] Sent [" + sent + "]");
+                TouchPortalPlugin.LOGGER.log(Level.INFO, "Update Setting [" + settingName + "] Sent [" + sent + "]");
             }
         }
         return sent;
@@ -965,7 +971,7 @@ public abstract class TouchPortalPlugin {
             }
         }
         catch (IllegalArgumentException | IOException exception) {
-            System.out.println("Check Update failed: " + exception.getMessage());
+            TouchPortalPlugin.LOGGER.log(Level.WARNING, "Check Update failed: " + exception.getMessage());
         }
         finally {
             if (cloudPropertiesStream != null) {
