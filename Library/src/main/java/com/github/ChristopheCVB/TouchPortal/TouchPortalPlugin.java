@@ -49,7 +49,7 @@ import java.util.logging.*;
 /**
  * This is the class you need to extend in order to create a Touch Portal Plugin
  *
- * @see <a href="https://www.touch-portal.com/api/index.php">Documentation: Touch Portal api</a>
+ * @see <a href="https://www.touch-portal.com/api/index.php">Documentation: Touch Portal API</a>
  */
 public abstract class TouchPortalPlugin {
     /**
