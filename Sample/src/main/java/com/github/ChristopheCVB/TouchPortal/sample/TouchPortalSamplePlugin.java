@@ -31,8 +31,8 @@ import com.github.ChristopheCVB.TouchPortal.model.TPSettingsMessage;
 import com.google.gson.JsonObject;
 
 import java.io.File;
-import java.util.Date;
-import java.util.logging.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
 @Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
