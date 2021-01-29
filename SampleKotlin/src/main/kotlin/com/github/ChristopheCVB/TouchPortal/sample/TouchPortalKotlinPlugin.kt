@@ -17,10 +17,12 @@ import kotlin.system.exitProcess
 @Suppress("unused")
 @Plugin(version = 4100, colorDark = "#556677", colorLight = "#112233")
 class TouchPortalKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPlugin(parallelizeActions), TouchPortalPlugin.TouchPortalPluginListener {
+
     /**
      * Logger
      */
-    private val LOGGER = Logger.getLogger(TouchPortalKotlinPlugin::class.java.name)
+    private val LOGGER = Logger.getLogger(TouchPortalPlugin::class.java.name)
+
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {

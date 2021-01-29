@@ -39,12 +39,12 @@ import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 /**
  * This is the class you need to extend in order to create a Touch Portal Plugin
@@ -72,6 +72,25 @@ public abstract class TouchPortalPlugin {
      * Plugin Version Property Key
      */
     private static final String KEY_PLUGIN_VERSION = "plugin.version";
+
+    static {
+        LOGGER.setUseParentHandlers(false);
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setFormatter(new SimpleFormatter() {
+            private static final String format = "[%1$-7s] %2$s %3$s %n";
+
+            @Override
+            public synchronized String format(LogRecord lr) {
+                String[] path =  lr.getSourceClassName().split("\\.");
+                return String.format(format,
+                        lr.getLevel().getLocalizedName(),
+                        path[path.length - 1] + "." + lr.getSourceMethodName(),
+                        lr.getMessage()
+                );
+            }
+        });
+        LOGGER.addHandler(handler);
+    }
 
     /**
      * Actual Plugin Class

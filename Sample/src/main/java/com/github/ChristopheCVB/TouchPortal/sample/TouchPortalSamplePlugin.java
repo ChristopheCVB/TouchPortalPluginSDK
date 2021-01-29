@@ -31,8 +31,8 @@ import com.github.ChristopheCVB.TouchPortal.model.TPSettingsMessage;
 import com.google.gson.JsonObject;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Date;
+import java.util.logging.*;
 
 @SuppressWarnings("unused")
 @Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
@@ -40,7 +40,8 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
     /**
      * Logger
      */
-    private final static Logger LOGGER = Logger.getLogger(TouchPortalSamplePlugin.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(TouchPortalPlugin.class.getName());
+
     private enum Categories {
         /**
          * Category definition example
@@ -87,7 +88,8 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
      */
     public TouchPortalSamplePlugin() {
         super(true);
-        Logger sdkLogger = Logger.getLogger(TouchPortalPlugin.class.getName());
+//        Logger sdkLogger = Logger.getLogger(TouchPortalPlugin.class.getName());
+//        sdkLogger.setLevel(Level.ALL);
     }
 
     public static void main(String[] args) {
