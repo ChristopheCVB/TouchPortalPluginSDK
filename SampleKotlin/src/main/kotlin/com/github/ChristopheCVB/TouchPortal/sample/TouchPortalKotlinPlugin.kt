@@ -10,11 +10,19 @@ import com.github.ChristopheCVB.TouchPortal.model.TPInfoMessage
 import com.github.ChristopheCVB.TouchPortal.model.TPListChangeMessage
 import com.github.ChristopheCVB.TouchPortal.model.TPSettingsMessage
 import com.google.gson.JsonObject
+import java.util.logging.Level
+import java.util.logging.Logger
 import kotlin.system.exitProcess
 
 @Suppress("unused")
 @Plugin(version = 4100, colorDark = "#556677", colorLight = "#112233")
 class TouchPortalKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPlugin(parallelizeActions), TouchPortalPlugin.TouchPortalPluginListener {
+
+    /**
+     * Logger
+     */
+    private val LOGGER = Logger.getLogger(TouchPortalPlugin::class.java.name)
+
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
@@ -42,7 +50,7 @@ class TouchPortalKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPlugin(p
 
     @Action(description = "Log Current Time Millis", categoryId = "BaseCategory")
     fun logTime() {
-        println(System.currentTimeMillis())
+        LOGGER.log(Level.INFO, System.currentTimeMillis().toString())
     }
 
     override fun onDisconnected(exception: Exception?) {

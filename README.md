@@ -29,6 +29,11 @@ Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 ```java
 public class MyTouchPortalPlugin extends TouchPortalPlugin {
     /**
+     * Logger
+     */
+    private final static Logger LOGGER = Logger.getLogger(TouchPortalPlugin.class.getName());
+    
+    /**
      * Constructor calling super
      */
     public MyTouchPortalPlugin() {
@@ -93,7 +98,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
      */
     @Action(description = "Long Description of Dummy Action with Data", format = "Set text to {$text$}", categoryId = "BaseCategory")
     private void dummyWithData(@Data String text) {
-        System.out.println("Action dummyWithData received: " + text);
+        LOGGER.log(Level.Info, "Action dummyWithData received: " + text);
     }
     private enum Categories {
         /**
