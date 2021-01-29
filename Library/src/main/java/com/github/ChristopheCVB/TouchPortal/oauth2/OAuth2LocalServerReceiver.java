@@ -22,6 +22,7 @@
 
 package com.github.ChristopheCVB.TouchPortal.oauth2;
 
+import com.github.ChristopheCVB.TouchPortal.TouchPortalPlugin;
 import com.sun.net.httpserver.HttpServer;
 
 import java.awt.*;
@@ -39,7 +40,7 @@ public class OAuth2LocalServerReceiver {
     /**
      * Logger
      */
-    private final static Logger LOGGER = Logger.getLogger(OAuth2LocalServerReceiver.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(TouchPortalPlugin.class.getName());
 
     private static final String LOCALHOST = "localhost";
     private static final String CALLBACK_PATH = "/oauth2";

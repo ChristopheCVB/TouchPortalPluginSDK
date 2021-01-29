@@ -49,7 +49,7 @@ import java.util.logging.*;
 /**
  * This is the class you need to extend in order to create a Touch Portal Plugin
  *
- * @see <a href="https://www.touch-portal.com/sdk/index.php">Documentation: Touch Portal SDK</a>
+ * @see <a href="https://www.touch-portal.com/api/index.php">Documentation: Touch Portal api</a>
  */
 public abstract class TouchPortalPlugin {
     /**
@@ -75,21 +75,7 @@ public abstract class TouchPortalPlugin {
 
     static {
         LOGGER.setUseParentHandlers(false);
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setFormatter(new SimpleFormatter() {
-            private static final String format = "[%1$-7s] %2$s %3$s %n";
-
-            @Override
-            public synchronized String format(LogRecord lr) {
-                String[] path =  lr.getSourceClassName().split("\\.");
-                return String.format(format,
-                        lr.getLevel().getLocalizedName(),
-                        path[path.length - 1] + "." + lr.getSourceMethodName(),
-                        lr.getMessage()
-                );
-            }
-        });
-        LOGGER.addHandler(handler);
+        LOGGER.addHandler(new CustomConsoleHandler());
     }
 
     /**
@@ -1073,6 +1059,28 @@ public abstract class TouchPortalPlugin {
          */
         public ActionMethodDataParameterException(Method method, Parameter parameter) {
             super("Impossible to retrieve Action Data Item for Method [" + method.getName() + "] and parameter [" + parameter.getName() + "]");
+        }
+    }
+    /**
+     * Custom ConsoleHandler
+     */
+    private static class CustomConsoleHandler extends ConsoleHandler {
+        public CustomConsoleHandler() {
+            super();
+            setFormatter(new SimpleFormatter() {
+                private static final String format = "[%1$-7s] %2$s %3$s %n";
+
+                @Override
+                public synchronized String format(LogRecord lr) {
+                    String[] path =  lr.getSourceClassName().split("\\.");
+                    return String.format(format,
+                            lr.getLevel().getLocalizedName(),
+                            path[path.length - 1] + "." + lr.getSourceMethodName(),
+                            lr.getMessage()
+                    );
+                }
+            });
+            setOutputStream(System.out);
         }
     }
 }
