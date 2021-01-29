@@ -88,8 +88,6 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
      */
     public TouchPortalSamplePlugin() {
         super(true);
-//        Logger sdkLogger = Logger.getLogger(TouchPortalPlugin.class.getName());
-//        sdkLogger.setLevel(Level.ALL);
     }
 
     public static void main(String[] args) {
