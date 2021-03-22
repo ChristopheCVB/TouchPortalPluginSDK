@@ -84,6 +84,12 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
     private int updateDelaySetting;
 
     /**
+     * Setting of type String and is read only definition example
+     */
+    @Setting(name = "Read Only", defaultValue = "Disconnected", isReadOnly = true)
+    private String readOnly = "Disconnected";
+
+    /**
      * Constructor calling super
      */
     public TouchPortalSamplePlugin() {
@@ -261,6 +267,7 @@ public class TouchPortalSamplePlugin extends TouchPortalPlugin implements TouchP
 
     @Override
     public void onInfo(TPInfoMessage tpInfoMessage) {
+        this.sendSettingUpdate(TouchPortalSamplePluginConstants.Settings.ReadOnly.NAME, "Connected at " + System.currentTimeMillis(), false);
     }
 
     @Override
