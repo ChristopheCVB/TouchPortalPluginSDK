@@ -16,7 +16,7 @@ Once you have cloned this project, you can run the `gradlew javaDoc` and browse 
 
 ## Releases
 
-Latest version is 5.0.0
+Latest version is 6.0.0
 
 Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 
@@ -52,7 +52,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
     }
 
     @Override
-    public void onDisconnect(Exception exception) {
+    public void onDisconnected(Exception exception) {
         // Socket connection is lost or plugin has received close message
         if (exception != null) {
             exception.printStackTrace();
@@ -61,7 +61,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
     }
 
     @Override
-    public void onReceive(JsonObject jsonMessage) {
+    public void onReceived(JsonObject jsonMessage) {
         // Check if ReceiveMessage is an Action
         if (ReceivedMessageHelper.isTypeAction(jsonMessage)) {
             // Get the Action ID
@@ -77,6 +77,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
         // dummyWithData and dummySwitchAction are automatically called by the SDK
     }
 
+    //...
 }
 ```
 - Edit the properties `mainClassPackage` and `mainClassSimpleName` in your `build.gradle`
@@ -100,6 +101,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
     private void dummyWithData(@Data String text) {
         LOGGER.log(Level.Info, "Action dummyWithData received: " + text);
     }
+
     private enum Categories {
         /**
          * Category definition example
@@ -108,6 +110,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
         BaseCategory
     }
 
+    //...
 }
 ```
 - Add the Plugin icon into the following directory `src/main/resources/` of your module
