@@ -78,6 +78,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         annotations.add(State.class.getCanonicalName());
         annotations.add(Event.class.getCanonicalName());
         annotations.add(Category.class.getCanonicalName());
+        annotations.add(Setting.class.getCanonicalName());
         return annotations;
     }
 
