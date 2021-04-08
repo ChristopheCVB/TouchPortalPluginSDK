@@ -1018,7 +1018,7 @@ public abstract class TouchPortalPlugin {
         void onReceived(JsonObject jsonMessage);
 
         /**
-         * Called when the Info Message is received
+         * Called when the Info Message is received when Touch Portal confirms our initial connection is successful
          *
          * @param tpInfoMessage {@link TPInfoMessage}
          */

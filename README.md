@@ -6,9 +6,10 @@
 [![Library Code Coverage](https://codecov.io/gh/ChristopheCVB/TouchPortalPluginSDK/branch/master/graph/badge.svg)](https://codecov.io/gh/ChristopheCVB/TouchPortalPluginSDK)
 [![Language gradle: Java](https://img.shields.io/lgtm/grade/java/g/ChristopheCVB/TouchPortalPluginSDK.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ChristopheCVB/TouchPortalPluginSDK/context:java)
 
-This Project is an SDK to create a Touch Portal Plugin using Java or Kotlin and Gradle
+This Project is an SDK to create a Touch Portal Plugin using Java or Kotlin and Gradle.
+This SDK is a COMPLETE solution which will not only help you connect to communicate with TouchPortal through Actions, Events and States, but it will also help you with the hazzle of packaging  
 
-The Touch Portal Plugin documentation can be found [here](https://www.touch-portal.com/api)
+For further reference, the Touch Portal Plugin documentation can be found [here](https://www.touch-portal.com/api)
 
 ## Documentation
 
@@ -23,11 +24,16 @@ Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 ## Get Started
 
 - Clone/Download/Fork this project
-- Create a new Gradle Java Module (i.e. `MyTPPlugin`)
-- Copy the `build.gradle` from the `Sample` module to your new module and remove unnecessary dependencies
-- Create a class, in the package you chose, extending `TouchPortalPlugin` (i.e. `MyTouchPortalPlugin extends TouchPortalPlugin`) like the example below:
+- Create a new Gradle Java Module
+    - Create a root level folder (i.e. `MyTPPlugin`)
+    - Add an 'include' line pointing to this new folder/module on the settings.gradle file (consider commenting out the Sample and SampleKotlin for faster build times)
+- Copy the `build.gradle` from the `Sample` module to your new module
+    - Edit the properties `versionMajor`, `versionMinor`, `versionPatch`, `mainClassPackage` and `mainClassSimpleName`
+    - Remove unnecessary dependencies
+- Create a class, in the package you chose, extending `TouchPortalPlugin` and implementing `TouchPortalPlugin.TouchPortalPluginListener` (i.e. `MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener`) like the example below:
+
 ```java
-public class MyTouchPortalPlugin extends TouchPortalPlugin {
+public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
     /**
      * Logger
      */
@@ -45,22 +51,71 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
             if (PluginHelper.COMMAND_START.equals(args[0])) {
                 // Initialize your Plugin
                 MyTouchPortalPlugin myTouchPortalPlugin = new MyTouchPortalPlugin();
-                // Initiate the connection with the Touch Portal Plugin System
+                // Initiate the connection with the Touch Portal Plugin System (will trigger an onInfo message with a confirmation from TouchPortal and the initial settings)
                 boolean connectedPairedAndListening = myTouchPortalPlugin.connectThenPairAndListen(myTouchPortalPlugin);
             }
         }
     }
 
-    @Override
-    public void onDisconnected(Exception exception) {
-        // Socket connection is lost or plugin has received close message
-        if (exception != null) {
-            exception.printStackTrace();
-        }
-        System.exit(0);
-    }
+    /**
+     * Called when the Socket connection is lost or the plugin has received the close Message
+     */
+    public void onDisconnected(Exception exception) {  }
 
-    @Override
+    /**
+     * Called when receiving a message from the Touch Portal Plugin System
+     */
+    public void onReceived(JsonObject jsonMessage) { }
+
+    /**
+     * Called when the Info Message is received when Touch Portal confirms our initial connection is successful
+     */
+    public void onInfo(TPInfoMessage tpInfoMessage) { }
+
+    /**
+     * Called when a List Change Message is received
+     */
+    public void onListChanged(TPListChangeMessage tpListChangeMessage) { }
+
+    /**
+     * Called when a Broadcast Message is received
+     */
+    public void onBroadcast(TPBroadcastMessage tpBroadcastMessage) { }
+
+    /**
+     * Called when a Settings Message is received
+     */
+    public void onSettings(TPSettingsMessage tpSettingsMessage) { }
+}
+```
+
+## Development and Interaction
+
+- The SDK will automatically callback your action methods if they only contain a `@Data` annotated parameter
+
+```java
+public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
+    // ...
+
+    /**
+     * Action example with a Data Text parameter
+     *
+     * @param text String
+     */
+    @Action(description = "Long Description of Dummy Action with Data Text", format = "Set text to {$text$}", categoryId = "BaseCategory")
+    private void actionWithText(@Data String text) {
+        TouchPortalSamplePlugin.LOGGER.log(Level.INFO, "Action actionWithText received: " + text);
+    }
+    
+    // ...
+}
+```
+
+- Otherwise, call your actions manually in the `onReceive(JsonObject jsonMessage)` method
+
+```java
+public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
+    // ...
     public void onReceived(JsonObject jsonMessage) {
         // Check if ReceiveMessage is an Action
         if (ReceivedMessageHelper.isTypeAction(jsonMessage)) {
@@ -74,15 +129,46 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
                 }
             }
         }
-        // dummyWithData and dummySwitchAction are automatically called by the SDK
     }
-
     //...
 }
 ```
-- Edit the properties `mainClassPackage` and `mainClassSimpleName` in your `build.gradle`
-- Implement the interface methods
-- Generating the `entry.tp` file using Annotations (More examples can be found in the Sample module)
+
+- Don't forget to initialize all your services once you receive the OnInfo event. The TPInfoMessage will also contain the initial values of your settings.
+
+```java
+public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
+    // ...
+    public void onInfo(TPInfoMessage tpInfoMessage) {
+        // tpInfoMessage will contain the initial settings stored by TP
+        // continue plugin initialization
+    }
+}
+```
+
+- Finally, send notifications back to TouchPortal once you update your states
+
+```java
+public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
+    // ...
+    @State(defaultValue = "Default Value", categoryId = "SecondCategory")
+    private String customStateText;
+  
+    @Action(description = "Long Description of Dummy Action with Data Text", format = "Set text to {$text$}", categoryId = "BaseCategory")
+    private void actionWithText(@Data String text) {
+      // ... do something then update state
+      this.customStateText = "new state value";
+      this.sendStateUpdate(MyTouchPortalPlugin.BaseCategory.States.CustomStateText.ID, this.customStateText, true);
+    }
+}
+```
+
+## Use 'annotations' to help you package your plugin
+
+- The provided Annotations help you in the automatic generation of the `entry.tp` file (necessary for packaging and deployment of your plugin)
+- Current supported annotations include: Action, Category, Data, Event, Plugin, Setting and State
+- More examples can be found in the Sample module...
+
 ```java
 package com.github.ChristopheCVB.TouchPortal.sample;
 
@@ -102,6 +188,13 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
         LOGGER.log(Level.Info, "Action dummyWithData received: " + text);
     }
 
+    /**
+     * State and Event definition example
+     */
+    @State(defaultValue = "1", categoryId = "BaseCategory")
+    @Event(valueChoices = {"1", "2"}, format = "When customStateWithEvent becomes $val")
+    private String customStateWithEvent;
+
     private enum Categories {
         /**
          * Category definition example
@@ -113,16 +206,20 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
     //...
 }
 ```
-- Add the Plugin icon into the following directory `src/main/resources/` of your module
-- If your declared Methods only contain `@Data` annotated parameter, it will be called automatically by the SDK, otherwise call your actions in the `onReceive(JsonObject jsonMessage)` method
+
+## Prepackaging
+
+- Add the Plugin icon and extra resources into the `src/main/resources/` directory of your module
 
 ## Build
 
-Use the common `gradlew clean` task to clean your build directories.
+- Use the common `gradlew clean` task to clean your build directories.
+- Use the common `gradlew build` task to build your project with the Annotations. 
+- Use the `gradlew packagePlugin` task to pack your plugin into a `.tpp` file. Output files will be in your module `build/plugin` directory.
 
-Use the common `gradlew build` task to build your project with the Annotations.
+## Debugging tips
 
-Use the `gradlew packagePlugin` task to pack your plugin into a `.tpp` file. Output files will be in your module `build/plugin` directory.
+- A clean Touch Portal installation won't accept plugin connections by default. You need to install your plugin first on TouchPortal to 'jumpstart' the Plugin listening service.
 
 ## ROADMAP
 
