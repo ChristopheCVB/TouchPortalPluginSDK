@@ -91,7 +91,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
 
 ## Development and Interaction
 
-- The SDK will automatically callback your action methods if they only contain a `@Data` annotated parameter
+- The SDK will automatically callback your action methods if they only contain `@Data` annotated parameters
 
 ```java
 public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
@@ -146,7 +146,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
 }
 ```
 
-- Finally, send notifications back to TouchPortal once you update your states
+- Finally, send messages back to TouchPortal when you want to update your states
 
 ```java
 public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
@@ -158,15 +158,15 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
     private void actionWithText(@Data String text) {
       // ... do something then update state
       this.customStateText = "new state value";
-      this.sendStateUpdate(MyTouchPortalPlugin.BaseCategory.States.CustomStateText.ID, this.customStateText, true);
+      this.sendStateUpdate(MyTouchPortalPluginConstants.BaseCategory.States.CustomStateText.ID, this.customStateText, true);
     }
 }
 ```
 
-## Use 'annotations' to help you package your plugin
+## Use Annotations to describe your plugin and package it
 
 - The provided Annotations help you in the automatic generation of the `entry.tp` file (necessary for packaging and deployment of your plugin)
-- Current supported annotations include: Action, Category, Data, Event, Plugin, Setting and State
+- Current supported annotations include: Plugin, Category, Action, Data, State, Event and Setting
 - More examples can be found in the Sample module...
 
 ```java
