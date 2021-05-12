@@ -31,10 +31,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import okhttp3.Call;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -358,7 +355,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -373,7 +370,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, "");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -398,7 +395,7 @@ public class LibraryTests {
         data.add(numberDataItem);
         jsonMessage.add(ActionHelper.DATA, data);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -424,7 +421,7 @@ public class LibraryTests {
         data.add(directoryDataItem);
         jsonMessage.add(ActionHelper.DATA, data);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -439,7 +436,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithJsonObject.ID);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -454,7 +451,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithTPActionMessage.ID);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -469,7 +466,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithParam.ID);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -485,7 +482,7 @@ public class LibraryTests {
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_HOLD_DOWN);
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
-        out.println(jsonMessageHoldDown.toString());
+        out.println(jsonMessageHoldDown);
 
         Thread.sleep(150);
 
@@ -495,7 +492,7 @@ public class LibraryTests {
         jsonMessageHoldUp.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessageHoldUp.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_HOLD_UP);
         jsonMessageHoldUp.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
-        out.println(jsonMessageHoldUp.toString());
+        out.println(jsonMessageHoldUp);
 
         Thread.sleep(150);
 
@@ -513,7 +510,7 @@ public class LibraryTests {
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
-        out.println(jsonMessageHoldDown.toString());
+        out.println(jsonMessageHoldDown);
 
         Thread.sleep(10);
 
@@ -529,7 +526,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_LIST_CHANGE);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -544,7 +541,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_LIST_CHANGE);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -559,7 +556,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -573,7 +570,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, "falsePluginId");
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -586,7 +583,7 @@ public class LibraryTests {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -600,7 +597,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, "unknown");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -629,7 +626,7 @@ public class LibraryTests {
         jsonMessage.add(ReceivedMessageHelper.SETTINGS, jsonSettings);
 
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -652,7 +649,7 @@ public class LibraryTests {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_INFO);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -674,7 +671,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_CLOSE_PLUGIN);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         // Wait for the listenerThread to catch up
         Thread.sleep(10);
@@ -727,7 +724,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.EVENT, ReceivedMessageHelper.EVENT_PAGE_CHANGE);
         jsonMessage.addProperty(ReceivedMessageHelper.PAGE_NAME, "Page ONE");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
     }
 
     @Test
@@ -736,7 +733,7 @@ public class LibraryTests {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_BROADCAST);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
     }
 
     @Test
@@ -758,7 +755,7 @@ public class LibraryTests {
         jsonMessage.add(ReceivedMessageHelper.VALUES, jsonSettings);
 
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -776,7 +773,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_SETTINGS);
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -805,7 +802,7 @@ public class LibraryTests {
         jsonMessage.add(ReceivedMessageHelper.SETTINGS, jsonSettings);
 
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
-        out.println(jsonMessage.toString());
+        out.println(jsonMessage);
 
         Thread.sleep(10);
 
@@ -974,11 +971,17 @@ public class LibraryTests {
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
 
-        Call callbackOptions = okHttpClient.newCall(new Request.Builder().url("http://localhost:" + oAuth2LocalServerReceiver.getPort() + oAuth2LocalServerReceiver.getCallbackPath() + "?code=CODE").method("OPTIONS", null).build());
+        String callbackUrl = "http://localhost:" + oAuth2LocalServerReceiver.getPort() + oAuth2LocalServerReceiver.getCallbackPath() + "?code=CODE&state";
+
+        Call callbackOptions = okHttpClient.newCall(new Request.Builder().url(callbackUrl).method("OPTIONS", null).build());
         Response responseOptions = callbackOptions.execute();
         assertTrue(responseOptions.isSuccessful());
 
-        Call callbackGet = okHttpClient.newCall(new Request.Builder().url("http://localhost:" + oAuth2LocalServerReceiver.getPort() + oAuth2LocalServerReceiver.getCallbackPath() + "?code=CODE").build());
+        Call callbackPatch = okHttpClient.newCall(new Request.Builder().url(callbackUrl).method("PATCH", RequestBody.create("", null)).build());
+        Response responsePatch = callbackPatch.execute();
+        assertFalse(responsePatch.isSuccessful());
+
+        Call callbackGet = okHttpClient.newCall(new Request.Builder().url(callbackUrl).build());
         Response responseGet = callbackGet.execute();
         assertTrue(responseGet.isSuccessful());
     }
