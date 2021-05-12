@@ -950,8 +950,8 @@ public class LibraryTests {
     @Test
     public void testIsUpdateAvailable() {
         assertFalse(this.touchPortalPluginTest.isUpdateAvailable("", 0));
-        assertFalse(this.touchPortalPluginTest.isUpdateAvailable("https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/Library/src/test/resources/TouchPortalPluginTest/plugin.config", 1));
-        assertTrue(this.touchPortalPluginTest.isUpdateAvailable("https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/Library/src/test/resources/TouchPortalPluginTest/plugin.config", 0));
+        assertFalse(this.touchPortalPluginTest.isUpdateAvailable("https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/Library/src/test/resources/TouchPortalPluginTest/plugin.config", 1)); // Uses plugin.version
+        assertTrue(this.touchPortalPluginTest.isUpdateAvailable("https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/Library/src/test/resources/TouchPortalPluginTest/plugin.config", 0)); // Uses plugin.version
     }
 
     @Test
