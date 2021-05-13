@@ -1,6 +1,17 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+    }
+}
+
 plugins {
     id 'java-library'
 }
+
+apply plugin: 'com.bmuschko.nexus'
 
 def versionMajor = 7
 def versionMinor = 0
@@ -8,6 +19,51 @@ def versionPatch = 0
 
 group 'com.christophecvb.touchportal'
 version "${versionMajor}.${versionMinor}.${versionPatch}"
+
+modifyPom {
+    project {
+        name 'Touch Portal Plgin SDK'
+        description 'This Project is an SDK to create a Touch Portal Plugin using Java or Kotlin and Gradle'
+        url 'https://github.com/ChristopheCVB/TouchPortalPluginSDK'
+        inceptionYear '2020'
+
+        artifactId 'plugin-sdk'
+
+        scm {
+            url 'https://github.com/ChristopheCVB/TouchPortalPluginSDK'
+            connection 'scm:https://github.com/ChristopheCVB/TouchPortalPluginSDK.git'
+            developerConnection 'scm:git://github.com/ChristopheCVB/TouchPortalPluginSDK.git'
+        }
+
+        licenses {
+            license {
+                name 'GNU General Public License v3.0'
+                url 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+                distribution 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id 'ChristopheCVB'
+                name 'Christophe Carvalho Vilas-Boas'
+                email 'christophe.carvalhovilasboas@gmail.com'
+            }
+        }
+    }
+}
+
+extraArchive {
+    sources = true
+    tests = true
+    javadoc = true
+}
+
+nexus {
+    sign = true
+    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+    snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+}
 
 dependencies {
     api project(':Annotations')
