@@ -7,7 +7,7 @@ buildscript {
 }
 plugins {
     id 'java'
-    id 'de.fuerstenau.buildconfig' version '1.1.8'
+    id 'com.github.gmazzo.buildconfig' version '3.0.0'
 }
 
 def versionMajor = 7
@@ -20,13 +20,11 @@ group mainClassPackage
 version "${versionMajor}.${versionMinor}.${versionPatch}"
 
 buildConfig {
-    appName = project.name
-    version = project.version
-
-    clsName = 'BuildConfig'
     packageName = project.group
 
-    buildConfigField 'int', 'VERSION_CODE', (versionMajor * 1000 + versionMinor * 100 + versionPatch) + ''
+    buildConfigField 'String', 'NAME', "\"${project.name}\""
+    buildConfigField 'String', 'VERSION_NAME', "\"${project.version}\""
+    buildConfigField 'long', 'VERSION_CODE', (versionMajor * 1000 + versionMinor * 100 + versionPatch) + ''
 }
 
 dependencies {

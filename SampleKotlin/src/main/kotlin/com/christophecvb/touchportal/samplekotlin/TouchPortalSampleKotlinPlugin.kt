@@ -5,6 +5,7 @@ import com.christophecvb.touchportal.annotations.Category
 import com.christophecvb.touchportal.annotations.Plugin
 import com.christophecvb.touchportal.helpers.PluginHelper
 import com.christophecvb.touchportal.TouchPortalPlugin
+import com.christophecvb.touchportal.annotations.Data
 import com.christophecvb.touchportal.model.TPBroadcastMessage
 import com.christophecvb.touchportal.model.TPInfoMessage
 import com.christophecvb.touchportal.model.TPListChangeMessage
@@ -15,15 +16,15 @@ import java.util.logging.Logger
 import kotlin.system.exitProcess
 
 @Suppress("unused")
-@Plugin(version = 4100, colorDark = "#556677", colorLight = "#112233")
+@Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#556677", colorLight = "#112233")
 class TouchPortalSampleKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPlugin(parallelizeActions), TouchPortalPlugin.TouchPortalPluginListener {
 
-    /**
-     * Logger
-     */
-    private val LOGGER = Logger.getLogger(TouchPortalPlugin::class.java.name)
-
     companion object {
+        /**
+         * Logger
+         */
+        private val LOGGER = Logger.getLogger(TouchPortalPlugin::class.java.name)
+
         @JvmStatic
         fun main(args: Array<String>) {
             if (args.size == 1) {
@@ -36,6 +37,7 @@ class TouchPortalSampleKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPl
                     @Suppress("ControlFlowWithEmptyBody")
                     if (connectedPairedAndListening) {
                         // Let's go!
+                        LOGGER.log(Level.INFO, "Plugin with ID[${TouchPortalSampleKotlinPluginConstants.ID}] Connected and Paired!")
                     }
                 }
             }
@@ -48,9 +50,14 @@ class TouchPortalSampleKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPl
         BaseCategory
     }
 
-    @Action(description = "Log Current Time Millis", categoryId = "BaseCategory")
+    @Action(name = "Log Current Time Millis", categoryId = "BaseCategory")
     fun logTime() {
         LOGGER.log(Level.INFO, System.currentTimeMillis().toString())
+    }
+
+    @Action(name = "Action with Text", format = "Action with {\$text\$}", categoryId = "BaseCategory")
+    fun actionWithText(@Data text: String) {
+        LOGGER.log(Level.INFO, text)
     }
 
     override fun onDisconnected(exception: Exception?) {
