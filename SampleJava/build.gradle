@@ -30,7 +30,7 @@ buildConfig {
 }
 
 dependencies {
-    compile project(':Library')
+    implementation project(':Library')
 
     annotationProcessor project(':Library')
 
@@ -42,12 +42,16 @@ compileJava {
 }
 
 jar {
+    dependsOn configurations.runtimeClasspath
+
     manifest {
         attributes 'Implementation-Title': "${mainClassSimpleName}",
                 'Implementation-Version': "${project.version}",
                 'Main-Class': "${mainClassPackage}.${mainClassSimpleName}"
     }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
 }
 
 task copyResources(type: Copy) {
