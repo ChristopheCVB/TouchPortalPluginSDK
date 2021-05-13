@@ -3,6 +3,6 @@ include 'Annotations'
 include 'Helpers'
 include 'AnnotationsProcessor'
 include 'Library'
-include 'Sample'
+include 'SampleJava'
 include 'SampleKotlin'
 

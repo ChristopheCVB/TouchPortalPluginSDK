@@ -2,11 +2,11 @@ plugins {
     id 'java-library'
 }
 
-def versionMajor = 6
+def versionMajor = 7
 def versionMinor = 0
 def versionPatch = 0
 
-group 'com.github.ChristopheCVB.TouchPortal.Annotations'
+group 'com.christophecvb.touchportal.annotations'
 version "${versionMajor}.${versionMinor}.${versionPatch}"
 
 dependencies {
