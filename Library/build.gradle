@@ -55,15 +55,20 @@ publishing {
 
     repositories {
         maven {
-            url = version.endsWith('SNAPSHOT') ? 'https://oss.sonatype.org/content/repositories/snapshots/' : 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+//            url = version.endsWith('SNAPSHOT') ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/' : 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            credentials {
+                username = findProperty('nexusUsername')
+                password = findProperty('nexusPassword')
+            }
         }
     }
 }
 
-
-signing {
-    sign publishing.publications.mavenJava
-}
+// TODO
+//signing {
+//    sign publishing.publications.mavenJava
+//}
 
 javadoc {
     if(JavaVersion.current().isJava9Compatible()) {
