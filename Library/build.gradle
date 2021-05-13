@@ -1,5 +1,8 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+    id 'jacoco'
 }
 
 def versionMajor = 7
@@ -7,7 +10,66 @@ def versionMinor = 0
 def versionPatch = 0
 
 group 'com.christophecvb.touchportal'
+def myArtifactId = 'plugin-sdk'
 version "${versionMajor}.${versionMinor}.${versionPatch}"
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId myArtifactId
+            from components.java
+            pom {
+                name = 'Touch Portal Plugin SDK'
+                description = 'This Project is an SDK to create a Touch Portal Plugin using Java or Kotlin and Gradle'
+                url = 'https://github.com/ChristopheCVB/TouchPortalPluginSDK'
+                inceptionYear = '2020'
+
+                scm {
+                    url = 'https://github.com/ChristopheCVB/TouchPortalPluginSDK'
+                    connection = 'scm:https://github.com/ChristopheCVB/TouchPortalPluginSDK.git'
+                    developerConnection = 'scm:git://github.com/ChristopheCVB/TouchPortalPluginSDK.git'
+                }
+
+                licenses {
+                    license {
+                        name = 'GNU General Public License v3.0'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'ChristopheCVB'
+                        name = 'Christophe Carvalho Vilas-Boas'
+                        email = 'christophe.carvalhovilasboas@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url = version.endsWith('SNAPSHOT') ? 'https://oss.sonatype.org/content/repositories/snapshots/' : 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+        }
+    }
+}
+
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
 
 dependencies {
     api project(':Annotations')
@@ -27,8 +89,6 @@ compileTestJava {
 }
 
 test.workingDir = new File("./src/test/resources/TouchPortalPluginTest/")
-
-apply plugin: 'jacoco'
 
 jacocoTestReport {
     reports {
