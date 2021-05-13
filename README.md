@@ -27,7 +27,7 @@ Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 - Create a new Gradle Java Module
     - Create a root level folder (i.e. `MyTPPlugin`)
     - Add an 'include' line pointing to this new folder/module on the settings.gradle file (consider commenting out the Sample and SampleKotlin for faster build times)
-- Copy the `build.gradle` from the `Sample` module to your new module
+- Copy the `build.gradle` from the `SampleJava` or `SampleKotlin` module to your new module
     - Edit the properties `versionMajor`, `versionMinor`, `versionPatch`, `mainClassPackage` and `mainClassSimpleName`
     - Remove unnecessary dependencies
 - Create a class, in the package you chose, extending `TouchPortalPlugin` and implementing `TouchPortalPlugin.TouchPortalPluginListener` (i.e. `MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener`) like the example below:
@@ -111,11 +111,12 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
 }
 ```
 
-- Otherwise, call your actions manually in the `onReceive(JsonObject jsonMessage)` method
+- Otherwise, call your actions manually in the `onReceived(JsonObject jsonMessage)` method
 
 ```java
 public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
     // ...
+  
     public void onReceived(JsonObject jsonMessage) {
         // Check if ReceiveMessage is an Action
         if (ReceivedMessageHelper.isTypeAction(jsonMessage)) {
@@ -130,6 +131,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
             }
         }
     }
+    
     //...
 }
 ```
@@ -139,10 +141,15 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
 ```java
 public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
     // ...
+  
     public void onInfo(TPInfoMessage tpInfoMessage) {
-        // tpInfoMessage will contain the initial settings stored by TP
+        // TPInfoMessage will contain the initial settings stored by TP
+        // -> Note that your annotated Settings fields will be up to date
+      
         // continue plugin initialization
     }
+    
+    // ...
 }
 ```
 
@@ -151,6 +158,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
 ```java
 public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
     // ...
+  
     @State(defaultValue = "Default Value", categoryId = "SecondCategory")
     private String customStateText;
   
@@ -160,6 +168,8 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
       this.customStateText = "new state value";
       this.sendStateUpdate(MyTouchPortalPluginConstants.BaseCategory.States.CustomStateText.ID, this.customStateText, true);
     }
+    
+    // ...
 }
 ```
 
@@ -170,9 +180,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
 - More examples can be found in the Sample module...
 
 ```java
-package com.github.ChristopheCVB.TouchPortal.sample;
-
-// import ...
+// imports ...
 
 @Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "My Touch Portal Plugin")
 public class MyTouchPortalPlugin extends TouchPortalPlugin {
@@ -219,7 +227,18 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
 
 ## Debugging tips
 
-- A clean Touch Portal installation won't accept plugin connections by default. You need to install your plugin first on TouchPortal to 'jumpstart' the Plugin listening service.
+- A clean Touch Portal installation won't accept plugin connections by default. You need to install your plugin first on TouchPortal to 'jumpstart' the Plugin listening service and then restart Touch Portal.
+- Using IntelliJ, you can also create a Configuration to start and debug the plugin right from the IDE
+  - Run > Edit Configurations
+  - Add New Configuration (`+`)
+  - Select Application
+    - Name: `TPP Start`
+    - Module: `Java 8 (1.8)`
+    - ClassPath Module (`-cp`): `YourModule.main`
+    - Main Class: `your.package.YourTouchPortalPlugin`
+    - Arguments: `start`
+    - Working Directory: `YourModule/build/plugin/YourTouchPortalPlugin`
+[![Touch Portal Plugin SDK Gradle Application Configuration](https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/resources/TP%20Plugin%20SDK%20Gradle%20Application%20Configuration.png)](#debugging-tips)
 
 ## ROADMAP
 

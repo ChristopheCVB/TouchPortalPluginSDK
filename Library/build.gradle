@@ -6,7 +6,7 @@ def versionMajor = 6
 def versionMinor = 0
 def versionPatch = 0
 
-group 'com.github.ChristopheCVB.TouchPortal'
+group 'com.christophecvb.touchportal'
 version "${versionMajor}.${versionMinor}.${versionPatch}"
 
 dependencies {
