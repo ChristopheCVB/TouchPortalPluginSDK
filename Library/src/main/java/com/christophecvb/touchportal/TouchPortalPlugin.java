@@ -908,9 +908,10 @@ public abstract class TouchPortalPlugin {
      *
      * @param pluginConfigURL   String - The URL of the properties file
      * @param pluginVersionCode long - Current Plugin Version Code
+     * @return boolean isUpdateAvailable
      */
     public boolean isUpdateAvailable(String pluginConfigURL, long pluginVersionCode) {
-        boolean updateAvailable = false;
+        boolean isUpdateAvailable = false;
 
         InputStream cloudPropertiesStream = null;
         try {
@@ -923,7 +924,7 @@ public abstract class TouchPortalPlugin {
                 if (responseBody != null) {
                     cloudProperties.load(cloudPropertiesStream = responseBody.byteStream());
                     long lastPluginVersion = Long.parseLong(cloudProperties.getProperty(TouchPortalPlugin.KEY_PLUGIN_VERSION));
-                    updateAvailable = lastPluginVersion > pluginVersionCode;
+                    isUpdateAvailable = lastPluginVersion > pluginVersionCode;
                     responseBody.close();
                 }
             }
@@ -940,7 +941,7 @@ public abstract class TouchPortalPlugin {
             }
         }
 
-        return updateAvailable;
+        return isUpdateAvailable;
     }
 
     /**
