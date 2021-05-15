@@ -17,20 +17,32 @@ Once you have cloned this project, you can run the `gradlew javaDoc` and browse 
 
 ## Releases
 
-Latest version is 6.0.0
+Latest is 6.0.0
 
 Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 
+### Maven Central
+
+Latest version is `7.0.0-alpha-1`
+
+Add this to your module to get started:
+```groovy
+dependencies {
+    implementation 'com.christophecvb.touchportal:plugin-sdk:VERSION'
+
+    annotationProcessor 'com.christophecvb.touchportal:plugin-sdk-annotations-processor:VERSION'
+}
+```
+
+Prior versions were not published to Maven Central
+
 ## Get Started
 
-- Clone/Download/Fork this project
-- Create a new Gradle Java Module
-    - Create a root level folder (i.e. `MyTPPlugin`)
-    - Add an 'include' line pointing to this new folder/module on the settings.gradle file (consider commenting out the Sample and SampleKotlin for faster build times)
+- Create a new Gradle Java Project
 - Copy the `build.gradle` from the `SampleJava` or `SampleKotlin` module to your new module
     - Edit the properties `versionMajor`, `versionMinor`, `versionPatch`, `mainClassPackage` and `mainClassSimpleName`
-    - Remove unnecessary dependencies
-- Create a class, in the package you chose, extending `TouchPortalPlugin` and implementing `TouchPortalPlugin.TouchPortalPluginListener` (i.e. `MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener`) like the example below:
+    - Replace the dependencies to get the latest Maven Central one
+- Create a class (`mainClassSimpleName`'s value), in the package you chose (`mainClassPackage`'s value), extending `TouchPortalPlugin` and implementing `TouchPortalPlugin.TouchPortalPluginListener` (i.e. `MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener`) like the example below:
 
 ```java
 public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
@@ -43,10 +55,10 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
      * Constructor calling super
      */
     public MyTouchPortalPlugin() {
-        super(true);
+        super(true);// true is for paralleling Actions executions
     }
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         if (args != null && args.length == 1) {
             if (PluginHelper.COMMAND_START.equals(args[0])) {
                 // Initialize your Plugin
@@ -136,7 +148,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
 }
 ```
 
-- Don't forget to initialize all your services once you receive the OnInfo event. The TPInfoMessage will also contain the initial values of your settings.
+- Don't forget to initialize all your services once you receive the onInfo event. The TPInfoMessage will also contain the initial values of your settings.
 
 ```java
 public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
@@ -144,7 +156,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
   
     public void onInfo(TPInfoMessage tpInfoMessage) {
         // TPInfoMessage will contain the initial settings stored by TP
-        // -> Note that your annotated Settings fields will be up to date
+        // -> Note that your annotated Settings fields will be up to date at this point
       
         // continue plugin initialization
     }
@@ -177,10 +189,10 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
 
 - The provided Annotations help you in the automatic generation of the `entry.tp` file (necessary for packaging and deployment of your plugin)
 - Current supported annotations include: Plugin, Category, Action, Data, State, Event and Setting
-- More examples can be found in the Sample module...
+- More examples can be found in the sample modules
 
 ```java
-// imports ...
+// ...
 
 @Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "My Touch Portal Plugin")
 public class MyTouchPortalPlugin extends TouchPortalPlugin {
