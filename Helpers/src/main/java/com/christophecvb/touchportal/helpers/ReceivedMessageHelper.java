@@ -328,7 +328,7 @@ public class ReceivedMessageHelper {
      * Retrieve the Settings from a received Message
      *
      * @param jsonSettingsElement JsonElement
-     * @return HashMap<String, String> settings
+     * @return HashMap&lt;String, String&gt; settings
      */
     public static HashMap<String, String> getSettings(JsonElement jsonSettingsElement) {
         HashMap<String, String> settings = new HashMap<>();
