@@ -30,9 +30,7 @@ buildConfig {
 dependencies {
     implementation project(':Library')
 
-    annotationProcessor project(':Library')
-
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    annotationProcessor project(':AnnotationsProcessor')
 }
 
 compileJava {

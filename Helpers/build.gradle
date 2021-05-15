@@ -1,17 +1,79 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
+    id 'signing'
 }
 
 def versionMajor = 7
 def versionMinor = 0
 def versionPatch = 0
 
-group 'com.christopheCcvb.touchportal.helpers'
-version "${versionMajor}.${versionMinor}.${versionPatch}"
+group 'com.christophecvb.touchportal'
+def localArchiveBaseName = 'plugin-sdk-helpers'
+version "${versionMajor}.${versionMinor}.${versionPatch}" + (isAlpha ? '-alpha-' + alphaVersion : '') + (isSnapshot ? '-SNAPSHOT' : '')
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = localArchiveBaseName
+            from components.java
+            pom {
+                name = 'Touch Portal Plugin SDK Helpers'
+                description = 'This Project is an SDK to create a Touch Portal Plugin using Java or Kotlin and Gradle'
+                url = 'https://github.com/ChristopheCVB/TouchPortalPluginSDK'
+                inceptionYear = '2020'
+
+                scm {
+                    url = 'https://github.com/ChristopheCVB/TouchPortalPluginSDK'
+                    connection = 'scm:https://github.com/ChristopheCVB/TouchPortalPluginSDK.git'
+                    developerConnection = 'scm:git://github.com/ChristopheCVB/TouchPortalPluginSDK.git'
+                }
+
+                licenses {
+                    license {
+                        name = 'GNU General Public License v3.0'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'ChristopheCVB'
+                        name = 'Christophe Carvalho Vilas-Boas'
+                        email = 'christophe.carvalhovilasboas@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url = version.endsWith('SNAPSHOT') ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/' : 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            credentials {
+                username = findProperty('nexusUsername')
+                password = findProperty('nexusPassword')
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
 
 dependencies {
     api group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
     api project(':Annotations')
-
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }

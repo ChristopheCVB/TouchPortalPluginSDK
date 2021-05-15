@@ -10,8 +10,8 @@ def versionMinor = 0
 def versionPatch = 0
 
 group 'com.christophecvb.touchportal'
-def myArtifactId = 'plugin-sdk'
-version "${versionMajor}.${versionMinor}.${versionPatch}"
+def localArchiveBaseName = 'plugin-sdk'
+version "${versionMajor}.${versionMinor}.${versionPatch}" + (isAlpha ? '-alpha-' + alphaVersion : '') + (isSnapshot ? '-SNAPSHOT' : '')
 
 java {
     withJavadocJar()
@@ -21,7 +21,7 @@ java {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId myArtifactId
+            artifactId = localArchiveBaseName
             from components.java
             pom {
                 name = 'Touch Portal Plugin SDK'
@@ -77,7 +77,6 @@ javadoc {
 dependencies {
     api project(':Annotations')
     api project(':Helpers')
-    api project(':AnnotationsProcessor')
 
     api group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
 

@@ -3,3 +3,7 @@ allprojects {
         mavenCentral()
     }
 }
+
+ext.isSnapshot = false
+ext.isAlpha = true
+ext.alphaVersion = 1
