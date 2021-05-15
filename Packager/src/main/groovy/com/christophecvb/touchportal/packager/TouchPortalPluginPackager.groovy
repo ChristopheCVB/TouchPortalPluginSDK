@@ -9,7 +9,6 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.jvm.tasks.Jar
 
 class TouchPortalPluginPackager implements Plugin<Project> {
-
     @Override
     void apply(Project project) {
         def extension = project.extensions.create('tpPlugin', TouchPortalPluginPackagerExtension)
@@ -35,7 +34,7 @@ class TouchPortalPluginPackager implements Plugin<Project> {
         }
 
         def copyResources = project.tasks.register('copyResources', Copy) {
-            group 'Touch Portal Plugin'
+            group = 'Touch Portal Plugin'
             from(project.file("${project.buildDir}/resources/main/"))
             into("${project.buildDir}/plugin/${extension.mainClassSimpleName.get()}/")
 
@@ -45,7 +44,7 @@ class TouchPortalPluginPackager implements Plugin<Project> {
         }
 
         def copyJar = project.tasks.register('copyJar', Copy) {
-            group 'Touch Portal Plugin'
+            group = 'Touch Portal Plugin'
             dependsOn project.jar
             from(project.file("${project.buildDir}/libs/"))
             into("${project.buildDir}/plugin/${extension.mainClassSimpleName.get()}/")
@@ -59,7 +58,7 @@ class TouchPortalPluginPackager implements Plugin<Project> {
         }
 
         def copyGeneratedResources = project.tasks.register('copyGeneratedResources', Copy) {
-            group 'Touch Portal Plugin'
+            group = 'Touch Portal Plugin'
             dependsOn copyJar
             from(project.file("${project.buildDir}/generated/sources/annotationProcessor/java/main/resources/"))
             into("${project.buildDir}/plugin/${extension.mainClassSimpleName.get()}/")
@@ -70,8 +69,8 @@ class TouchPortalPluginPackager implements Plugin<Project> {
         }
 
         def packagePlugin = project.tasks.register('packagePlugin', Zip) {
-            group 'Touch Portal Plugin'
-            description 'Package the Project into a TPP'
+            group = 'Touch Portal Plugin'
+            description = 'Package the Project into a TPP'
             dependsOn copyResources, copyGeneratedResources
 
             archiveFileName = "${extension.mainClassSimpleName.get()}.tpp"
@@ -84,25 +83,6 @@ class TouchPortalPluginPackager implements Plugin<Project> {
                 println 'Plugin Packaged'
             }
         }
-
-//        project.tasks {
-//
-//            task packagePlugin(type: Zip) {
-//                group 'Touch Portal Plugin'
-//                description 'Package the Project into a TPP'
-//                dependsOn copyResources, copyGeneratedResources, copyJar
-//
-//                archiveFileName = "${mainClassSimpleName}.tpp"
-//                destinationDirectory = file("$buildDir/plugin")
-//                from "$buildDir/plugin/"
-//                exclude "*.tpp"
-//                includeEmptyDirs = false
-//
-//                doLast {
-//                    println 'Plugin Packaged'
-//                }
-//            }
-//        }
     }
 }
 
