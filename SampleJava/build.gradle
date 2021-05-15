@@ -1,14 +1,20 @@
 buildscript {
     repositories {
+        mavenLocal()
         maven {
             url 'https://plugins.gradle.org/m2/'
         }
+    }
+    dependencies {
+        classpath 'com.christophecvb.touchportal:Packager:7.0.0'
     }
 }
 plugins {
     id 'java'
     id 'com.github.gmazzo.buildconfig' version '3.0.0'
 }
+
+apply plugin: 'com.christophecvb.touchportal.Packager'
 
 def versionMajor = 7
 def versionMinor = 0
@@ -18,6 +24,8 @@ def mainClassSimpleName = 'TouchPortalSampleJavaPlugin'
 def mainClassPackage = 'com.christophecvb.touchportal.samplejava'
 group mainClassPackage
 version "${versionMajor}.${versionMinor}.${versionPatch}"
+
+tpPlugin.mainClassSimpleName = mainClassSimpleName
 
 buildConfig {
     packageName = project.group
@@ -31,69 +39,4 @@ dependencies {
     implementation project(':Library')
 
     annotationProcessor project(':AnnotationsProcessor')
-}
-
-compileJava {
-    options.compilerArgs.add('-parameters')
-}
-
-jar {
-    dependsOn configurations.runtimeClasspath
-
-    manifest {
-        attributes 'Implementation-Title': "${mainClassSimpleName}",
-                'Implementation-Version': "${project.version}",
-                'Main-Class': "${mainClassPackage}.${mainClassSimpleName}"
-    }
-    from {
-        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
-    }
-}
-
-task copyResources(type: Copy) {
-    from(file("$buildDir/resources/main/"))
-    into("$buildDir/plugin/${mainClassSimpleName}/")
-
-    doLast {
-        println 'Resources Copied into plugin directory'
-    }
-}
-
-task copyJar(type: Copy) {
-    dependsOn jar
-    from(file("$buildDir/libs/"))
-    into("$buildDir/plugin/${mainClassSimpleName}/")
-    rename {
-        "${mainClassSimpleName}.jar"
-    }
-
-    doLast {
-        println 'Jar Copied into plugin directory'
-    }
-}
-
-task copyGeneratedResources(type: Copy) {
-    dependsOn copyJar
-    from(file("$buildDir/generated/sources/annotationProcessor/java/main/resources/"))
-    into("$buildDir/plugin/${mainClassSimpleName}/")
-
-    doLast {
-        println 'Generated Resources Copied into plugin directory'
-    }
-}
-
-task packagePlugin(type: Zip) {
-    dependsOn copyResources, copyGeneratedResources, copyJar
-    group 'Touch Portal - Plugin'
-    description 'Package the Project into a TPP'
-
-    archiveFileName = "${mainClassSimpleName}.tpp"
-    destinationDirectory = file("$buildDir/plugin")
-    from "$buildDir/plugin/"
-    exclude "*.tpp"
-    includeEmptyDirs = false
-
-    doLast {
-        println 'Plugin Packaged'
-    }
 }

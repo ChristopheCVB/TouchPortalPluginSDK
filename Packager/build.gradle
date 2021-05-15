@@ -1,0 +1,29 @@
+plugins {
+    id 'groovy'
+    id 'groovy-gradle-plugin'
+    id 'maven-publish'
+}
+
+def versionMajor = 7
+def versionMinor = 0
+def versionPatch = 0
+
+group 'com.christophecvb.touchportal'
+version "${versionMajor}.${versionMinor}.${versionPatch}"
+
+dependencies {
+    implementation 'org.codehaus.groovy:groovy-all:3.0.5'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+gradlePlugin {
+    plugins {
+        simplePlugin {
+            id = 'com.christophecvb.touchportal.Packager'
+            implementationClass = 'com.christophecvb.touchportal.packager.TouchPortalPluginPackager'
+        }
+    }
+}
