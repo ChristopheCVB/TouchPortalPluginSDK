@@ -1,29 +1,30 @@
 buildscript {
     repositories {
+        //mavenCentral()
+        //maven {
+        //    url 'https://s01.oss.sonatype.org/content/repositories/releases/'
+        //}
         mavenLocal()
         maven {
             url 'https://plugins.gradle.org/m2/'
         }
     }
     dependencies {
-        classpath 'com.christophecvb.touchportal:Packager:1.0.0'
+        classpath 'com.christophecvb.touchportal:plugin-packager:7.0.0-alpha-3'
     }
 }
+
 plugins {
     id 'java'
     id 'com.github.gmazzo.buildconfig' version '3.0.0'
 }
 
-apply plugin: 'com.christophecvb.touchportal.packager'
-
-def versionMajor = 7
-def versionMinor = 0
-def versionPatch = 0
+apply plugin: 'com.christophecvb.touchportal.plugin-packager'
 
 def mainClassSimpleName = 'TouchPortalSampleJavaPlugin'
 def mainClassPackage = 'com.christophecvb.touchportal.samplejava'
 group mainClassPackage
-version "${versionMajor}.${versionMinor}.${versionPatch}"
+version versionName
 
 tpPlugin.mainClassSimpleName = mainClassSimpleName
 
@@ -31,8 +32,8 @@ buildConfig {
     packageName = project.group
 
     buildConfigField 'String', 'NAME', "\"${project.name}\""
-    buildConfigField 'String', 'VERSION_NAME', "\"${project.version}\""
-    buildConfigField 'long', 'VERSION_CODE', (versionMajor * 1000 + versionMinor * 100 + versionPatch) + ''
+    buildConfigField 'String', 'VERSION_NAME', "\"${versionName}\""
+    buildConfigField 'long', 'VERSION_CODE', versionCode + ''
 }
 
 dependencies {

@@ -4,13 +4,9 @@ plugins {
     id 'signing'
 }
 
-def versionMajor = 7
-def versionMinor = 0
-def versionPatch = 0
-
 group 'com.christophecvb.touchportal'
 def localArchiveBaseName = 'plugin-sdk-annotations-processor'
-version "${versionMajor}.${versionMinor}.${versionPatch}" + (isAlpha ? '-alpha-' + alphaVersion : '') + (isSnapshot ? '-SNAPSHOT' : '')
+version versionName
 
 java {
     withJavadocJar()

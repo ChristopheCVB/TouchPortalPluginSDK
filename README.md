@@ -23,7 +23,7 @@ Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 
 ### Maven Central
 
-Latest version is `7.0.0-alpha-1`
+Latest version is `7.0.0-alpha-3`
 
 Add this to your module to get started:
 ```groovy

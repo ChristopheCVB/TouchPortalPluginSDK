@@ -4,6 +4,13 @@ allprojects {
     }
 }
 
+ext.versionMajor = 7
+ext.versionMinor = 0
+ext.versionPatch = 0
+
 ext.isSnapshot = false
 ext.isAlpha = true
-ext.alphaVersion = 1
+ext.alphaVersion = 3
+
+ext.versionCode = versionMajor * 1000 + versionMinor * 100 + versionPatch
+ext.versionName = "${versionMajor}.${versionMinor}.${versionPatch}" + (isAlpha ? '-alpha-' + alphaVersion : '') + (isSnapshot ? '-SNAPSHOT' : '')
