@@ -1,3 +1,19 @@
+buildscript {
+    repositories {
+        //mavenCentral()
+        //maven {
+        //    url 'https://s01.oss.sonatype.org/content/repositories/releases/'
+        //}
+        mavenLocal()
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+    dependencies {
+        classpath 'com.christophecvb.touchportal:plugin-packager:7.0.0-alpha-3'
+    }
+}
+
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.5.0'
     id 'org.jetbrains.kotlin.kapt' version '1.5.0'
@@ -5,14 +21,14 @@ plugins {
     id 'com.github.gmazzo.buildconfig' version '3.0.0'
 }
 
-def versionMajor = 7
-def versionMinor = 0
-def versionPatch = 0
+apply plugin: 'com.christophecvb.touchportal.plugin-packager'
 
 def mainClassSimpleName = 'TouchPortalSampleKotlinPlugin'
 def mainClassPackage = 'com.christophecvb.touchportal.samplekotlin'
 group mainClassPackage
-version "${versionMajor}.${versionMinor}.${versionPatch}"
+version versionName
+
+tpPlugin.mainClassSimpleName = mainClassSimpleName
 
 buildConfig {
     packageName = project.group
@@ -20,8 +36,8 @@ buildConfig {
     useKotlinOutput()
 
     buildConfigField 'String', 'NAME', "\"${project.name}\""
-    buildConfigField 'String', 'VERSION_NAME', "\"${project.version}\""
-    buildConfigField 'long', 'VERSION_CODE', (versionMajor * 1000 + versionMinor * 100 + versionPatch) + ''
+    buildConfigField 'String', 'VERSION_NAME', "\"${versionName}\""
+    buildConfigField 'long', 'VERSION_CODE', versionCode + ''
 }
 
 dependencies {
@@ -30,75 +46,4 @@ dependencies {
     implementation project(':Library')
 
     kapt project(':AnnotationsProcessor')
-}
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = '1.8'
-        freeCompilerArgs += '-java-parameters'
-    }
-}
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-jar {
-    dependsOn configurations.runtimeClasspath
-
-    manifest {
-        attributes 'Implementation-Title': "${mainClassSimpleName}",
-                'Implementation-Version': "${project.version}",
-                'Main-Class': "${mainClassPackage}.${mainClassSimpleName}"
-    }
-    from {
-        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
-    }
-}
-
-task copyResources(type: Copy) {
-    from(file("$buildDir/resources/main/"))
-    into("$buildDir/plugin/${mainClassSimpleName}/")
-
-    doLast {
-        println 'Resources Copied into plugin directory'
-    }
-}
-
-task copyJar(type: Copy) {
-    dependsOn jar
-    from(file("$buildDir/libs/"))
-    into("$buildDir/plugin/${mainClassSimpleName}/")
-    rename {
-        "${mainClassSimpleName}.jar"
-    }
-
-    doLast {
-        println 'Jar Copied into plugin directory'
-    }
-}
-
-task copyGeneratedResources(type: Copy) {
-    dependsOn copyJar
-    from(file("$buildDir/generated/source/kapt/main/resources/"))
-    into("$buildDir/plugin/${mainClassSimpleName}/")
-
-    doLast {
-        println 'Generated Resources Copied into plugin directory'
-    }
-}
-
-task packagePlugin(type: Zip) {
-    dependsOn copyResources, copyGeneratedResources, copyJar
-    group 'Touch Portal - Plugin'
-    description 'Package the Project into a TPP'
-
-    archiveFileName = "${mainClassSimpleName}.tpp"
-    destinationDirectory = file("$buildDir/plugin")
-    from "$buildDir/plugin/"
-    exclude "*.tpp"
-    includeEmptyDirs = false
-
-    doLast {
-        println 'Plugin Packaged'
-    }
 }

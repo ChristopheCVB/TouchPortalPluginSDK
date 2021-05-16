@@ -5,13 +5,9 @@ plugins {
     id 'jacoco'
 }
 
-def versionMajor = 7
-def versionMinor = 0
-def versionPatch = 0
-
 group 'com.christophecvb.touchportal'
 def localArchiveBaseName = 'plugin-sdk'
-version "${versionMajor}.${versionMinor}.${versionPatch}" + (isAlpha ? '-alpha-' + alphaVersion : '') + (isSnapshot ? '-SNAPSHOT' : '')
+version versionName
 
 java {
     withJavadocJar()

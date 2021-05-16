@@ -1,12 +1,31 @@
 plugins {
-    id 'java-library'
+    id 'groovy-gradle-plugin'
+    id 'com.gradle.plugin-publish' version '0.14.0'
     id 'maven-publish'
     id 'signing'
 }
 
 group 'com.christophecvb.touchportal'
-def localArchiveBaseName = 'plugin-sdk-annotations-processor'
+def localArchiveBaseName = 'plugin-packager'
 version versionName
+
+pluginBundle {
+    website = 'https://github.com/ChristopheCVB/TouchPortalPluginSDK'
+    vcsUrl = 'https://github.com/ChristopheCVB/TouchPortalPluginSDK'
+    description = 'Touch Portal Plugin Packager - Use with Touch Portal Plugin SDK'
+    tags = ['touchportal', 'packager']
+}
+
+gradlePlugin {
+    plugins {
+        packagerPlugin {
+            displayName = 'Touch Portal Plugin SDK Packager'
+            id = group + '.' + localArchiveBaseName
+            implementationClass = 'com.christophecvb.touchportal.packager.TouchPortalPluginPackager'
+            description = 'Touch Portal Plugin Packager - Use with Touch Portal Plugin SDK'
+        }
+    }
+}
 
 java {
     withJavadocJar()
@@ -15,11 +34,10 @@ java {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        withType(MavenPublication) {
             artifactId = localArchiveBaseName
-            from components.java
             pom {
-                name = 'Touch Portal Plugin SDK Annotations Processor'
+                name = 'Touch Portal Plugin SDK Packager'
                 description = 'This Project is an SDK to create a Touch Portal Plugin using Java or Kotlin and Gradle'
                 url = 'https://github.com/ChristopheCVB/TouchPortalPluginSDK'
                 inceptionYear = '2020'
@@ -60,21 +78,11 @@ publishing {
 }
 
 signing {
-    sign publishing.publications.mavenJava
+    sign publishing.publications
 }
 
 javadoc {
     if(JavaVersion.current().isJava9Compatible()) {
         options.addBooleanOption('html5', true)
     }
-}
-
-dependencies {
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
-    implementation 'com.google.auto.service:auto-service:1.0-rc7'
-    implementation group: 'com.squareup', name: 'javapoet', version: '1.12.1'
-    implementation project(':Annotations')
-    implementation project(':Helpers')
-
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }

@@ -5,4 +5,5 @@ include 'AnnotationsProcessor'
 include 'Library'
 include 'SampleJava'
 include 'SampleKotlin'
+include 'Packager'
 
