@@ -25,23 +25,15 @@ Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 
 Latest version is `7.0.0-alpha-3`
 
-Add this to your module to get started:
-```groovy
-dependencies {
-    implementation 'com.christophecvb.touchportal:plugin-sdk:VERSION'
-
-    annotationProcessor 'com.christophecvb.touchportal:plugin-sdk-annotations-processor:VERSION'
-}
-```
-
 Prior versions were not published to Maven Central
 
 ## Get Started
 
 - Create a new Gradle Java Project
 - Copy the `build.gradle` from the `SampleJava` or `SampleKotlin` module to your new module
-    - Edit the properties `versionMajor`, `versionMinor`, `versionPatch`, `mainClassPackage` and `mainClassSimpleName`
-    - Replace the dependencies to get the latest Maven Central one
+    - Edit the properties `mainClassPackage` and `mainClassSimpleName`
+    - Replace `versionName` by your plugin version (`'1.0.0'` for example)
+    - Replace the dependencies to get the latest Maven Central ones
 - Create a class (`mainClassSimpleName`'s value), in the package you chose (`mainClassPackage`'s value), extending `TouchPortalPlugin` and implementing `TouchPortalPlugin.TouchPortalPluginListener` (i.e. `MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener`) like the example below:
 
 ```java
