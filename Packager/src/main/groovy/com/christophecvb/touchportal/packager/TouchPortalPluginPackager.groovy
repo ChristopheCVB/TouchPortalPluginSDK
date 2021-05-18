@@ -33,16 +33,19 @@ class TouchPortalPluginPackager implements Plugin<Project> {
             }
         }
 
-        project.tasks.named('jar', Jar) { task ->
-            dependsOn project.configurations.runtimeClasspath
+        project.tasks.withType(Jar) { task ->
+            task.dependsOn project.configurations.runtimeClasspath
 
-            manifest {
-                attributes 'Implementation-Title': "${extension.mainClassSimpleName.get()}",
-                        'Implementation-Version': "${project.version}",
-                        'Main-Class': "${project.group}.${extension.mainClassSimpleName.get()}"
-            }
-            from {
-                project.configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { project.zipTree(it) }
+            task.doFirst {
+                manifest {
+                    attributes 'Implementation-Title': "${extension.mainClassSimpleName.get()}",
+                            'Implementation-Version': "${project.version}",
+                            'Main-Class': "${project.group}.${extension.mainClassSimpleName.get()}"
+                }
+
+                from {
+                    project.configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { project.zipTree(it) }
+                }
             }
         }
 
