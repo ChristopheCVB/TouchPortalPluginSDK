@@ -26,7 +26,6 @@ import com.christophecvb.touchportal.helpers.*;
 import com.google.auto.service.AutoService;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -44,7 +43,9 @@ import javax.tools.StandardLocation;
 import java.io.Writer;
 import java.lang.annotation.AnnotationFormatError;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Touch Portal Plugin Annotation Processor
@@ -384,7 +385,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         if (desiredTPType.equals(StateHelper.TYPE_CHOICE)) {
             JsonArray stateValueChoices = new JsonArray();
             for (String valueChoice : state.valueChoices()) {
-                stateValueChoices.add(new JsonPrimitive(valueChoice));
+                stateValueChoices.add(valueChoice);
             }
             jsonState.add(StateHelper.VALUE_CHOICES, stateValueChoices);
         }
@@ -435,7 +436,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
             jsonEvent.addProperty(EventHelper.VALUE_TYPE, EventHelper.VALUE_TYPE_CHOICE);
             JsonArray eventValueChoices = new JsonArray();
             for (String valueChoice : event.valueChoices()) {
-                eventValueChoices.add(new JsonPrimitive(valueChoice));
+                eventValueChoices.add(valueChoice);
             }
             jsonEvent.add(EventHelper.VALUE_CHOICES, eventValueChoices);
             jsonEvent.addProperty(EventHelper.VALUE_STATE_ID, StateHelper.getStateId(pluginElement, categoryElement, category, eventElement, state));
@@ -471,8 +472,6 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         String className = method.getEnclosingElement().getSimpleName() + "." + method.getSimpleName() + "(" + dataElement.getSimpleName() + ")";
 
         JsonObject jsonData = new JsonObject();
-        String dataId = DataHelper.getActionDataId(pluginElement, categoryElement, category, actionElement, action, dataElement, data);
-        jsonData.addProperty(DataHelper.ID, dataId);
         String desiredTPType = GenericHelper.getTouchPortalType(className, dataElement);
         jsonData.addProperty(DataHelper.TYPE, desiredTPType);
         jsonData.addProperty(DataHelper.LABEL, DataHelper.getActionDataLabel(dataElement, data));
@@ -495,14 +494,33 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 jsonData.addProperty(DataHelper.DEFAULT, data.defaultValue());
                 break;
         }
+        AtomicReference<String> dataId = new AtomicReference<>(DataHelper.getActionDataId(pluginElement, categoryElement, category, actionElement, action, dataElement, data));
         // Specific properties
         switch (desiredTPType) {
             case GenericHelper.TP_TYPE_CHOICE:
                 JsonArray dataValueChoices = new JsonArray();
-                for (String valueChoice : data.valueChoices()) {
-                    dataValueChoices.add(valueChoice);
+                if (!data.stateId().isEmpty()) {
+                    Optional<? extends Element> optionalStateElement = roundEnv.getElementsAnnotatedWith(State.class).stream().filter(element -> {
+                        State state = element.getAnnotation(State.class);
+                        String shortStateId = !state.id().isEmpty() ? state.id() : element.getSimpleName().toString();
+                        return shortStateId.equals(data.stateId());
+                    }).findFirst();
+                    if (optionalStateElement.isPresent()) {
+                        Element stateElement = optionalStateElement.get();
+                        State state = stateElement.getAnnotation(State.class);
+                        dataId.set(StateHelper.getStateId(pluginElement, categoryElement, category, stateElement, state));
+                        for (String valueChoice : state.valueChoices()) {
+                            dataValueChoices.add(valueChoice);
+                        }
+                        jsonData.addProperty(DataHelper.DEFAULT, state.defaultValue());
+                    }
+                    else {
+                        for (String valueChoice : data.valueChoices()) {
+                            dataValueChoices.add(valueChoice);
+                        }
+                    }
+                    jsonData.add(DataHelper.VALUE_CHOICES, dataValueChoices);
                 }
-                jsonData.add(DataHelper.VALUE_CHOICES, dataValueChoices);
                 break;
 
             case GenericHelper.TP_TYPE_FILE:
@@ -553,10 +571,11 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                 }
                 break;
         }
+        jsonData.addProperty(DataHelper.ID, dataId.get());
         if (!action.format().isEmpty()) {
             // Replace wildcards
             String rawFormat = jsonAction.get(ActionHelper.FORMAT).getAsString();
-            jsonAction.addProperty(ActionHelper.FORMAT, rawFormat.replace("{$" + (data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id()) + "$}", "{$" + dataId + "$}"));
+            jsonAction.addProperty(ActionHelper.FORMAT, rawFormat.replace("{$" + (data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id()) + "$}", "{$" + dataId.get() + "$}"));
         }
 
         return Pair.create(jsonData, actionDataTypeSpecBuilder);

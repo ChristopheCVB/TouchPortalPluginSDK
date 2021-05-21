@@ -133,4 +133,15 @@ public @interface Data {
      * @return double maxValue
      */
     double maxValue() default Double.POSITIVE_INFINITY;
+
+    /**
+     * Data State Id
+     * <p>
+     * The State Id bound to this parameter
+     * Used if the parameter type is choice
+     * </p>
+     *
+     * @return String stateId
+     */
+    String stateId() default "";
 }

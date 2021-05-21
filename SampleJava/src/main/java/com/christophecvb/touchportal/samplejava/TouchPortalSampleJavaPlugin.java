@@ -123,6 +123,9 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
                     touchPortalSampleJavaPlugin.sendRemoveState("BaseCategory", "createdState2");
                     touchPortalSampleJavaPlugin.sendRemoveState("BaseCategory", "createdState1");
                     touchPortalSampleJavaPlugin.sendRemoveState("BaseCategory", "customState");
+
+                    // Update State Choice
+                    touchPortalSampleJavaPlugin.sendChoiceUpdate(TouchPortalSampleJavaPluginConstants.SecondCategory.States.CustomStateChoice.ID, new String[]{"1", "2", "3"});
                 }
             }
         }
@@ -238,6 +241,11 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
             // Action is triggered by a Press
             TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, "actionHoldable has been triggered by a Press");
         }
+    }
+
+    @Action(format = "Do Action with Choice {$choices$}", categoryId = "SecondCategory")
+    private void actionWithDataStateId(@Data(stateId = "customStateChoice") String[] choices) {
+        LOGGER.log(Level.INFO, "Action with Data State Id received: " + choices[0]);
     }
 
     @Override
