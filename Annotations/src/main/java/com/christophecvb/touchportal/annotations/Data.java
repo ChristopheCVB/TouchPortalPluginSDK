@@ -138,6 +138,7 @@ public @interface Data {
      * Data State Id
      * <p>
      * The State Id bound to this parameter
+     * Note that valueChoices and default will be ignored and the ones from the State will be used
      * Used if the parameter type is choice
      * </p>
      *
