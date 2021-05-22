@@ -320,12 +320,14 @@ public abstract class TouchPortalPlugin {
                             try {
                                 method.setAccessible(true);
                                 method.invoke(this, arguments);
-                                if (held == null || !held) {
-                                    this.heldActionsStates.remove(tpActionMessage.actionId);
-                                }
                             }
                             catch (Exception e) {
                                 TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Action method could not be invoked", e);
+                            }
+                            finally {
+                                if (held == null || !held) {
+                                    this.heldActionsStates.remove(tpActionMessage.actionId);
+                                }
                             }
                         });
                         called = true;

@@ -22,8 +22,8 @@ package com.christophecvb.touchportal.test;
 
 import com.christophecvb.touchportal.TouchPortalPlugin;
 import com.christophecvb.touchportal.helpers.*;
-import com.christophecvb.touchportal.model.TPInfoMessage;
 import com.christophecvb.touchportal.model.TPBroadcastMessage;
+import com.christophecvb.touchportal.model.TPInfoMessage;
 import com.christophecvb.touchportal.model.TPListChangeMessage;
 import com.christophecvb.touchportal.model.TPSettingsMessage;
 import com.christophecvb.touchportal.oauth2.OAuth2LocalServerReceiver;
