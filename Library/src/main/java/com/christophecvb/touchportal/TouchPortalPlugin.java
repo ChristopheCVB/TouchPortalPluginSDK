@@ -627,18 +627,32 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Send a Create a State Message to the Touch Portal Plugin System not allowing empty value
+     *
+     * @param categoryId  String
+     * @param stateId     String
+     * @param description String
+     * @param value       Object
+     * @return boolean stateUpdateMessageSent
+     */
+    public boolean sendCreateState(String categoryId, String stateId, String description, Object value) {
+        return this.sendCreateState(categoryId, stateId, description, value, false);
+    }
+
+    /**
      * Send a Create a State Message to the Touch Portal Plugin System
      *
      * @param categoryId  String
      * @param stateId     String
      * @param description String
      * @param value       Object
+     * @param allowEmptyValue boolean
      * @return boolean stateCreateSent
      */
-    public boolean sendCreateState(String categoryId, String stateId, String description, Object value) {
+    public boolean sendCreateState(String categoryId, String stateId, String description, Object value, boolean allowEmptyValue) {
         boolean sent = false;
         String valueStr = value != null ? String.valueOf(value) : null;
-        if (categoryId != null && !categoryId.isEmpty() && stateId != null && !stateId.isEmpty() && description != null && !description.isEmpty() && valueStr != null && !valueStr.isEmpty()) {
+        if (categoryId != null && !categoryId.isEmpty() && stateId != null && !stateId.isEmpty() && description != null && !description.isEmpty() && valueStr != null && (allowEmptyValue || !valueStr.isEmpty())) {
             stateId = StateHelper.getStateId(this.pluginClass, categoryId, stateId);
             if (!this.currentStates.containsKey(stateId)) {
                 JsonObject createStateMessage = new JsonObject();
@@ -653,7 +667,7 @@ public abstract class TouchPortalPlugin {
                 TouchPortalPlugin.LOGGER.info("Create State [" + stateId + "] Sent [" + sent + "]");
             }
             else {
-                sent = this.sendStateUpdate(stateId, value, true);
+                sent = this.sendStateUpdate(stateId, value, allowEmptyValue);
             }
         }
         return sent;
