@@ -317,6 +317,9 @@ public class LibraryTests {
         assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", null));
         assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", ""));
 
+        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "StateId", "Dynamically Created State", null, true));
+        assertTrue(this.touchPortalPluginTest.sendCreateState("CategoryId", "StateId", "Dynamically Created State", "", true));
+
         assertTrue(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", "Default Value 01"));
         assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", "Default Value 01"));
         assertTrue(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", "Default Value 02"));
