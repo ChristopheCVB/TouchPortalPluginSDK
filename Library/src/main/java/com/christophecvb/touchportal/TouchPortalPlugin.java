@@ -642,11 +642,11 @@ public abstract class TouchPortalPlugin {
     /**
      * Send a Create a State Message to the Touch Portal Plugin System
      *
-     * @param categoryId  String
-     * @param stateId     String
-     * @param description String
-     * @param value       Object
-     * @param allowEmptyValue boolean
+     * @param categoryId        String
+     * @param stateId           String
+     * @param description       String
+     * @param value             Object
+     * @param allowEmptyValue   boolean
      * @return boolean stateCreateSent
      */
     public boolean sendCreateState(String categoryId, String stateId, String description, Object value, boolean allowEmptyValue) {
