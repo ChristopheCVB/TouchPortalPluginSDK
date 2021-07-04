@@ -61,7 +61,7 @@ publishing {
 }
 
 signing {
-    def signingKey = System.getenv('PGP_KEY') ? System.getenv('PGP_KEY') : rootProject.file('secret-key.pgp').text.trim().replace("\\n", "\n")
+    def signingKey = System.getenv('PGP_KEY') ? System.getenv('PGP_KEY') : findProperty("PGP_KEY").toString().replace("\\n", "\n")
     def signingPassword = System.getenv('PGP_PWD') ? System.getenv('PGP_PWD') : findProperty("PGP_PWD").toString()
 
     useInMemoryPgpKeys(signingKey, signingPassword)
