@@ -6,7 +6,7 @@ on:
       - develop
 
 jobs:
-  build:
+  publish-snapshot:
 
     runs-on: ubuntu-latest
 
