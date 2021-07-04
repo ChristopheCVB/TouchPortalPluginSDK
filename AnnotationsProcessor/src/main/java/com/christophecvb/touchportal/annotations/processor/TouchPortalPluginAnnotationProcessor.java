@@ -278,9 +278,9 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
             Connector connector = connectorElement.getAnnotation(Connector.class);
             String categoryId = category.id().isEmpty() ? categoryElement.getSimpleName().toString() : category.id();
             if (categoryId.equals(connector.categoryId())) {
-                Pair<JsonObject, TypeSpec.Builder> actionResult = this.processConnector(roundEnv, pluginElement, plugin, categoryElement, category, connectorElement);
-                jsonConnectors.add(actionResult.first);
-                connectorsTypeSpecBuilder.addType(actionResult.second.build());
+                Pair<JsonObject, TypeSpec.Builder> connectorResult = this.processConnector(roundEnv, pluginElement, plugin, categoryElement, category, connectorElement);
+                jsonConnectors.add(connectorResult.first);
+                connectorsTypeSpecBuilder.addType(connectorResult.second.build());
             }
         }
         categoryTypeSpecBuilder.addType(connectorsTypeSpecBuilder.build());
@@ -418,9 +418,9 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         for (Element dataElement : dataElements) {
             Element enclosingElement = dataElement.getEnclosingElement();
             if (connectorElement.equals(enclosingElement)) {
-                Pair<JsonObject, TypeSpec.Builder> actionDataResult = this.processConnectorData(roundEnv, pluginElement, plugin, categoryElement, category, connectorElement, connector, jsonConnector, dataElement);
-                jsonConnectorData.add(actionDataResult.first);
-                connectorTypeSpecBuilder.addType(actionDataResult.second.build());
+                Pair<JsonObject, TypeSpec.Builder> connectorDataResult = this.processConnectorData(roundEnv, pluginElement, plugin, categoryElement, category, connectorElement, connector, jsonConnector, dataElement);
+                jsonConnectorData.add(connectorDataResult.first);
+                connectorTypeSpecBuilder.addType(connectorDataResult.second.build());
             }
         }
         if (jsonConnectorData.size() > 0) {
