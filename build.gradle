@@ -4,7 +4,7 @@ allprojects {
     }
 }
 
-ext.versionMajor = 6
+ext.versionMajor = 8
 ext.versionMinor = 0
 ext.versionPatch = 0
 
