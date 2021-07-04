@@ -1,6 +1,6 @@
 plugins {
     id 'groovy-gradle-plugin'
-    id 'com.gradle.plugin-publish' version '0.14.0'
+    id 'com.gradle.plugin-publish' version '0.15.0'
     id 'maven-publish'
     id 'signing'
 }
@@ -70,15 +70,22 @@ publishing {
         maven {
             url = version.endsWith('SNAPSHOT') ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/' : 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
             credentials {
-                username = findProperty('nexusUsername')
-                password = findProperty('nexusPassword')
+                username = System.getenv('OSSRH_USERNAME') ? System.getenv('OSSRH_USERNAME') : findProperty("OSSRH_USERNAME").toString()
+                password = System.getenv('OSSRH_PASSWORD') ? System.getenv('OSSRH_PASSWORD') : findProperty("OSSRH_PASSWORD").toString()
             }
         }
     }
 }
 
 signing {
-    sign publishing.publications
+    def signingKey = System.getenv('PGP_KEY') ? System.getenv('PGP_KEY') : rootProject.file('secret-key.pgp').text.trim().replace("\\n", "\n")
+    def signingPassword = System.getenv('PGP_PWD') ? System.getenv('PGP_PWD') : findProperty("PGP_PWD").toString()
+
+    useInMemoryPgpKeys(signingKey, signingPassword)
+
+    if (signingKey != '') {
+        sign publishing.publications
+    }
 }
 
 javadoc {
