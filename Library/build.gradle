@@ -53,16 +53,16 @@ publishing {
         maven {
             url = version.endsWith('SNAPSHOT') ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/' : 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
             credentials {
-                username = System.getenv('OSSRH_USERNAME') ? System.getenv('OSSRH_USERNAME') : findProperty("OSSRH_USERNAME").toString()
-                password = System.getenv('OSSRH_PASSWORD') ? System.getenv('OSSRH_PASSWORD') : findProperty("OSSRH_PASSWORD").toString()
+                username = envOrPropOrEmpty('OSSRH_USERNAME')
+                password = envOrPropOrEmpty('OSSRH_PASSWORD')
             }
         }
     }
 }
 
 signing {
-    def signingKey = System.getenv('PGP_KEY') ? System.getenv('PGP_KEY') : rootProject.file('secret-key.pgp').text.trim().replace("\\n", "\n")
-    def signingPassword = System.getenv('PGP_PWD') ? System.getenv('PGP_PWD') : findProperty("PGP_PWD").toString()
+    def signingKey = envOrPropOrEmpty('PGP_KEY')
+    def signingPassword = envOrPropOrEmpty('PGP_PWD')
 
     useInMemoryPgpKeys(signingKey, signingPassword)
 
