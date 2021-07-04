@@ -2,12 +2,12 @@
 
 [![Touch Portal Plugin SDK](https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/resources/TP%20Plugin%20SDK%20Logo.png)](#touch-portal-plugin-sdk)
 
-[![Java CI with Gradle](https://github.com/ChristopheCVB/TouchPortalPluginSDK/workflows/Java%20CI%20with%20Gradle/badge.svg)](#touch-portal-plugin-sdk)
-[![Library Code Coverage](https://codecov.io/gh/ChristopheCVB/TouchPortalPluginSDK/branch/master/graph/badge.svg)](https://codecov.io/gh/ChristopheCVB/TouchPortalPluginSDK)
+[![Build and Coverage](https://github.com/ChristopheCVB/TouchPortalPluginSDK/workflows/Build%20and%20Coverage/badge.svg)](#touch-portal-plugin-sdk)
+[![Code Coverage](https://codecov.io/gh/ChristopheCVB/TouchPortalPluginSDK/branch/master/graph/badge.svg)](https://codecov.io/gh/ChristopheCVB/TouchPortalPluginSDK)
 [![Language gradle: Java](https://img.shields.io/lgtm/grade/java/g/ChristopheCVB/TouchPortalPluginSDK.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ChristopheCVB/TouchPortalPluginSDK/context:java)
 
 This Project is an SDK to create a Touch Portal Plugin using Java or Kotlin and Gradle.
-This SDK is a COMPLETE solution which will not only help you connect to communicate with TouchPortal through Actions, Events and States, but it will also help you with the hazzle of packaging  
+This SDK is a complete solution which will not only help you connect to communicate with TouchPortal through Actions, Events, States, Settings and Connectors, but it will also help you with the hassle of packaging it  
 
 For further reference, the Touch Portal Plugin documentation can be found [here](https://www.touch-portal.com/api)
 
@@ -17,15 +17,24 @@ Once you have cloned this project, you can run the `gradlew javaDoc` and browse 
 
 ## Releases
 
-Latest is 6.0.0
+Latest is 8.0.0
 
 Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
 
 ### Maven Central
 
-Latest version is `7.0.0-alpha-3`
+Latest version is `8.0.0`
 
 Prior versions were not published to Maven Central
+
+#### Gradle
+
+```groovy
+dependencies {
+  implementation 'com.christophecvb.touchportal:plugin-sdk:8.0.0'
+  annotationProcessor 'com.christophecvb.touchportal:plugin-sdk-annotations-processor:8.0.0'
+}
+```
 
 ## Get Started
 
