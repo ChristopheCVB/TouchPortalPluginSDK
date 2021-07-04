@@ -10,7 +10,7 @@ ext.versionPatch = 0
 
 ext.isSnapshot = false
 ext.isAlpha = true
-ext.alphaVersion = 3
+ext.alphaVersion = 4
 
 ext.versionCode = versionMajor * 1000 + versionMinor * 100 + versionPatch
 ext.versionName = "${versionMajor}.${versionMinor}.${versionPatch}" + (isAlpha ? '-alpha-' + alphaVersion : '') + (isSnapshot ? '-SNAPSHOT' : '')

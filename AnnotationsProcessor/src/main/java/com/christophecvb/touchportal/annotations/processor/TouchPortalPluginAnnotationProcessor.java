@@ -74,12 +74,13 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> annotations = new LinkedHashSet<>();
         annotations.add(Plugin.class.getCanonicalName());
+        annotations.add(Setting.class.getCanonicalName());
+        annotations.add(Category.class.getCanonicalName());
         annotations.add(Action.class.getCanonicalName());
         annotations.add(Data.class.getCanonicalName());
         annotations.add(State.class.getCanonicalName());
         annotations.add(Event.class.getCanonicalName());
-        annotations.add(Category.class.getCanonicalName());
-        annotations.add(Setting.class.getCanonicalName());
+        annotations.add(Connector.class.getCanonicalName());
         return annotations;
     }
 
@@ -270,6 +271,21 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         categoryTypeSpecBuilder.addType(actionsTypeSpecBuilder.build());
         jsonCategory.add(CategoryHelper.ACTIONS, jsonActions);
 
+        TypeSpec.Builder connectorsTypeSpecBuilder = TypeSpec.classBuilder("Connectors").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        JsonArray jsonConnectors = new JsonArray();
+        Set<? extends Element> connectorElements = roundEnv.getElementsAnnotatedWith(Connector.class);
+        for (Element connectorElement : connectorElements) {
+            Connector connector = connectorElement.getAnnotation(Connector.class);
+            String categoryId = category.id().isEmpty() ? categoryElement.getSimpleName().toString() : category.id();
+            if (categoryId.equals(connector.categoryId())) {
+                Pair<JsonObject, TypeSpec.Builder> actionResult = this.processConnector(roundEnv, pluginElement, plugin, categoryElement, category, connectorElement);
+                jsonConnectors.add(actionResult.first);
+                connectorsTypeSpecBuilder.addType(actionResult.second.build());
+            }
+        }
+        categoryTypeSpecBuilder.addType(connectorsTypeSpecBuilder.build());
+        jsonCategory.add(CategoryHelper.CONNECTORS, jsonConnectors);
+
         TypeSpec.Builder statesTypeSpecBuilder = TypeSpec.classBuilder("States").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         JsonArray jsonStates = new JsonArray();
         Set<? extends Element> stateElements = roundEnv.getElementsAnnotatedWith(State.class);
@@ -354,6 +370,64 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         }
 
         return Pair.create(jsonAction, actionTypeSpecBuilder);
+    }
+
+    /**
+     * Generates a JsonObject and a TypeSpec.Builder representing the {@link Connector}
+     *
+     * @param roundEnv          RoundEnvironment
+     * @param pluginElement     Element
+     * @param plugin            {@link Plugin}
+     * @param categoryElement   Element
+     * @param category          {@link Category}
+     * @param connectorElement  Element
+     * @return Pair<JsonObject, TypeSpec.Builder> actionPair
+     */
+    private Pair<JsonObject, TypeSpec.Builder> processConnector(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element connectorElement) throws Exception {
+        this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Connector: " + connectorElement.getSimpleName());
+        Connector connector = connectorElement.getAnnotation(Connector.class);
+
+        TypeSpec.Builder connectorTypeSpecBuilder = this.createConnectorTypeSpecBuilder(pluginElement, categoryElement, category, connectorElement, connector);
+
+        JsonObject jsonConnector = new JsonObject();
+        jsonConnector.addProperty(ConnectorHelper.ID, ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connectorElement, connector));
+        jsonConnector.addProperty(ConnectorHelper.NAME, ConnectorHelper.getConnectorName(connectorElement, connector));
+        jsonConnector.addProperty(ConnectorHelper.FORMAT, connector.format());
+
+        String classMethod = pluginElement.getSimpleName() + "." + connectorElement.getSimpleName();
+        boolean connectorValueFound = false;
+        Set<? extends Element> connectorValueElements = roundEnv.getElementsAnnotatedWith(ConnectorValue.class);
+        for (Element connectorValueElement : connectorValueElements) {
+            Element enclosingElement = connectorValueElement.getEnclosingElement();
+            if (connectorElement.equals(enclosingElement)) {
+                String classMethodParameter = classMethod + "(" + connectorValueElement.getSimpleName() + ")";
+                String desiredType = GenericHelper.getTouchPortalType(classMethodParameter, connectorValueElement);
+                if (!desiredType.equals(GenericHelper.TP_TYPE_NUMBER)) {
+                    throw new GenericHelper.TPTypeException.Builder(classMethodParameter).typeUnsupported(desiredType).forAnnotation(GenericHelper.TPTypeException.ForAnnotation.CONNECTOR_VALUE).build();
+                }
+                connectorValueFound = true;
+                break;
+            }
+        }
+        if (!connectorValueFound) {
+            throw new IllegalArgumentException("Connector " + classMethod + " has no declared ConnectorValue");
+        }
+
+        JsonArray jsonConnectorData = new JsonArray();
+        Set<? extends Element> dataElements = roundEnv.getElementsAnnotatedWith(Data.class);
+        for (Element dataElement : dataElements) {
+            Element enclosingElement = dataElement.getEnclosingElement();
+            if (connectorElement.equals(enclosingElement)) {
+                Pair<JsonObject, TypeSpec.Builder> actionDataResult = this.processConnectorData(roundEnv, pluginElement, plugin, categoryElement, category, connectorElement, connector, jsonConnector, dataElement);
+                jsonConnectorData.add(actionDataResult.first);
+                connectorTypeSpecBuilder.addType(actionDataResult.second.build());
+            }
+        }
+        if (jsonConnectorData.size() > 0) {
+            jsonConnector.add(ConnectorHelper.DATA, jsonConnectorData);
+        }
+
+        return Pair.create(jsonConnector, connectorTypeSpecBuilder);
     }
 
     /**
@@ -449,7 +523,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     }
 
     /**
-     * Generates a JsonObject and a TypeSpec.Builder representing the {@link Data}
+     * Generates a JsonObject and a TypeSpec.Builder representing the {@link Data} for an {@link Action}
      *
      * @param roundEnv        RoundEnvironment
      * @param pluginElement   Element
@@ -474,7 +548,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         JsonObject jsonData = new JsonObject();
         String desiredTPType = GenericHelper.getTouchPortalType(className, dataElement);
         jsonData.addProperty(DataHelper.TYPE, desiredTPType);
-        jsonData.addProperty(DataHelper.LABEL, DataHelper.getActionDataLabel(dataElement, data));
+        jsonData.addProperty(DataHelper.LABEL, DataHelper.getDataLabel(dataElement, data));
         // Default Value
         switch (desiredTPType) {
             case GenericHelper.TP_TYPE_NUMBER:
@@ -582,6 +656,139 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     }
 
     /**
+     * Generates a JsonObject and a TypeSpec.Builder representing the {@link Data} for a {@link Connector}
+     *
+     * @param roundEnv          RoundEnvironment
+     * @param pluginElement     Element
+     * @param plugin            {@link Plugin}
+     * @param categoryElement   Element
+     * @param category          {@link Category}
+     * @param connectorElement  Element
+     * @param connector         {@link Connector}
+     * @param jsonConnector     JsonObject
+     * @param dataElement       Element
+     * @return Pair<JsonObject, TypeSpec.Builder> dataPair
+     */
+    private Pair<JsonObject, TypeSpec.Builder> processConnectorData(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element connectorElement, Connector connector, JsonObject jsonConnector, Element dataElement) throws Exception {
+        this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Connector Data: " + dataElement.getSimpleName());
+        Data data = dataElement.getAnnotation(Data.class);
+
+        TypeSpec.Builder actionDataTypeSpecBuilder = this.createConnectorDataTypeSpecBuilder(pluginElement, categoryElement, category, connectorElement, connector, dataElement, data);
+
+        Element method = dataElement.getEnclosingElement();
+        String className = method.getEnclosingElement().getSimpleName() + "." + method.getSimpleName() + "(" + dataElement.getSimpleName() + ")";
+
+        JsonObject jsonData = new JsonObject();
+        String desiredTPType = GenericHelper.getTouchPortalType(className, dataElement);
+        jsonData.addProperty(DataHelper.TYPE, desiredTPType);
+        jsonData.addProperty(DataHelper.LABEL, DataHelper.getDataLabel(dataElement, data));
+        // Default Value
+        switch (desiredTPType) {
+            case GenericHelper.TP_TYPE_NUMBER:
+                double defaultValue = 0;
+                try {
+                    defaultValue = Double.parseDouble(data.defaultValue());
+                }
+                catch (NumberFormatException ignored) {}
+                jsonData.addProperty(DataHelper.DEFAULT, defaultValue);
+                break;
+
+            case GenericHelper.TP_TYPE_SWITCH:
+                jsonData.addProperty(DataHelper.DEFAULT, data.defaultValue().equals("true"));
+                break;
+
+            default:
+                jsonData.addProperty(DataHelper.DEFAULT, data.defaultValue());
+                break;
+        }
+        AtomicReference<String> dataId = new AtomicReference<>(DataHelper.getConnectorDataId(pluginElement, categoryElement, category, connectorElement, connector, dataElement, data));
+        // Specific properties
+        switch (desiredTPType) {
+            case GenericHelper.TP_TYPE_CHOICE:
+                JsonArray dataValueChoices = new JsonArray();
+                if (!data.stateId().isEmpty()) {
+                    Optional<? extends Element> optionalStateElement = roundEnv.getElementsAnnotatedWith(State.class).stream().filter(element -> {
+                        State state = element.getAnnotation(State.class);
+                        String shortStateId = !state.id().isEmpty() ? state.id() : element.getSimpleName().toString();
+                        return shortStateId.equals(data.stateId());
+                    }).findFirst();
+                    if (optionalStateElement.isPresent()) {
+                        Element stateElement = optionalStateElement.get();
+                        State state = stateElement.getAnnotation(State.class);
+                        dataId.set(StateHelper.getStateId(pluginElement, categoryElement, category, stateElement, state));
+                        for (String valueChoice : state.valueChoices()) {
+                            dataValueChoices.add(valueChoice);
+                        }
+                        jsonData.addProperty(DataHelper.DEFAULT, state.defaultValue());
+                    }
+                    else {
+                        for (String valueChoice : data.valueChoices()) {
+                            dataValueChoices.add(valueChoice);
+                        }
+                    }
+                    jsonData.add(DataHelper.VALUE_CHOICES, dataValueChoices);
+                }
+                break;
+
+            case GenericHelper.TP_TYPE_FILE:
+                if (data.isDirectory()) {
+                    jsonData.addProperty(DataHelper.TYPE, GenericHelper.TP_TYPE_DIRECTORY);
+                }
+                else {
+                    JsonArray jsonExtensions = new JsonArray();
+                    for (String extension : data.extensions()) {
+                        if (extension.matches(DataHelper.EXTENSION_FORMAT)) {
+                            jsonExtensions.add(extension);
+                        }
+                        else {
+                            this.messager.printMessage(Diagnostic.Kind.ERROR, "Action Data Extension: [" + extension + "] format is not valid");
+                        }
+                    }
+                    jsonData.add(DataHelper.EXTENSIONS, jsonExtensions);
+                }
+                break;
+
+            case GenericHelper.TP_TYPE_TEXT:
+                if (data.isColor()) {
+                    jsonData.addProperty(DataHelper.TYPE, GenericHelper.TP_TYPE_COLOR);
+                    if (!data.defaultValue().isEmpty()) {
+                        if (!data.defaultValue().matches(DataHelper.COLOR_FORMAT)) {
+                            this.messager.printMessage(Diagnostic.Kind.ERROR, "Action Data Color Default value: [" + data.defaultValue() + "] format is not valid");
+                        }
+                    }
+                }
+                break;
+
+            case GenericHelper.TP_TYPE_NUMBER:
+                try {
+                    double defaultValue = jsonData.get(DataHelper.DEFAULT).getAsDouble();
+                    if (defaultValue < data.minValue() || defaultValue > data.maxValue()) {
+                        throw new GenericHelper.TPTypeException.Builder(className).defaultNotInRange().build();
+                    }
+                }
+                catch (NumberFormatException numberFormatException) {
+                    throw new GenericHelper.TPTypeException.Builder(className).defaultInvalid(data.defaultValue()).build();
+                }
+                jsonData.addProperty(DataHelper.ALLOW_DECIMALS, GenericHelper.getTouchPortalTypeNumberAllowDecimals(dataElement.asType().toString()));
+                if (data.minValue() > Double.NEGATIVE_INFINITY) {
+                    jsonData.addProperty(DataHelper.MIN_VALUE, data.minValue());
+                }
+                if (data.maxValue() < Double.POSITIVE_INFINITY) {
+                    jsonData.addProperty(DataHelper.MAX_VALUE, data.maxValue());
+                }
+                break;
+        }
+        jsonData.addProperty(DataHelper.ID, dataId.get());
+        if (!connector.format().isEmpty()) {
+            // Replace wildcards
+            String rawFormat = jsonConnector.get(ActionHelper.FORMAT).getAsString();
+            jsonConnector.addProperty(ActionHelper.FORMAT, rawFormat.replace("{$" + (data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id()) + "$}", "{$" + dataId.get() + "$}"));
+        }
+
+        return Pair.create(jsonData, actionDataTypeSpecBuilder);
+    }
+
+    /**
      * Generates a TypeSpec.Builder with Constants for the {@link Plugin}
      *
      * @param pluginElement Element
@@ -650,7 +857,30 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
     }
 
     /**
-     * Generates a TypeSpec.Builder with Constants for the {@link Data}
+     * Generates a TypeSpec.Builder with Constants for the {@link Action}
+     *
+     * @param pluginElement     Element
+     * @param categoryElement   Element
+     * @param category          {@link Category}
+     * @param connectorElement  Element
+     * @param connector         {@link Action}
+     * @return TypeSpec.Builder actionTypeSpecBuilder
+     */
+    private TypeSpec.Builder createConnectorTypeSpecBuilder(Element pluginElement, Element categoryElement, Category category, Element connectorElement, Connector connector) {
+        String simpleClassName = connector.id().isEmpty() ? connectorElement.getSimpleName().toString() : connector.id();
+
+        TypeSpec.Builder actionTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        actionTypeSpecBuilder.addModifiers(Modifier.PUBLIC);
+
+        actionTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("id", ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connectorElement, connector)));
+        actionTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("name", ConnectorHelper.getConnectorName(connectorElement, connector)));
+        actionTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("format", connector.format()));
+
+        return actionTypeSpecBuilder;
+    }
+
+    /**
+     * Generates a TypeSpec.Builder with Constants for the {@link Data} for an {@link Action}
      *
      * @param pluginElement   Element
      * @param categoryElement Element
@@ -666,7 +896,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
 
         TypeSpec.Builder actionDataTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         actionDataTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("id", DataHelper.getActionDataId(pluginElement, categoryElement, category, actionElement, action, dataElement, data)));
-        actionDataTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("label", DataHelper.getActionDataLabel(dataElement, data)));
+        actionDataTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("label", DataHelper.getDataLabel(dataElement, data)));
         actionDataTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("default_value", data.defaultValue()));
         actionDataTypeSpecBuilder.addField(this.getStaticFinalStringArrayFieldSpec("value_choices", data.valueChoices()));
         actionDataTypeSpecBuilder.addField(this.getStaticFinalStringArrayFieldSpec("extensions", data.extensions()));
@@ -680,6 +910,39 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         }
 
         return actionDataTypeSpecBuilder;
+    }
+
+    /**
+     * Generates a TypeSpec.Builder with Constants for the {@link Data} for a {@link Connector}
+     *
+     * @param pluginElement     Element
+     * @param categoryElement   Element
+     * @param category          {@link Category}
+     * @param connectorElement  Element
+     * @param connector         {@link Connector}
+     * @param dataElement       Element
+     * @param data              {@link Data}
+     * @return TypeSpec.Builder dataTypeSpecBuilder
+     */
+    private TypeSpec.Builder createConnectorDataTypeSpecBuilder(Element pluginElement, Element categoryElement, Category category, Element connectorElement, Connector connector, Element dataElement, Data data) {
+        String simpleClassName = data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id();
+
+        TypeSpec.Builder connectorDataTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        connectorDataTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("id", DataHelper.getConnectorDataId(pluginElement, categoryElement, category, connectorElement, connector, dataElement, data)));
+        connectorDataTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("label", DataHelper.getDataLabel(dataElement, data)));
+        connectorDataTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("default_value", data.defaultValue()));
+        connectorDataTypeSpecBuilder.addField(this.getStaticFinalStringArrayFieldSpec("value_choices", data.valueChoices()));
+        connectorDataTypeSpecBuilder.addField(this.getStaticFinalStringArrayFieldSpec("extensions", data.extensions()));
+        connectorDataTypeSpecBuilder.addField(this.getStaticFinalBooleanFieldSpec("is_directory", data.isDirectory()));
+        connectorDataTypeSpecBuilder.addField(this.getStaticFinalBooleanFieldSpec("is_color", data.isColor()));
+        if (data.minValue() > Double.NEGATIVE_INFINITY) {
+            connectorDataTypeSpecBuilder.addField(this.getStaticFinalDoubleFieldSpec("min_value", data.minValue()));
+        }
+        if (data.maxValue() < Double.POSITIVE_INFINITY) {
+            connectorDataTypeSpecBuilder.addField(this.getStaticFinalDoubleFieldSpec("max_value", data.maxValue()));
+        }
+
+        return connectorDataTypeSpecBuilder;
     }
 
     /**

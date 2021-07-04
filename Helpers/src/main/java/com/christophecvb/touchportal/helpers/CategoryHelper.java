@@ -34,6 +34,7 @@ public class CategoryHelper {
     public static final String ACTIONS = "actions";
     public static final String EVENTS = "events";
     public static final String STATES = "states";
+    public static final String CONNECTORS = "connectors";
 
     /**
      * Get the generated Category ID

@@ -22,6 +22,7 @@ package com.christophecvb.touchportal.helpers;
 
 import com.christophecvb.touchportal.annotations.Action;
 import com.christophecvb.touchportal.annotations.Category;
+import com.christophecvb.touchportal.annotations.Connector;
 import com.christophecvb.touchportal.annotations.Data;
 
 import javax.lang.model.element.Element;
@@ -59,7 +60,23 @@ public class DataHelper {
      * @return String dataId
      */
     public static String getActionDataId(Element pluginElement, Element categoryElement, Category category, Element actionElement, Action action, Element dataElement, Data data) {
-        return DataHelper._getActionDataId(ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action), data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id());
+        return DataHelper._getDataId(ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action), data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id());
+    }
+
+    /**
+     * Get the generated Data Id
+     *
+     * @param pluginElement     Element
+     * @param categoryElement   Element
+     * @param category          {@link Category}
+     * @param connectorElement  Element
+     * @param connector         {@link Action}
+     * @param dataElement       Element
+     * @param data              {@link Data}
+     * @return String dataId
+     */
+    public static String getConnectorDataId(Element pluginElement, Element categoryElement, Category category, Element connectorElement, Connector connector, Element dataElement, Data data) {
+        return DataHelper._getDataId(ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connectorElement, connector), data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id());
     }
 
     /**
@@ -69,7 +86,7 @@ public class DataHelper {
      * @param data        {@link Data}
      * @return String dataLabel
      */
-    public static String getActionDataLabel(Element dataElement, Data data) {
+    public static String getDataLabel(Element dataElement, Data data) {
         return data.label().isEmpty() ? dataElement.getSimpleName().toString() : data.label();
     }
 
@@ -88,7 +105,7 @@ public class DataHelper {
                 for (Parameter parameter : declaredMethod.getParameters()) {
                     Data data = parameter.getAnnotation(Data.class);
                     if (data != null && parameter.getName().equals(actionParameterName)) {
-                        actionDataId = DataHelper._getActionDataId(ActionHelper.getActionId(pluginClass, actionMethodName), data.id().isEmpty() ? actionParameterName : data.id());
+                        actionDataId = DataHelper._getDataId(ActionHelper.getActionId(pluginClass, actionMethodName), data.id().isEmpty() ? actionParameterName : data.id());
                     }
                 }
             }
@@ -99,30 +116,30 @@ public class DataHelper {
     /**
      * Get the generated Data Id
      *
-     * @param pluginClass           Class
-     * @param actionMethod          Method
-     * @param actionMethodParameter Parameter
+     * @param pluginClass     Class
+     * @param method          Method
+     * @param methodParameter Parameter
      * @return String actionId
      */
-    public static String getActionDataId(Class<?> pluginClass, Method actionMethod, Parameter actionMethodParameter) {
-        String actionDataId = "";
+    public static String getDataId(Class<?> pluginClass, Method method, Parameter methodParameter) {
+        String dataId = "";
 
-        if (actionMethodParameter.isAnnotationPresent(Data.class)) {
-            Data data = actionMethodParameter.getAnnotation(Data.class);
-            actionDataId = DataHelper._getActionDataId(ActionHelper.getActionId(pluginClass, actionMethod), data.id().isEmpty() ? actionMethodParameter.getName() : data.id());
+        if (methodParameter.isAnnotationPresent(Data.class)) {
+            Data data = methodParameter.getAnnotation(Data.class);
+            dataId = DataHelper._getDataId(ActionHelper.getActionId(pluginClass, method), data.id().isEmpty() ? methodParameter.getName() : data.id());
         }
 
-        return actionDataId;
+        return dataId;
     }
 
     /**
      * Internal - Get the formatted Data Id
      *
-     * @param actionId String
+     * @param parentId String
      * @param dataId   String
      * @return String dataId
      */
-    private static String _getActionDataId(String actionId, String dataId) {
-        return actionId + "." + DataHelper.KEY_DATA + "." + dataId;
+    private static String _getDataId(String parentId, String dataId) {
+        return parentId + "." + DataHelper.KEY_DATA + "." + dataId;
     }
 }

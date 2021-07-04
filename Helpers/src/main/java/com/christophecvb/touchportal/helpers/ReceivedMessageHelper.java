@@ -37,6 +37,7 @@ public class ReceivedMessageHelper {
     public static final String TYPE_ACTION = "action";
     public static final String TYPE_HOLD_DOWN = "down";
     public static final String TYPE_HOLD_UP = "up";
+    public static final String TYPE_CONNECTOR_CHANGE = "connectorChange";
     public static final String TYPE_INFO = "info";
     public static final String TYPE_LIST_CHANGE = "listChange";
     public static final String TYPE_CLOSE_PLUGIN = "closePlugin";
@@ -251,7 +252,7 @@ public class ReceivedMessageHelper {
      * @return Object actionDataValue
      */
     public static Object getTypedActionDataValue(JsonObject jsonMessage, Class<?> pluginClass, Method method, Parameter parameter) {
-        String parameterDataId = DataHelper.getActionDataId(pluginClass, method, parameter);
+        String parameterDataId = DataHelper.getDataId(pluginClass, method, parameter);
         return ReceivedMessageHelper.getTypedActionDataValue(jsonMessage, parameterDataId, parameter.getParameterizedType().getTypeName());
     }
 
