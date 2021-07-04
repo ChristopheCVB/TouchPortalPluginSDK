@@ -252,7 +252,7 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
      * Connector example with no parameter
      */
     @Connector(format = "Connector Simple", categoryId = "BaseCategory")
-    private void connectorSimple(@ConnectorValue(value = "10") int value) {
+    private void connectorSimple(@ConnectorValue(value = "10") Integer value) {
         TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, "Connector connectorSimple received");
     }
 

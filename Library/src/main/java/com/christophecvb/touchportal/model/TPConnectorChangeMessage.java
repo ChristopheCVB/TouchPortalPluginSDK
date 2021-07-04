@@ -30,7 +30,7 @@ import java.util.ArrayList;
 public class TPConnectorChangeMessage extends TPMessage {
     public String pluginId;
     public String connectorId;
-    public Number value;
+    public Integer value;
     public ArrayList<Data> data;
 
     public static class Data {
