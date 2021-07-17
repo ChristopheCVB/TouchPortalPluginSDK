@@ -30,6 +30,10 @@ Prior versions were not published to Maven Central
 #### Gradle
 
 ```groovy
+plugins {
+  id 'com.christophecvb.touchportal.plugin-packager' version '8.0.0'
+}
+
 dependencies {
   implementation 'com.christophecvb.touchportal:plugin-sdk:8.0.0'
   annotationProcessor 'com.christophecvb.touchportal:plugin-sdk-annotations-processor:8.0.0'
