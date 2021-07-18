@@ -23,6 +23,7 @@ package com.christophecvb.touchportal.test;
 import com.christophecvb.touchportal.annotations.*;
 import com.christophecvb.touchportal.TouchPortalPlugin;
 import com.christophecvb.touchportal.model.TPActionMessage;
+import com.christophecvb.touchportal.model.TPConnectorChangeMessage;
 import com.google.gson.JsonObject;
 
 import java.io.File;
@@ -152,12 +153,17 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
 
     @Connector(format = "Slide Me!", categoryId = "BaseCategory")
     private void connectorForSlider(@ConnectorValue Integer value) {
-        System.out.println("connectorForSlider: " + value);
+        System.out.printf("connectorForSlider: value[%d]%n", value);
     }
 
     @Connector(format = "Slide Me with {$text$}!", categoryId = "BaseCategory")
     private void connectorForSliderWithData(@ConnectorValue Integer value, @Data String text) {
-        System.out.println("connectorForSlider: " + value);
+        System.out.printf("connectorForSliderWithData: value[%d] text[%s]%n", value, text);
+    }
+
+    @Connector(format = "Slide Me with Non Data!", categoryId = "BaseCategory")
+    private void connectorForSliderWithNonData(@ConnectorValue Integer value, JsonObject jsonObject, TPConnectorChangeMessage tpConnectorChangeMessage) {
+        System.out.printf("connectorForSliderWithNonData: value[%d]%n", value);
     }
 
     private enum Categories {

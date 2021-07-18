@@ -589,6 +589,24 @@ public class LibraryTests {
     }
 
     @Test
+    public void testReceiveConnectorForSliderWithNonData() throws IOException, InterruptedException {
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+
+        JsonObject jsonMessageConnectorForSliderWithNonData = new JsonObject();
+        jsonMessageConnectorForSliderWithNonData.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessageConnectorForSliderWithNonData.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_CONNECTOR_CHANGE);
+        jsonMessageConnectorForSliderWithNonData.addProperty(ReceivedMessageHelper.CONNECTOR_ID, TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithNonData.ID);
+        jsonMessageConnectorForSliderWithNonData.addProperty(ReceivedMessageHelper.VALUE, 50);
+
+        out.println(jsonMessageConnectorForSliderWithNonData);
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
     public void testReceiveListChange() throws IOException, InterruptedException {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
@@ -975,7 +993,7 @@ public class LibraryTests {
 
         // Base Category Connectors
         JsonArray baseCategoryConnectors = baseCategory.getAsJsonArray(CategoryHelper.CONNECTORS);
-        assertEquals(2, baseCategoryConnectors.size());
+        assertEquals(3, baseCategoryConnectors.size());
 
         // Base Category Connector ConnectorForSlider
         JsonObject baseCategoryConnectorConnectorForSlider = baseCategoryConnectors.get(0).getAsJsonObject();
