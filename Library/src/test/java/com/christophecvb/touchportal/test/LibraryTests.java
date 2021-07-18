@@ -362,11 +362,40 @@ public class LibraryTests {
     }
 
     @Test
+    public void testReceiveConnectorNoId() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_CONNECTOR_CHANGE);
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage);
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
     public void testReceiveActionEmptyId() throws IOException, InterruptedException {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, "");
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage);
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
+    public void testReceiveConnectorEmptyId() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_CONNECTOR_CHANGE);
+        jsonMessage.addProperty(ReceivedMessageHelper.CONNECTOR_ID, "");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -513,6 +542,47 @@ public class LibraryTests {
         Thread.sleep(10);
 
         assertNull(this.touchPortalPluginTest.isActionBeingHeld(TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID));
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
+    public void testReceiveConnectorForSlider() throws IOException, InterruptedException {
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+
+        JsonObject jsonMessageConnectorForSlider = new JsonObject();
+        jsonMessageConnectorForSlider.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessageConnectorForSlider.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_CONNECTOR_CHANGE);
+        jsonMessageConnectorForSlider.addProperty(ReceivedMessageHelper.CONNECTOR_ID, TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSlider.ID);
+        jsonMessageConnectorForSlider.addProperty(ReceivedMessageHelper.VALUE, 50);
+
+        out.println(jsonMessageConnectorForSlider);
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
+    public void testReceiveConnectorForSliderWithData() throws IOException, InterruptedException {
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+
+        JsonObject jsonMessageConnectorForSliderWithData = new JsonObject();
+        jsonMessageConnectorForSliderWithData.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessageConnectorForSliderWithData.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_CONNECTOR_CHANGE);
+        jsonMessageConnectorForSliderWithData.addProperty(ReceivedMessageHelper.CONNECTOR_ID, TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.ID);
+        jsonMessageConnectorForSliderWithData.addProperty(ReceivedMessageHelper.VALUE, 50);
+        JsonArray data = new JsonArray();
+        JsonObject dataText = new JsonObject();
+        dataText.addProperty(ReceivedMessageHelper.ACTION_DATA_ID, TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.Text.ID);
+        dataText.addProperty(ReceivedMessageHelper.ACTION_DATA_VALUE, "Sliding!");
+        jsonMessageConnectorForSliderWithData.add(ConnectorHelper.DATA, data);
+
+        out.println(jsonMessageConnectorForSliderWithData);
+
+        Thread.sleep(10);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -902,6 +972,14 @@ public class LibraryTests {
         // Base Category State Custom State
         JsonObject baseCategoryStateCustomState = baseCategoryStates.get(0).getAsJsonObject();
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, baseCategoryStateCustomState.get(StateHelper.ID).getAsString());
+
+        // Base Category Connectors
+        JsonArray baseCategoryConnectors = baseCategory.getAsJsonArray(CategoryHelper.CONNECTORS);
+        assertEquals(2, baseCategoryConnectors.size());
+
+        // Base Category Connector ConnectorForSlider
+        JsonObject baseCategoryConnectorConnectorForSlider = baseCategoryConnectors.get(0).getAsJsonObject();
+        assertEquals(TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSlider.ID, baseCategoryConnectorConnectorForSlider.get(ConnectorHelper.ID).getAsString());
     }
 
     @Test

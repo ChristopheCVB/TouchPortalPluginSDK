@@ -378,7 +378,7 @@ public abstract class TouchPortalPlugin {
                                 method.invoke(this, arguments);
                             }
                             catch (Exception e) {
-                                TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Action method could not be invoked", e);
+                                TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Connector method could not be invoked", e);
                             }
                         });
                         called = true;

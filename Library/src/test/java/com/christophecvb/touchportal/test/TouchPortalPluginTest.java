@@ -150,6 +150,16 @@ public class TouchPortalPluginTest extends TouchPortalPlugin {
         }
     }
 
+    @Connector(format = "Slide Me!", categoryId = "BaseCategory")
+    private void connectorForSlider(@ConnectorValue Integer value) {
+        System.out.println("connectorForSlider: " + value);
+    }
+
+    @Connector(format = "Slide Me with {$text$}!", categoryId = "BaseCategory")
+    private void connectorForSliderWithData(@ConnectorValue Integer value, @Data String text) {
+        System.out.println("connectorForSlider: " + value);
+    }
+
     private enum Categories {
         /**
          * Category definition example
