@@ -362,7 +362,9 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
             if (actionElement.equals(enclosingElement)) {
                 Pair<JsonObject, TypeSpec.Builder> actionDataResult = this.processActionData(roundEnv, pluginElement, plugin, categoryElement, category, actionElement, action, jsonAction, dataElement);
                 jsonActionData.add(actionDataResult.first);
-                actionTypeSpecBuilder.addType(actionDataResult.second.build());
+                if (actionDataResult.second != null) {
+                    actionTypeSpecBuilder.addType(actionDataResult.second.build());
+                }
             }
         }
         if (jsonActionData.size() > 0) {
@@ -420,7 +422,9 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
             if (connectorElement.equals(enclosingElement)) {
                 Pair<JsonObject, TypeSpec.Builder> connectorDataResult = this.processConnectorData(roundEnv, pluginElement, plugin, categoryElement, category, connectorElement, connector, jsonConnector, dataElement);
                 jsonConnectorData.add(connectorDataResult.first);
-                connectorTypeSpecBuilder.addType(connectorDataResult.second.build());
+                if (connectorDataResult.second != null) {
+                    connectorTypeSpecBuilder.addType(connectorDataResult.second.build());
+                }
             }
         }
         if (jsonConnectorData.size() > 0) {
@@ -580,6 +584,8 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                         return shortStateId.equals(data.stateId());
                     }).findFirst();
                     if (optionalStateElement.isPresent()) {
+                        actionDataTypeSpecBuilder = null;
+
                         Element stateElement = optionalStateElement.get();
                         State state = stateElement.getAnnotation(State.class);
                         dataId.set(StateHelper.getStateId(pluginElement, categoryElement, category, stateElement, state));
@@ -678,7 +684,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Connector Data: " + dataElement.getSimpleName());
         Data data = dataElement.getAnnotation(Data.class);
 
-        TypeSpec.Builder actionDataTypeSpecBuilder = this.createConnectorDataTypeSpecBuilder(pluginElement, categoryElement, category, connectorElement, connector, dataElement, data);
+        TypeSpec.Builder connectorDataTypeSpecBuilder = this.createConnectorDataTypeSpecBuilder(pluginElement, categoryElement, category, connectorElement, connector, dataElement, data);
 
         Element method = dataElement.getEnclosingElement();
         String className = method.getEnclosingElement().getSimpleName() + "." + method.getSimpleName() + "(" + dataElement.getSimpleName() + ")";
@@ -718,6 +724,8 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                         return shortStateId.equals(data.stateId());
                     }).findFirst();
                     if (optionalStateElement.isPresent()) {
+                        connectorDataTypeSpecBuilder = null;
+
                         Element stateElement = optionalStateElement.get();
                         State state = stateElement.getAnnotation(State.class);
                         dataId.set(StateHelper.getStateId(pluginElement, categoryElement, category, stateElement, state));
@@ -791,11 +799,11 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonData.addProperty(DataHelper.ID, dataId.get());
         if (!connector.format().isEmpty()) {
             // Replace wildcards
-            String rawFormat = jsonConnector.get(ActionHelper.FORMAT).getAsString();
-            jsonConnector.addProperty(ActionHelper.FORMAT, rawFormat.replace("{$" + (data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id()) + "$}", "{$" + dataId.get() + "$}"));
+            String rawFormat = jsonConnector.get(ConnectorHelper.FORMAT).getAsString();
+            jsonConnector.addProperty(ConnectorHelper.FORMAT, rawFormat.replace("{$" + (data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id()) + "$}", "{$" + dataId.get() + "$}"));
         }
 
-        return Pair.create(jsonData, actionDataTypeSpecBuilder);
+        return Pair.create(jsonData, connectorDataTypeSpecBuilder);
     }
 
     /**
