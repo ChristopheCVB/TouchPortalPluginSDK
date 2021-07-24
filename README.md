@@ -2,7 +2,8 @@
 
 [![Touch Portal Plugin SDK](https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/resources/TP%20Plugin%20SDK%20Logo.png)](#touch-portal-plugin-sdk)
 
-[![Build and Coverage](https://github.com/ChristopheCVB/TouchPortalPluginSDK/workflows/Build%20and%20Coverage/badge.svg)](#touch-portal-plugin-sdk)
+[![Build, Coverage and Publish Release](https://github.com/ChristopheCVB/TouchPortalPluginSDK/workflows/Build,%20Coverage%20and%20Publish%20Release/badge.svg)](#touch-portal-plugin-sdk)
+[![Build and Publish Snapshot](https://github.com/ChristopheCVB/TouchPortalPluginSDK/workflows/Build%20and%20Publish%20Snapshot/badge.svg)](#touch-portal-plugin-sdk)
 [![Code Coverage](https://codecov.io/gh/ChristopheCVB/TouchPortalPluginSDK/branch/master/graph/badge.svg)](https://codecov.io/gh/ChristopheCVB/TouchPortalPluginSDK)
 [![Language gradle: Java](https://img.shields.io/lgtm/grade/java/g/ChristopheCVB/TouchPortalPluginSDK.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ChristopheCVB/TouchPortalPluginSDK/context:java)
 
