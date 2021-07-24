@@ -20,14 +20,12 @@
 
 package com.christophecvb.touchportal.helpers;
 
-import com.christophecvb.touchportal.annotations.Action;
-import com.christophecvb.touchportal.annotations.Category;
-import com.christophecvb.touchportal.annotations.Connector;
-import com.christophecvb.touchportal.annotations.Data;
+import com.christophecvb.touchportal.annotations.*;
 
 import javax.lang.model.element.Element;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 
 /**
  * Touch Portal Plugin Data Helper
@@ -126,7 +124,23 @@ public class DataHelper {
 
         if (methodParameter.isAnnotationPresent(Data.class)) {
             Data data = methodParameter.getAnnotation(Data.class);
-            dataId = DataHelper._getDataId(ActionHelper.getActionId(pluginClass, method), data.id().isEmpty() ? methodParameter.getName() : data.id());
+            if (!data.stateId().isEmpty()) {
+                String categoryId = null;
+                if (method.isAnnotationPresent(Action.class)) {
+                    Action action = method.getAnnotation(Action.class);
+                    categoryId = action.categoryId();
+                }
+                else if (method.isAnnotationPresent(Connector.class)) {
+                    Connector connector = method.getAnnotation(Connector.class);
+                    categoryId = connector.categoryId();
+                }
+                if (categoryId != null) {
+                    dataId = StateHelper.getStateId(pluginClass, categoryId, data.stateId());
+                }
+            }
+            else {
+                dataId = DataHelper._getDataId(ActionHelper.getActionId(pluginClass, method), data.id().isEmpty() ? methodParameter.getName() : data.id());
+            }
         }
 
         return dataId;
