@@ -27,9 +27,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 
-public class TPActionMessage extends TPMessage {
+public class TPConnectorChangeMessage extends TPMessage {
     public String pluginId;
-    public String actionId;
+    public String connectorId;
+    public Integer value;
     public ArrayList<Data> data;
 
     public static class Data {
@@ -37,16 +38,16 @@ public class TPActionMessage extends TPMessage {
         public String value;
     }
 
-    public Object getTypedDataValue(Class<?> pluginClass, Method actionMethod, Parameter actionMethodParameter) {
-        return this.getTypedDataValue(actionMethodParameter.getParameterizedType().getTypeName(), DataHelper.getDataId(pluginClass, actionMethod, actionMethodParameter));
+    public Object getTypedDataValue(Class<?> pluginClass, Method actionMethod, Parameter connectorMethodParameter) {
+        return this.getTypedDataValue(connectorMethodParameter.getParameterizedType().getTypeName(), DataHelper.getDataId(pluginClass, actionMethod, connectorMethodParameter));
     }
 
-    public Object getTypedDataValue(String actionDataType, String actionDataId) {
+    public Object getTypedDataValue(String connectorDataType, String connectorDataId) {
         Object value = null;
 
-        Data data = this.data.stream().filter(datum -> datum.id.equals(actionDataId)).findFirst().orElse(null);
+        Data data = this.data.stream().filter(datum -> datum.id.equals(connectorDataId)).findFirst().orElse(null);
         if (data != null) {
-            value = ReceivedMessageHelper.getTypedValue(actionDataType, data.value);
+            value = ReceivedMessageHelper.getTypedValue(connectorDataType, data.value);
         }
 
         return value;

@@ -52,15 +52,22 @@ publishing {
         maven {
             url = version.endsWith('SNAPSHOT') ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/' : 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
             credentials {
-                username = findProperty('nexusUsername')
-                password = findProperty('nexusPassword')
+                username = envOrPropOrEmpty('OSSRH_USERNAME')
+                password = envOrPropOrEmpty('OSSRH_PASSWORD')
             }
         }
     }
 }
 
 signing {
-    sign publishing.publications.mavenJava
+    def signingKey = envOrPropOrEmpty('PGP_KEY')
+    def signingPassword = envOrPropOrEmpty('PGP_PWD')
+
+    useInMemoryPgpKeys(signingKey, signingPassword)
+
+    if (signingKey != '') {
+        sign publishing.publications.mavenJava
+    }
 }
 
 javadoc {

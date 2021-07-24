@@ -142,7 +142,8 @@ public class GenericHelper {
         public enum ForAnnotation {
             STATE,
             EVENT,
-            SETTING
+            SETTING,
+            CONNECTOR_VALUE
         }
 
         /**
@@ -185,15 +186,19 @@ public class GenericHelper {
                 if (forAnnotation != null) {
                     switch (forAnnotation) {
                         case STATE:
-                            this.message += " for states, only '" + StateHelper.TYPE_CHOICE + "' and '" + StateHelper.TYPE_TEXT + "' are.";
+                            this.message += " for States, only '" + StateHelper.TYPE_CHOICE + "' and '" + StateHelper.TYPE_TEXT + "' are.";
                             break;
 
                         case EVENT:
-                            this.message += " for events, only '" + EventHelper.VALUE_TYPE_CHOICE + "' is.";
+                            this.message += " for Events, only '" + EventHelper.VALUE_TYPE_CHOICE + "' is.";
                             break;
 
                         case SETTING:
-                            this.message += " for settings, only '" + SettingHelper.TYPE_NUMBER + "' and '" + SettingHelper.TYPE_TEXT + "' are.";
+                            this.message += " for Settings, only '" + SettingHelper.TYPE_NUMBER + "' and '" + SettingHelper.TYPE_TEXT + "' are.";
+                            break;
+
+                        case CONNECTOR_VALUE:
+                            this.message += " for ConnectorValues, only '" + GenericHelper.TP_TYPE_NUMBER + "' is.";
                             break;
                     }
                 }

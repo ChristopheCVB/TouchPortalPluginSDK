@@ -248,6 +248,14 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
         LOGGER.log(Level.INFO, "Action with Data State Id received: " + choices[0]);
     }
 
+    /**
+     * Connector example with no parameter
+     */
+    @Connector(format = "Connector Simple", categoryId = "BaseCategory")
+    private void connectorSimple(@ConnectorValue Integer value) {
+        TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, "Connector connectorSimple received");
+    }
+
     @Override
     public void onDisconnected(Exception exception) {
         // Socket connection is lost or plugin has received close message

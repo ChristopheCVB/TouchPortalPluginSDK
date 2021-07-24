@@ -4,13 +4,16 @@ allprojects {
     }
 }
 
-ext.versionMajor = 7
+ext.versionMajor = 8
 ext.versionMinor = 0
 ext.versionPatch = 0
 
-ext.isSnapshot = false
-ext.isAlpha = true
-ext.alphaVersion = 3
+ext.isRelease = System.getenv('IS_RELEASE') == 'YES'
 
 ext.versionCode = versionMajor * 1000 + versionMinor * 100 + versionPatch
-ext.versionName = "${versionMajor}.${versionMinor}.${versionPatch}" + (isAlpha ? '-alpha-' + alphaVersion : '') + (isSnapshot ? '-SNAPSHOT' : '')
+ext.versionName = "${versionMajor}.${versionMinor}.${versionPatch}" + (ext.isRelease ? '' : '-SNAPSHOT')
+
+ext.envOrPropOrEmpty = { String name ->
+    def value = System.getenv(name) ? System.getenv(name) : findProperty(name)
+    return value ? value.toString() : ''
+}

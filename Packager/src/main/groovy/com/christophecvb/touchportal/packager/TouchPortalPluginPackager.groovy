@@ -2,6 +2,7 @@ package com.christophecvb.touchportal.packager
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
@@ -53,6 +54,7 @@ class TouchPortalPluginPackager implements Plugin<Project> {
             group = 'Touch Portal Plugin'
             from(project.file("${project.buildDir}/resources/main/"))
             into("${project.buildDir}/plugin/${extension.mainClassSimpleName.get()}/")
+            setDuplicatesStrategy(DuplicatesStrategy.WARN)
 
             doLast {
                 println 'Resources Copied into plugin directory'

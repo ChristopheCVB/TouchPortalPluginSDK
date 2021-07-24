@@ -37,6 +37,7 @@ public class ReceivedMessageHelper {
     public static final String TYPE_ACTION = "action";
     public static final String TYPE_HOLD_DOWN = "down";
     public static final String TYPE_HOLD_UP = "up";
+    public static final String TYPE_CONNECTOR_CHANGE = "connectorChange";
     public static final String TYPE_INFO = "info";
     public static final String TYPE_LIST_CHANGE = "listChange";
     public static final String TYPE_CLOSE_PLUGIN = "closePlugin";
@@ -44,6 +45,7 @@ public class ReceivedMessageHelper {
     public static final String TYPE_SETTINGS = "settings";
     public static final String PLUGIN_ID = "pluginId";
     public static final String ACTION_ID = "actionId";
+    public static final String CONNECTOR_ID = "connectorId";
     public static final String LIST_ID = "listId";
     public static final String INSTANCE_ID = "instanceId";
     public static final String VALUE = GenericHelper.VALUE;
@@ -93,6 +95,17 @@ public class ReceivedMessageHelper {
      */
     public static String getActionId(JsonObject jsonMessage) {
         return jsonMessage.has(ReceivedMessageHelper.ACTION_ID) ? jsonMessage.get(ReceivedMessageHelper.ACTION_ID).getAsString() : null;
+    }
+
+
+    /**
+     * Retrieve the Connector ID of a received Message
+     *
+     * @param jsonMessage {@link JsonObject}
+     * @return String connectorId
+     */
+    public static String getConnectorId(JsonObject jsonMessage) {
+        return jsonMessage.has(ReceivedMessageHelper.CONNECTOR_ID) ? jsonMessage.get(ReceivedMessageHelper.CONNECTOR_ID).getAsString() : null;
     }
 
     /**
@@ -251,7 +264,7 @@ public class ReceivedMessageHelper {
      * @return Object actionDataValue
      */
     public static Object getTypedActionDataValue(JsonObject jsonMessage, Class<?> pluginClass, Method method, Parameter parameter) {
-        String parameterDataId = DataHelper.getActionDataId(pluginClass, method, parameter);
+        String parameterDataId = DataHelper.getDataId(pluginClass, method, parameter);
         return ReceivedMessageHelper.getTypedActionDataValue(jsonMessage, parameterDataId, parameter.getParameterizedType().getTypeName());
     }
 
