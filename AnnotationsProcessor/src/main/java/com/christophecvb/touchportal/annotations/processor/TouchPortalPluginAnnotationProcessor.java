@@ -586,7 +586,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                         for (String valueChoice : state.valueChoices()) {
                             dataValueChoices.add(valueChoice);
                         }
-                        jsonData.addProperty(DataHelper.DEFAULT, state.defaultValue());
+                        jsonData.addProperty(DataHelper.DEFAULT, data.defaultValue().isEmpty() ? state.defaultValue() : data.defaultValue());
                     }
                     else {
                         for (String valueChoice : data.valueChoices()) {
@@ -724,7 +724,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                         for (String valueChoice : state.valueChoices()) {
                             dataValueChoices.add(valueChoice);
                         }
-                        jsonData.addProperty(DataHelper.DEFAULT, state.defaultValue());
+                        jsonData.addProperty(DataHelper.DEFAULT, data.defaultValue().isEmpty() ? state.defaultValue() : data.defaultValue());
                     }
                     else {
                         for (String valueChoice : data.valueChoices()) {
