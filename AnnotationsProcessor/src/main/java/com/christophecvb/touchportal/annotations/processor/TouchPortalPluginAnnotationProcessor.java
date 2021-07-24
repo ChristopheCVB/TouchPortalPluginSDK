@@ -731,8 +731,13 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
                             dataValueChoices.add(valueChoice);
                         }
                     }
-                    jsonData.add(DataHelper.VALUE_CHOICES, dataValueChoices);
                 }
+                else {
+                    for (String valueChoice : data.valueChoices()) {
+                        dataValueChoices.add(valueChoice);
+                    }
+                }
+                jsonData.add(DataHelper.VALUE_CHOICES, dataValueChoices);
                 break;
 
             case GenericHelper.TP_TYPE_FILE:
