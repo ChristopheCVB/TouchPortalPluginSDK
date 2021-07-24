@@ -1,9 +1,8 @@
-name: Publish Snapshot
+name: Build and Publish Snapshot
 
 on:
   push:
-    branches:
-      - develop
+    branches: [ develop ]
 
 jobs:
   build:
