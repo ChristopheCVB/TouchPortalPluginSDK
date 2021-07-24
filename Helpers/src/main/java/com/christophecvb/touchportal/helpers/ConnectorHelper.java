@@ -87,16 +87,16 @@ public class ConnectorHelper {
     /**
      * Get the generated Connector ID
      *
-     * @param pluginClass  Class
-     * @param actionMethod Method
+     * @param pluginClass       Class
+     * @param connectorMethod   Method
      * @return String connectorId
      */
-    public static String getConnectorId(Class<?> pluginClass, Method actionMethod) {
+    public static String getConnectorId(Class<?> pluginClass, Method connectorMethod) {
         String connectorId = "";
 
-        if (actionMethod.isAnnotationPresent(Action.class)) {
-            Action action = actionMethod.getDeclaredAnnotation(Action.class);
-            connectorId = ConnectorHelper._getConnectorId(CategoryHelper.getCategoryId(pluginClass, action.categoryId()), (!action.id().isEmpty() ? action.id() : actionMethod.getName()));
+        if (connectorMethod.isAnnotationPresent(Connector.class)) {
+            Connector connector = connectorMethod.getDeclaredAnnotation(Connector.class);
+            connectorId = ConnectorHelper._getConnectorId(CategoryHelper.getCategoryId(pluginClass, connector.categoryId()), (!connector.id().isEmpty() ? connector.id() : connectorMethod.getName()));
         }
 
         return connectorId;

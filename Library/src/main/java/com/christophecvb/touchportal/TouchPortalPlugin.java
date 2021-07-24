@@ -378,7 +378,7 @@ public abstract class TouchPortalPlugin {
                                 method.invoke(this, arguments);
                             }
                             catch (Exception e) {
-                                TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Action method could not be invoked", e);
+                                TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Connector method could not be invoked", e);
                             }
                         });
                         called = true;
@@ -647,7 +647,7 @@ public abstract class TouchPortalPlugin {
      * @return boolean stateUpdateMessageSent
      */
     public boolean sendStateUpdate(String stateId, Object value) {
-        return this.sendStateUpdate(stateId, value, false);
+        return this.sendStateUpdate(stateId, value, false, false);
     }
 
     /**
@@ -656,13 +656,14 @@ public abstract class TouchPortalPlugin {
      * @param stateId         String
      * @param value           Object
      * @param allowEmptyValue boolean
+     * @param forceUpdate     boolean
      * @return boolean stateUpdateMessageSent
      */
-    public boolean sendStateUpdate(String stateId, Object value, boolean allowEmptyValue) {
+    public boolean sendStateUpdate(String stateId, Object value, boolean allowEmptyValue, boolean forceUpdate) {
         boolean sent = false;
         String valueStr = value != null ? String.valueOf(value) : null;
         if (stateId != null && !stateId.isEmpty() && valueStr != null && (allowEmptyValue || !valueStr.isEmpty())) {
-            if (!this.currentStates.containsKey(stateId) || !this.currentStates.get(stateId).equals(valueStr)) {
+            if (forceUpdate || (!this.currentStates.containsKey(stateId) || !this.currentStates.get(stateId).equals(valueStr))) {
                 JsonObject stateUpdateMessage = new JsonObject();
                 stateUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_STATE_UPDATE);
                 stateUpdateMessage.addProperty(SentMessageHelper.ID, stateId);
@@ -687,7 +688,7 @@ public abstract class TouchPortalPlugin {
      * @return boolean stateUpdateMessageSent
      */
     public boolean sendCreateState(String categoryId, String stateId, String description, Object value) {
-        return this.sendCreateState(categoryId, stateId, description, value, false);
+        return this.sendCreateState(categoryId, stateId, description, value, false, false);
     }
 
     /**
@@ -698,9 +699,10 @@ public abstract class TouchPortalPlugin {
      * @param description       String
      * @param value             Object
      * @param allowEmptyValue   boolean
+     * @param forceUpdate       boolean
      * @return boolean stateCreateSent
      */
-    public boolean sendCreateState(String categoryId, String stateId, String description, Object value, boolean allowEmptyValue) {
+    public boolean sendCreateState(String categoryId, String stateId, String description, Object value, boolean allowEmptyValue, boolean forceUpdate) {
         boolean sent = false;
         String valueStr = value != null ? String.valueOf(value) : null;
         if (categoryId != null && !categoryId.isEmpty() && stateId != null && !stateId.isEmpty() && description != null && !description.isEmpty() && valueStr != null && (allowEmptyValue || !valueStr.isEmpty())) {
@@ -718,7 +720,7 @@ public abstract class TouchPortalPlugin {
                 TouchPortalPlugin.LOGGER.info("Create State [" + stateId + "] Sent [" + sent + "]");
             }
             else {
-                sent = this.sendStateUpdate(stateId, value, allowEmptyValue);
+                sent = this.sendStateUpdate(stateId, value, allowEmptyValue, forceUpdate);
             }
         }
         return sent;

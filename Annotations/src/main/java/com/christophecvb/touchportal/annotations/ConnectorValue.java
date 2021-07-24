@@ -40,10 +40,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface ConnectorValue {
-    /**
-     * ConnectorValue value
-     *
-     * @return String value
-     */
-    String value();
 }

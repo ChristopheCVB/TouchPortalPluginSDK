@@ -45,6 +45,7 @@ public class ReceivedMessageHelper {
     public static final String TYPE_SETTINGS = "settings";
     public static final String PLUGIN_ID = "pluginId";
     public static final String ACTION_ID = "actionId";
+    public static final String CONNECTOR_ID = "connectorId";
     public static final String LIST_ID = "listId";
     public static final String INSTANCE_ID = "instanceId";
     public static final String VALUE = GenericHelper.VALUE;
@@ -94,6 +95,17 @@ public class ReceivedMessageHelper {
      */
     public static String getActionId(JsonObject jsonMessage) {
         return jsonMessage.has(ReceivedMessageHelper.ACTION_ID) ? jsonMessage.get(ReceivedMessageHelper.ACTION_ID).getAsString() : null;
+    }
+
+
+    /**
+     * Retrieve the Connector ID of a received Message
+     *
+     * @param jsonMessage {@link JsonObject}
+     * @return String connectorId
+     */
+    public static String getConnectorId(JsonObject jsonMessage) {
+        return jsonMessage.has(ReceivedMessageHelper.CONNECTOR_ID) ? jsonMessage.get(ReceivedMessageHelper.CONNECTOR_ID).getAsString() : null;
     }
 
     /**
