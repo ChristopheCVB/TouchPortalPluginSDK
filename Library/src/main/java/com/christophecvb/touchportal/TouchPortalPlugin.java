@@ -182,6 +182,7 @@ public abstract class TouchPortalPlugin {
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_HOLD_DOWN, TPActionMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_HOLD_UP, TPActionMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_CONNECTOR_CHANGE, TPConnectorChangeMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_NOTIFICATION_OPTION_CLICKED, TPNotificationOptionClickedMessage.class);
                         this.gson = new GsonBuilder().registerTypeAdapter(TPMessage.class, tpMessageDeserializer).create();
                     }
                     String socketMessage = this.bufferedReader.readLine();
@@ -199,6 +200,7 @@ public abstract class TouchPortalPlugin {
         });
     }
 
+    //todo: add TYPE_NOTIFICATION_OPTION_CLICKED
     private void onMessage(String socketMessage) throws SocketException, JsonParseException {
         if (!socketMessage.isEmpty()) {
             TPMessage tpMessage = this.gson.fromJson(socketMessage, TPMessage.class);
@@ -802,6 +804,33 @@ public abstract class TouchPortalPlugin {
                 TouchPortalPlugin.LOGGER.log(Level.INFO, "Update Setting [" + settingName + "] Sent [" + sent + "]");
             }
         }
+        return sent;
+    }
+
+
+    //TODO: make a option object class?
+    /**
+     * Send a Show Notification Message to the Touch Portal Plugin System
+     *
+     * @param notificationId String
+     * @param title          String
+     * @param msg            String
+     * @param options
+     * @return boolean showNotificationMessageSent
+     */
+    public boolean sendShowNotification(String notificationId, String title, String msg, JsonArray options) {
+        boolean sent = false;
+        if (notificationId != null && !notificationId.isEmpty() && title != null && !title.isEmpty() && msg != null && !msg.isEmpty() && options != null && options.size() >= 1) {
+            JsonObject showNotificationMessage = new JsonObject();
+            showNotificationMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_SHOW_NOTIFICATION);
+            showNotificationMessage.addProperty(SentMessageHelper.NOTIFICATION_ID, notificationId);
+            showNotificationMessage.addProperty(SentMessageHelper.TITLE, title);
+            showNotificationMessage.addProperty(SentMessageHelper.MSG, msg);
+            showNotificationMessage.add(SentMessageHelper.OPTIONS, options);
+
+            sent = this.send(showNotificationMessage);
+        }
+
         return sent;
     }
 
