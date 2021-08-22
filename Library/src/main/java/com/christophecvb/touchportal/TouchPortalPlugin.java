@@ -834,11 +834,16 @@ public abstract class TouchPortalPlugin {
 
             JsonArray jsonOptions = new JsonArray();
             for (TPNotificationOption option : options) {
-                jsonOptions.add(this.gson.toJson(option));
+                JsonObject jsonOption = new JsonObject();
+                jsonOption.addProperty(SentMessageHelper.ID, option.id);
+                jsonOption.addProperty(SentMessageHelper.TITLE, option.title);
+
+                jsonOptions.add(jsonOption);
             }
             showNotificationMessage.add(SentMessageHelper.OPTIONS, jsonOptions);
 
             sent = this.send(showNotificationMessage);
+            TouchPortalPlugin.LOGGER.info("Show Notification [" + notificationId + "] Sent [" + sent + "]");
         }
 
         return sent;
