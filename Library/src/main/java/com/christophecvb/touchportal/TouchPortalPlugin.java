@@ -820,12 +820,12 @@ public abstract class TouchPortalPlugin {
      * @param notificationId String
      * @param title          String
      * @param msg            String
-     * @param options        ArrayList&lt;TPNotificationOption&gt;
+     * @param options        TPNotificationOption[]
      * @return boolean showNotificationMessageSent
      */
-    public boolean sendShowNotification(String notificationId, String title, String msg, ArrayList<TPNotificationOption> options) {
+    public boolean sendShowNotification(String notificationId, String title, String msg, TPNotificationOption[] options) {
         boolean sent = false;
-        if (notificationId != null && !notificationId.isEmpty() && title != null && !title.isEmpty() && msg != null && !msg.isEmpty() && options != null && options.size() >= 1) {
+        if (notificationId != null && !notificationId.isEmpty() && title != null && !title.isEmpty() && msg != null && !msg.isEmpty() && options != null && options.length >= 1) {
             JsonObject showNotificationMessage = new JsonObject();
             showNotificationMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_SHOW_NOTIFICATION);
             showNotificationMessage.addProperty(SentMessageHelper.NOTIFICATION_ID, notificationId);
@@ -833,7 +833,9 @@ public abstract class TouchPortalPlugin {
             showNotificationMessage.addProperty(SentMessageHelper.MSG, msg);
 
             JsonArray jsonOptions = new JsonArray();
-            options.forEach(tpNotificationOption -> jsonOptions.add(this.gson.toJson(tpNotificationOption)));
+            for (TPNotificationOption option : options) {
+                jsonOptions.add(this.gson.toJson(option));
+            }
             showNotificationMessage.add(SentMessageHelper.OPTIONS, jsonOptions);
 
             sent = this.send(showNotificationMessage);

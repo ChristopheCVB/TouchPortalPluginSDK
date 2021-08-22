@@ -24,10 +24,7 @@ import com.christophecvb.touchportal.annotations.*;
 import com.christophecvb.touchportal.helpers.PluginHelper;
 import com.christophecvb.touchportal.helpers.ReceivedMessageHelper;
 import com.christophecvb.touchportal.TouchPortalPlugin;
-import com.christophecvb.touchportal.model.TPBroadcastMessage;
-import com.christophecvb.touchportal.model.TPInfoMessage;
-import com.christophecvb.touchportal.model.TPListChangeMessage;
-import com.christophecvb.touchportal.model.TPSettingsMessage;
+import com.christophecvb.touchportal.model.*;
 import com.google.gson.JsonObject;
 
 import java.io.File;
@@ -296,5 +293,9 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
 
     @Override
     public void onSettings(TPSettingsMessage tpSettingsMessage) {
+    }
+
+    @Override
+    public void onNotificationOptionClicked(TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage) {
     }
 }

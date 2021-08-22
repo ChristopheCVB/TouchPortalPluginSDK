@@ -22,10 +22,7 @@ package com.christophecvb.touchportal.test;
 
 import com.christophecvb.touchportal.TouchPortalPlugin;
 import com.christophecvb.touchportal.helpers.*;
-import com.christophecvb.touchportal.model.TPBroadcastMessage;
-import com.christophecvb.touchportal.model.TPInfoMessage;
-import com.christophecvb.touchportal.model.TPListChangeMessage;
-import com.christophecvb.touchportal.model.TPSettingsMessage;
+import com.christophecvb.touchportal.model.*;
 import com.christophecvb.touchportal.oauth2.OAuth2LocalServerReceiver;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -78,6 +75,10 @@ public class LibraryTests {
 
         @Override
         public void onSettings(TPSettingsMessage tpSettingsMessage) {
+        }
+
+        @Override
+        public void onNotificationOptionClicked(TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage) {
         }
     };
 
@@ -292,6 +293,18 @@ public class LibraryTests {
         assertTrue(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, stateValue));
         assertFalse(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, stateValue));
         Assert.assertEquals(stateValue, this.touchPortalPluginTest.getLastStateValue(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID));
+    }
+
+    @Test
+    public void testShowNotification() {
+        assertFalse (this.touchPortalPluginTest.sendShowNotification(null, null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendShowNotification("", null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendShowNotification("", "", null, null));
+        assertFalse(this.touchPortalPluginTest.sendShowNotification("", "", "", null));
+        assertTrue(this.touchPortalPluginTest.sendShowNotification(TouchPortalPluginTestConstants.BaseCategory.ID + ".testNotification", "Test", "This is a test notification", new TPNotificationOption[]{
+                new TPNotificationOption(TouchPortalPluginTestConstants.BaseCategory.ID + ".Option1", "Option 1"),
+                new TPNotificationOption(TouchPortalPluginTestConstants.BaseCategory.ID + ".Option2", "Option 2")
+        }));
     }
 
     @Test

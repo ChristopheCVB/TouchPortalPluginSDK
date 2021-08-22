@@ -104,6 +104,11 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
      * Called when a Settings Message is received
      */
     public void onSettings(TPSettingsMessage tpSettingsMessage) { }
+
+  /**
+   * Called when a Notification Option Clicked Message is received
+   */
+  public void onNotificationOptionClicked(TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage) {}
 }
 ```
 
