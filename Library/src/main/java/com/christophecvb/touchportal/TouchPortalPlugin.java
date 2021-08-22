@@ -820,7 +820,7 @@ public abstract class TouchPortalPlugin {
      * @param notificationId String
      * @param title          String
      * @param msg            String
-     * @param options        TPNotificationOption[]
+     * @param options        {@link TPNotificationOption}[]
      * @return boolean showNotificationMessageSent
      */
     public boolean sendShowNotification(String notificationId, String title, String msg, TPNotificationOption[] options) {
