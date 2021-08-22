@@ -36,6 +36,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
@@ -200,7 +201,6 @@ public abstract class TouchPortalPlugin {
         });
     }
 
-    //todo: add TYPE_NOTIFICATION_OPTION_CLICKED
     private void onMessage(String socketMessage) throws SocketException, JsonParseException {
         if (!socketMessage.isEmpty()) {
             TPMessage tpMessage = this.gson.fromJson(socketMessage, TPMessage.class);
@@ -240,6 +240,13 @@ public abstract class TouchPortalPlugin {
 
                         if (this.touchPortalPluginListener != null) {
                             this.touchPortalPluginListener.onSettings(tpSettingsMessage);
+                        }
+                        break;
+
+                    case ReceivedMessageHelper.TYPE_NOTIFICATION_OPTION_CLICKED:
+                        TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage = (TPNotificationOptionClickedMessage) tpMessage;
+                        if (this.touchPortalPluginListener != null) {
+                            this.touchPortalPluginListener.onNotificationOptionClicked(tpNotificationOptionClickedMessage);
                         }
                         break;
 
@@ -807,18 +814,16 @@ public abstract class TouchPortalPlugin {
         return sent;
     }
 
-
-    //TODO: make a option object class?
     /**
      * Send a Show Notification Message to the Touch Portal Plugin System
      *
      * @param notificationId String
      * @param title          String
      * @param msg            String
-     * @param options
+     * @param options        ArrayList&lt;TPNotificationOption&gt;
      * @return boolean showNotificationMessageSent
      */
-    public boolean sendShowNotification(String notificationId, String title, String msg, JsonArray options) {
+    public boolean sendShowNotification(String notificationId, String title, String msg, ArrayList<TPNotificationOption> options) {
         boolean sent = false;
         if (notificationId != null && !notificationId.isEmpty() && title != null && !title.isEmpty() && msg != null && !msg.isEmpty() && options != null && options.size() >= 1) {
             JsonObject showNotificationMessage = new JsonObject();
@@ -826,7 +831,10 @@ public abstract class TouchPortalPlugin {
             showNotificationMessage.addProperty(SentMessageHelper.NOTIFICATION_ID, notificationId);
             showNotificationMessage.addProperty(SentMessageHelper.TITLE, title);
             showNotificationMessage.addProperty(SentMessageHelper.MSG, msg);
-            showNotificationMessage.add(SentMessageHelper.OPTIONS, options);
+
+            JsonArray jsonOptions = new JsonArray();
+            options.forEach(tpNotificationOption -> jsonOptions.add(this.gson.toJson(tpNotificationOption)));
+            showNotificationMessage.add(SentMessageHelper.OPTIONS, jsonOptions);
 
             sent = this.send(showNotificationMessage);
         }
@@ -1097,6 +1105,13 @@ public abstract class TouchPortalPlugin {
          * @param tpSettingsMessage TPSettingsMessage
          */
         void onSettings(TPSettingsMessage tpSettingsMessage);
+
+        /**
+         * Called when a Notification Option Clicked Message is received
+         *
+         * @param tpNotificationOptionClickedMessage TPNotificationOptionClickedMessage
+         */
+        void onNotificationOptionClicked(TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage);
     }
 
     /**
