@@ -845,6 +845,27 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Send a Connector Update Message to the Touch Portal Plugin System
+     *
+     * @param connectorId String
+     * @param value       Integer
+     * @return boolean sendConnectorUpdateSent
+     */
+    public boolean sendConnectorUpdate(String connectorId, Integer value) {
+        boolean sent = false;
+        if (connectorId != null && !connectorId.isEmpty() && value != null) {
+            JsonObject showNotificationMessage = new JsonObject();
+            showNotificationMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CONNECTOR_UPDATE);
+            showNotificationMessage.addProperty(SentMessageHelper.CONNECTOR_ID, connectorId);
+            showNotificationMessage.addProperty(SentMessageHelper.VALUE, value);
+
+            sent = this.send(showNotificationMessage);
+        }
+
+        return sent;
+    }
+
+    /**
      * Is the Plugin connected to the Touch Portal Plugin System
      *
      * @return boolean isPluginConnected
