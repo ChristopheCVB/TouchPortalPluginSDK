@@ -301,6 +301,9 @@ public class LibraryTests {
         assertFalse(this.touchPortalPluginTest.sendShowNotification("", null, null, null));
         assertFalse(this.touchPortalPluginTest.sendShowNotification("", "", null, null));
         assertFalse(this.touchPortalPluginTest.sendShowNotification("", "", "", null));
+        assertFalse (this.touchPortalPluginTest.sendShowNotification("title", null, null, null));
+        assertFalse (this.touchPortalPluginTest.sendShowNotification("id", "title", null, null));
+        assertFalse (this.touchPortalPluginTest.sendShowNotification("id", "title", "message", null));
         assertTrue(this.touchPortalPluginTest.sendShowNotification(TouchPortalPluginTestConstants.BaseCategory.ID + ".testNotification", "Test", "This is a test notification", new TPNotificationOption[]{
                 new TPNotificationOption(TouchPortalPluginTestConstants.BaseCategory.ID + ".Option1", "Option 1"),
                 new TPNotificationOption(TouchPortalPluginTestConstants.BaseCategory.ID + ".Option2", "Option 2")
