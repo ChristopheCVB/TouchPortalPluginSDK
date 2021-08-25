@@ -123,6 +123,9 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
 
                     // Update State Choice
                     touchPortalSampleJavaPlugin.sendChoiceUpdate(TouchPortalSampleJavaPluginConstants.SecondCategory.States.CustomStateChoice.ID, new String[]{"1", "2", "3"});
+
+                    // Update connector value
+                    touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 10);
                 }
             }
         }
