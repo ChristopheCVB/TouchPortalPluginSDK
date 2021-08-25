@@ -123,6 +123,15 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
 
                     // Update State Choice
                     touchPortalSampleJavaPlugin.sendChoiceUpdate(TouchPortalSampleJavaPluginConstants.SecondCategory.States.CustomStateChoice.ID, new String[]{"1", "2", "3"});
+
+                    // Send notification
+                    touchPortalSampleJavaPlugin.sendShowNotification(
+                            TouchPortalSampleJavaPluginConstants.BaseCategory.ID + ".exampleNotification",
+                            "Example notification",
+                            "the message of the notification",
+                            new TPNotificationOption[]{
+                                    new TPNotificationOption(TouchPortalSampleJavaPluginConstants.BaseCategory.ID + ".exampleNotification.options.exampleOption", "example option")
+                            });
                 }
             }
         }
@@ -297,5 +306,10 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
 
     @Override
     public void onNotificationOptionClicked(TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage) {
+        if (tpNotificationOptionClickedMessage.notificationId.equals(TouchPortalSampleJavaPluginConstants.BaseCategory.ID + ".exampleNotification")) {
+            if (tpNotificationOptionClickedMessage.optionId.equals(TouchPortalSampleJavaPluginConstants.BaseCategory.ID + ".exampleNotification.options.exampleOption")) {
+                LOGGER.log(Level.INFO, "Example option clicked");
+            }
+        }
     }
 }
