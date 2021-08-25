@@ -36,6 +36,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
@@ -182,6 +183,7 @@ public abstract class TouchPortalPlugin {
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_HOLD_DOWN, TPActionMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_HOLD_UP, TPActionMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_CONNECTOR_CHANGE, TPConnectorChangeMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_NOTIFICATION_OPTION_CLICKED, TPNotificationOptionClickedMessage.class);
                         this.gson = new GsonBuilder().registerTypeAdapter(TPMessage.class, tpMessageDeserializer).create();
                     }
                     String socketMessage = this.bufferedReader.readLine();
@@ -238,6 +240,13 @@ public abstract class TouchPortalPlugin {
 
                         if (this.touchPortalPluginListener != null) {
                             this.touchPortalPluginListener.onSettings(tpSettingsMessage);
+                        }
+                        break;
+
+                    case ReceivedMessageHelper.TYPE_NOTIFICATION_OPTION_CLICKED:
+                        TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage = (TPNotificationOptionClickedMessage) tpMessage;
+                        if (this.touchPortalPluginListener != null) {
+                            this.touchPortalPluginListener.onNotificationOptionClicked(tpNotificationOptionClickedMessage);
                         }
                         break;
 
@@ -806,6 +815,41 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Send a Show Notification Message to the Touch Portal Plugin System
+     *
+     * @param notificationId String
+     * @param title          String
+     * @param msg            String
+     * @param options        {@link TPNotificationOption}[]
+     * @return boolean showNotificationMessageSent
+     */
+    public boolean sendShowNotification(String notificationId, String title, String msg, TPNotificationOption[] options) {
+        boolean sent = false;
+        if (notificationId != null && !notificationId.isEmpty() && title != null && !title.isEmpty() && msg != null && !msg.isEmpty() && options != null && options.length >= 1) {
+            JsonObject showNotificationMessage = new JsonObject();
+            showNotificationMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_SHOW_NOTIFICATION);
+            showNotificationMessage.addProperty(SentMessageHelper.NOTIFICATION_ID, notificationId);
+            showNotificationMessage.addProperty(SentMessageHelper.TITLE, title);
+            showNotificationMessage.addProperty(SentMessageHelper.MSG, msg);
+
+            JsonArray jsonOptions = new JsonArray();
+            for (TPNotificationOption option : options) {
+                JsonObject jsonOption = new JsonObject();
+                jsonOption.addProperty(SentMessageHelper.ID, option.id);
+                jsonOption.addProperty(SentMessageHelper.TITLE, option.title);
+
+                jsonOptions.add(jsonOption);
+            }
+            showNotificationMessage.add(SentMessageHelper.OPTIONS, jsonOptions);
+
+            sent = this.send(showNotificationMessage);
+            TouchPortalPlugin.LOGGER.info("Show Notification [" + notificationId + "] Sent [" + sent + "]");
+        }
+
+        return sent;
+    }
+
+    /**
      * Is the Plugin connected to the Touch Portal Plugin System
      *
      * @return boolean isPluginConnected
@@ -1068,6 +1112,13 @@ public abstract class TouchPortalPlugin {
          * @param tpSettingsMessage TPSettingsMessage
          */
         void onSettings(TPSettingsMessage tpSettingsMessage);
+
+        /**
+         * Called when a Notification Option Clicked Message is received
+         *
+         * @param tpNotificationOptionClickedMessage TPNotificationOptionClickedMessage
+         */
+        void onNotificationOptionClicked(TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage);
     }
 
     /**

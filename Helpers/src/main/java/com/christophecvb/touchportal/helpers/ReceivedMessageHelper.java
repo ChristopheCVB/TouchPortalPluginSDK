@@ -43,6 +43,7 @@ public class ReceivedMessageHelper {
     public static final String TYPE_CLOSE_PLUGIN = "closePlugin";
     public static final String TYPE_BROADCAST = "broadcast";
     public static final String TYPE_SETTINGS = "settings";
+    public static final String TYPE_NOTIFICATION_OPTION_CLICKED = "notificationOptionClicked";
     public static final String PLUGIN_ID = "pluginId";
     public static final String ACTION_ID = "actionId";
     public static final String CONNECTOR_ID = "connectorId";
