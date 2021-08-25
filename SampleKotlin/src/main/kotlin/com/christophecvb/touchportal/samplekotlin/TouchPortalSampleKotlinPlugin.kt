@@ -26,10 +26,7 @@ import com.christophecvb.touchportal.annotations.Plugin
 import com.christophecvb.touchportal.helpers.PluginHelper
 import com.christophecvb.touchportal.TouchPortalPlugin
 import com.christophecvb.touchportal.annotations.Data
-import com.christophecvb.touchportal.model.TPBroadcastMessage
-import com.christophecvb.touchportal.model.TPInfoMessage
-import com.christophecvb.touchportal.model.TPListChangeMessage
-import com.christophecvb.touchportal.model.TPSettingsMessage
+import com.christophecvb.touchportal.model.*
 import com.google.gson.JsonObject
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -89,4 +86,5 @@ class TouchPortalSampleKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPl
     override fun onInfo(tpInfoMessage: TPInfoMessage) {}
     override fun onBroadcast(tpBroadcastMessage: TPBroadcastMessage) {}
     override fun onSettings(tpSettingsMessage: TPSettingsMessage) {}
+    override fun onNotificationOptionClicked(tpNotificationOptionClickedMessage: TPNotificationOptionClickedMessage) {}
 }
