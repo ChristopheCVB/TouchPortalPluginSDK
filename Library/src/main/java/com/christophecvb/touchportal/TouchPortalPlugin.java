@@ -166,7 +166,7 @@ public abstract class TouchPortalPlugin {
      */
     private void performPlatformSpecificInitialization() {
         String OS = System.getProperty("os.name").toLowerCase();
-        Bool isMac = OS.indexOf("mac") >= 0;
+        Boolean isMac = OS.indexOf("mac") >= 0;
 
         if (isMac && System.getProperty("apple.awt.UIElement") == null) {
             // Given a mac
