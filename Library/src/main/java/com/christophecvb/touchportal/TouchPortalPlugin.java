@@ -158,6 +158,23 @@ public abstract class TouchPortalPlugin {
         }
         this.pluginClass = this.getClass();
         this.callbacksExecutor = Executors.newFixedThreadPool(parallelizeActions ? 5 : 1);
+        this.performPlatformSpecificInitialization();
+    }
+
+    /**
+     * Perform any platform-specific initialization
+     */
+    private void performPlatformSpecificInitialization() {
+        String OS = System.getProperty("os.name").toLowerCase();
+        Bool isMac = OS.indexOf("mac") >= 0;
+
+        if (isMac && System.getProperty("apple.awt.UIElement") == null) {
+            // Given a mac
+            // When it does not have `apple.awt.UIElement` explicitly set
+            // Then set it to true
+            // So that a dock icon is not created for this plugin while it is running
+            System.setProperty("apple.awt.UIElement", "true");
+        }
     }
 
     /**
