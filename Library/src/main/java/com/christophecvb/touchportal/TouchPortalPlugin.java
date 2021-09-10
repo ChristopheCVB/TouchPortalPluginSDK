@@ -858,7 +858,7 @@ public abstract class TouchPortalPlugin {
      */
     public boolean sendConnectorUpdate(String connectorId, Integer value) {
         boolean sent = false;
-        if (connectorId != null && !connectorId.isEmpty() && value != null) {
+        if (connectorId != null && !connectorId.isEmpty() && value != null && value >= 0 && value <= 100) {
             JsonObject showNotificationMessage = new JsonObject();
             showNotificationMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CONNECTOR_UPDATE);
             showNotificationMessage.addProperty(SentMessageHelper.CONNECTOR_ID, connectorId);

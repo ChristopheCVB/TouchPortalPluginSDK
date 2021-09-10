@@ -612,6 +612,8 @@ public class LibraryTests {
         assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", 1));
         assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("ID", 1));
         assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("ID", null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("ID", 200));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("ID", -13));
     }
 
     @Test
