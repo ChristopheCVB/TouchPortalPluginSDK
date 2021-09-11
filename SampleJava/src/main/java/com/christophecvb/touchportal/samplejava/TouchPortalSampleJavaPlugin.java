@@ -123,7 +123,6 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
 
                     // Update State Choice
                     touchPortalSampleJavaPlugin.sendChoiceUpdate(TouchPortalSampleJavaPluginConstants.SecondCategory.States.CustomStateChoice.ID, new String[]{"1", "2", "3"});
-
                     // Send notification
                     touchPortalSampleJavaPlugin.sendShowNotification(
                             TouchPortalSampleJavaPluginConstants.BaseCategory.ID + ".exampleNotification",
@@ -132,6 +131,9 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
                             new TPNotificationOption[]{
                                     new TPNotificationOption(TouchPortalSampleJavaPluginConstants.BaseCategory.ID + ".exampleNotification.options.exampleOption", "example option")
                             });
+                  
+                  // Update connector value
+                  touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 10);
                 }
             }
         }

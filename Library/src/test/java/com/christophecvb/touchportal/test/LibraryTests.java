@@ -605,6 +605,18 @@ public class LibraryTests {
     }
 
     @Test
+    public void testUpdateConnectorValue() {
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate(null, null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", 1));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", 1));
+        assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("ID", 1));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("ID", null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("ID", 200));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("ID", -13));
+    }
+
+    @Test
     public void testReceiveConnectorForSliderWithNonData() throws IOException, InterruptedException {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
 
