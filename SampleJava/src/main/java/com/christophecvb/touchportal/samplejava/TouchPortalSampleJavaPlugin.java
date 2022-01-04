@@ -261,7 +261,7 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
      */
     @Connector(format = "Connector Simple", categoryId = "BaseCategory")
     private void connectorSimple(@ConnectorValue Integer value) {
-        TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, "Connector connectorSimple received");
+        TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, String.format("Connector connectorSimple received: value[%d]", value));
     }
 
     @Override

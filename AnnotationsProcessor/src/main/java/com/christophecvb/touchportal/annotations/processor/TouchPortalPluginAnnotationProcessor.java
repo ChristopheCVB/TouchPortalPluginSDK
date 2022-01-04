@@ -392,7 +392,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         TypeSpec.Builder connectorTypeSpecBuilder = this.createConnectorTypeSpecBuilder(pluginElement, categoryElement, category, connectorElement, connector);
 
         JsonObject jsonConnector = new JsonObject();
-        jsonConnector.addProperty(ConnectorHelper.ID, ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connectorElement, connector));
+        jsonConnector.addProperty(ConnectorHelper.ID, ConnectorHelper.getConnectorId(connectorElement, connector));
         jsonConnector.addProperty(ConnectorHelper.NAME, ConnectorHelper.getConnectorName(connectorElement, connector));
         jsonConnector.addProperty(ConnectorHelper.FORMAT, connector.format());
 
@@ -890,7 +890,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         TypeSpec.Builder actionTypeSpecBuilder = TypeSpec.classBuilder(TouchPortalPluginAnnotationProcessor.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         actionTypeSpecBuilder.addModifiers(Modifier.PUBLIC);
 
-        actionTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("id", ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connectorElement, connector)));
+        actionTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("id", ConnectorHelper.getConnectorId(connectorElement, connector)));
         actionTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("name", ConnectorHelper.getConnectorName(connectorElement, connector)));
         actionTypeSpecBuilder.addField(this.getStaticFinalStringFieldSpec("format", connector.format()));
 

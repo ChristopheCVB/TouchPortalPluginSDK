@@ -174,7 +174,7 @@ public class ReceivedMessageHelper {
      * @return String dataValue
      */
     public static String getActionDataValue(JsonObject jsonMessage, Class<?> pluginClass, String actionMethodName, String actionParameterName) {
-        return ReceivedMessageHelper.getActionDataValue(jsonMessage, DataHelper.getActionDataId(pluginClass, actionMethodName, actionParameterName));
+        return ReceivedMessageHelper.getActionDataValue(jsonMessage, DataHelper.getDataId(pluginClass, actionMethodName, actionParameterName));
     }
 
     /**
