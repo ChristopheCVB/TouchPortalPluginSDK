@@ -133,7 +133,7 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
                             });
                   
                   // Update connector value
-                  touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 10);
+                  touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.ID, TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 10, null);
                 }
             }
         }

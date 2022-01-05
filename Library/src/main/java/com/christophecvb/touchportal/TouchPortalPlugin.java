@@ -36,10 +36,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.*;
@@ -852,11 +849,43 @@ public abstract class TouchPortalPlugin {
     /**
      * Send a Connector Update Message to the Touch Portal Plugin System
      *
+     * @param pluginId      String
+     * @param connectorId   String
+     * @param value         Integer
+     * @param data          Map&lt;String, Object&gt;
+     * @return Boolean sent
+     */
+    public boolean sendConnectorUpdate(String pluginId, String connectorId, Integer value, Map<String, Object> data) {
+        boolean sent = false;
+
+        if (pluginId != null && !pluginId.isEmpty() && connectorId != null && !connectorId.isEmpty() && value != null && value >= 0 && value <= 100) {
+            StringBuilder constructedConnectorId = new StringBuilder(ConnectorHelper.UPDATE_PREFIX)
+                    .append(ConnectorHelper.UPDATE_ID_SEPARATOR)
+                    .append(pluginId)
+                    .append(ConnectorHelper.UPDATE_ID_SEPARATOR)
+                    .append(connectorId);
+            if (data != null && data.size() > 0) {
+                for (String dataKey : data.keySet()) {
+                    constructedConnectorId.append(ConnectorHelper.UPDATE_DATA_SEPARATOR)
+                            .append(dataKey)
+                            .append("=")
+                            .append(data.get(dataKey));
+                }
+            }
+            sent = this.sendConnectorUpdate(constructedConnectorId.toString(), value);
+        }
+
+        return sent;
+    }
+
+    /**
+     * Send a Connector Update Message to the Touch Portal Plugin System
+     *
      * @param connectorId String
      * @param value       Integer
      * @return boolean sendConnectorUpdateSent
      */
-    public boolean sendConnectorUpdate(String connectorId, Integer value) {
+    private boolean sendConnectorUpdate(String connectorId, Integer value) {
         boolean sent = false;
         if (connectorId != null && !connectorId.isEmpty() && value != null && value >= 0 && value <= 100) {
             JsonObject showNotificationMessage = new JsonObject();

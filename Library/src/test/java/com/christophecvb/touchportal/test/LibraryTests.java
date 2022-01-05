@@ -606,14 +606,18 @@ public class LibraryTests {
 
     @Test
     public void testUpdateConnectorValue() {
-        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate(null, null));
-        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", null));
-        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", 1));
-        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", 1));
-        assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("ID", 1));
-        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("ID", null));
-        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("ID", 200));
-        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("ID", -13));
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("dataId", "value");
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate(null, null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", null, 1, null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", "", 1, null));
+        assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 1, null));
+        assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 1, new HashMap<>()));
+        assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 1, data));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", null, null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 200, null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", -13, null));
     }
 
     @Test

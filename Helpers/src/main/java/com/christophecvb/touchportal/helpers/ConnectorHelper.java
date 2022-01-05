@@ -34,6 +34,9 @@ public class ConnectorHelper {
     public static final String TYPE = GenericHelper.TYPE;
     public static final String DATA = "data";
     public static final String FORMAT = "format";
+    public static final String UPDATE_PREFIX = "pc";
+    public static final String UPDATE_ID_SEPARATOR = "_";
+    public static final String UPDATE_DATA_SEPARATOR = "|";
 
     protected static final String KEY_CONNECTOR = "connector";
 
