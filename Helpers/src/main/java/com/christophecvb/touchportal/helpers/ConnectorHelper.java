@@ -119,4 +119,21 @@ public class ConnectorHelper {
     private static String _getConnectorId(String rawConnectorId) {
         return ConnectorHelper.KEY_CONNECTOR + "." + rawConnectorId;
     }
+
+    /**
+     * Compute a Linear Translate
+     *
+     * @param inputMin      float
+     * @param inputMax      float
+     * @param outputMin     float
+     * @param outputMax     float
+     * @param inputValue    float
+     * @return float computedValue
+     */
+    public static Float linearTranslate(float inputMin, float inputMax, float outputMin, float outputMax, float inputValue) {
+        float inputRange = inputMax - inputMin;
+        float outputRange = outputMax - outputMin;
+        float computedCross = outputRange / inputRange * (inputValue - inputMin);
+        return computedCross + outputMin;
+    }
 }
