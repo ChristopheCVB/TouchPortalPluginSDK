@@ -24,6 +24,7 @@ import com.christophecvb.touchportal.annotations.Connector;
 
 import javax.lang.model.element.Element;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * Touch Portal Plugin Action Helper
@@ -135,5 +136,37 @@ public class ConnectorHelper {
         float outputRange = outputMax - outputMin;
         float computedCross = outputRange / inputRange * (inputValue - inputMin);
         return computedCross + outputMin;
+    }
+
+    /**
+     * Get the constructed Connector Id for Connector Update
+     *
+     * @param pluginId      String
+     * @param connectorId   String
+     * @param value         Integer
+     * @param data          Map&lt;String, Object&gt;
+     * @return String constructedConnectorId
+     */
+    public static String getConstructedId(String pluginId, String connectorId, Integer value, Map<String, Object> data) {
+        String constructedConnectorId = null;
+
+        if (pluginId != null && !pluginId.isEmpty() && connectorId != null && !connectorId.isEmpty() && value != null && value >= 0 && value <= 100) {
+            StringBuilder constructedConnectorIdBuilder = new StringBuilder(ConnectorHelper.UPDATE_PREFIX)
+                    .append(ConnectorHelper.UPDATE_ID_SEPARATOR)
+                    .append(pluginId)
+                    .append(ConnectorHelper.UPDATE_ID_SEPARATOR)
+                    .append(connectorId);
+            if (data != null && data.size() > 0) {
+                for (String dataKey : data.keySet()) {
+                    constructedConnectorIdBuilder.append(ConnectorHelper.UPDATE_DATA_SEPARATOR)
+                            .append(dataKey)
+                            .append("=")
+                            .append(data.get(dataKey));
+                }
+            }
+            constructedConnectorId = constructedConnectorIdBuilder.toString();
+        }
+
+        return constructedConnectorId;
     }
 }

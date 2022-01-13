@@ -20,12 +20,14 @@
 
 package com.christophecvb.touchportal.model;
 
+import com.christophecvb.touchportal.helpers.ConnectorHelper;
 import com.christophecvb.touchportal.helpers.DataHelper;
 import com.christophecvb.touchportal.helpers.ReceivedMessageHelper;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class TPConnectorChangeMessage extends TPMessage {
     public String pluginId;
@@ -51,5 +53,14 @@ public class TPConnectorChangeMessage extends TPMessage {
         }
 
         return value;
+    }
+
+    public String getConstructedId() {
+        return ConnectorHelper.getConstructedId(
+                this.pluginId,
+                this.connectorId,
+                this.value,
+                this.data.stream().collect(Collectors.toMap(data -> data.id, data -> data.value))
+        );
     }
 }

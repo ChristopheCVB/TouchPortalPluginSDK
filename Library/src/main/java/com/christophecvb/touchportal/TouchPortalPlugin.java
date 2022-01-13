@@ -36,7 +36,10 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.*;
@@ -116,6 +119,10 @@ public abstract class TouchPortalPlugin {
      * Last sent States HashMap (Key, Value)
      */
     private final HashMap<String, String> currentStates = new HashMap<>();
+    /**
+     * Current Connector Values HashMap (Key, Value)
+     */
+    private final HashMap<String, Integer> currentConnectorValues = new HashMap<>();
     /**
      * Last sent Choices HashMap (Key, Value)
      */
@@ -378,6 +385,7 @@ public abstract class TouchPortalPlugin {
                                 throw new MethodDataParameterException(method, parameter);
                             }
                         }
+                        this.currentConnectorValues.put(tpConnectorChangeMessage.getConstructedId(), tpConnectorChangeMessage.value);
                         this.callbacksExecutor.submit(() -> {
                             try {
                                 method.setAccessible(true);
@@ -856,44 +864,29 @@ public abstract class TouchPortalPlugin {
      * @return Boolean sent
      */
     public boolean sendConnectorUpdate(String pluginId, String connectorId, Integer value, Map<String, Object> data) {
-        boolean sent = false;
-
-        if (pluginId != null && !pluginId.isEmpty() && connectorId != null && !connectorId.isEmpty() && value != null && value >= 0 && value <= 100) {
-            StringBuilder constructedConnectorId = new StringBuilder(ConnectorHelper.UPDATE_PREFIX)
-                    .append(ConnectorHelper.UPDATE_ID_SEPARATOR)
-                    .append(pluginId)
-                    .append(ConnectorHelper.UPDATE_ID_SEPARATOR)
-                    .append(connectorId);
-            if (data != null && data.size() > 0) {
-                for (String dataKey : data.keySet()) {
-                    constructedConnectorId.append(ConnectorHelper.UPDATE_DATA_SEPARATOR)
-                            .append(dataKey)
-                            .append("=")
-                            .append(data.get(dataKey));
-                }
-            }
-            sent = this.sendConnectorUpdate(constructedConnectorId.toString(), value);
-        }
-
-        return sent;
+        return this.sendConnectorUpdate(ConnectorHelper.getConstructedId(pluginId, connectorId, value, data), value);
     }
 
     /**
      * Send a Connector Update Message to the Touch Portal Plugin System
      *
-     * @param connectorId String
-     * @param value       Integer
+     * @param constructedConnectorId    String
+     * @param value                     Integer
      * @return boolean sendConnectorUpdateSent
      */
-    private boolean sendConnectorUpdate(String connectorId, Integer value) {
+    private boolean sendConnectorUpdate(String constructedConnectorId, Integer value) {
         boolean sent = false;
-        if (connectorId != null && !connectorId.isEmpty() && value != null && value >= 0 && value <= 100) {
+        if (constructedConnectorId != null && !constructedConnectorId.isEmpty() && value != null && value >= 0 && value <= 100 && !this.currentConnectorValues.get(constructedConnectorId).equals(value)) {
             JsonObject showNotificationMessage = new JsonObject();
             showNotificationMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CONNECTOR_UPDATE);
-            showNotificationMessage.addProperty(SentMessageHelper.CONNECTOR_ID, connectorId);
+            showNotificationMessage.addProperty(SentMessageHelper.CONNECTOR_ID, constructedConnectorId);
             showNotificationMessage.addProperty(SentMessageHelper.VALUE, value);
 
             sent = this.send(showNotificationMessage);
+            if (sent) {
+                this.currentConnectorValues.put(constructedConnectorId, value);
+            }
+            TouchPortalPlugin.LOGGER.log(Level.INFO, "Connector Update [" + constructedConnectorId + "] Sent [" + sent + "]");
         }
 
         return sent;
