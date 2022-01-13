@@ -20,6 +20,7 @@
 
 package com.christophecvb.touchportal.helpers;
 
+import com.christophecvb.touchportal.annotations.Category;
 import com.christophecvb.touchportal.annotations.Connector;
 
 import javax.lang.model.element.Element;
@@ -44,12 +45,15 @@ public class ConnectorHelper {
     /**
      * Get the generated Connector ID
      *
+     * @param pluginElement     Element
+     * @param categoryElement   Element
+     * @param category          {@link Category}
      * @param connectorElement  Element
      * @param connector         {@link Connector}
      * @return String connectorId
      */
-    public static String getConnectorId(Element connectorElement, Connector connector) {
-        return ConnectorHelper._getConnectorId(connector.id().isEmpty() ? connectorElement.getSimpleName().toString() : connector.id());
+    public static String getConnectorId(Element pluginElement, Element categoryElement, Category category, Element connectorElement, Connector connector) {
+        return ConnectorHelper._getConnectorId(CategoryHelper.getCategoryId(pluginElement, categoryElement, category), connector.id().isEmpty() ? connectorElement.getSimpleName().toString() : connector.id());
     }
 
     /**
@@ -76,7 +80,7 @@ public class ConnectorHelper {
         for (Method method : pluginClass.getDeclaredMethods()) {
             if (method.isAnnotationPresent(Connector.class) && method.getName().equals(connectorMethodName)) {
                 Connector connector = method.getDeclaredAnnotation(Connector.class);
-                connectorId = ConnectorHelper.getConnectorId(method, connector);
+                connectorId = ConnectorHelper.getConnectorId(pluginClass, method, connector);
             }
         }
 
@@ -86,15 +90,16 @@ public class ConnectorHelper {
     /**
      * Get the generated Connector ID
      *
-     * @param connectorMethod  Method
+     * @param pluginClass       Class
+     * @param connectorMethod   Method
      * @return String connectorId
      */
-    public static String getConnectorId(Method connectorMethod) {
+    public static String getConnectorId(Class<?> pluginClass, Method connectorMethod) {
         String connectorId = "";
 
         if (connectorMethod.isAnnotationPresent(Connector.class)) {
             Connector connector = connectorMethod.getDeclaredAnnotation(Connector.class);
-            connectorId = ConnectorHelper.getConnectorId(connectorMethod, connector);
+            connectorId = ConnectorHelper.getConnectorId(pluginClass, connectorMethod, connector);
         }
 
         return connectorId;
@@ -103,12 +108,13 @@ public class ConnectorHelper {
     /**
      * Get the generated Connector ID
      *
+     * @param pluginClass       Class
      * @param connectorMethod   Method
      * @param connector         {@link Connector}
      * @return String connectorId
      */
-    public static String getConnectorId(Method connectorMethod, Connector connector) {
-        return ConnectorHelper._getConnectorId(!connector.id().isEmpty() ? connector.id() : connectorMethod.getName());
+    public static String getConnectorId(Class<?> pluginClass, Method connectorMethod, Connector connector) {
+        return ConnectorHelper._getConnectorId(CategoryHelper.getCategoryId(pluginClass, connector.categoryId()), !connector.id().isEmpty() ? connector.id() : connectorMethod.getName());
     }
 
     /**
@@ -117,8 +123,8 @@ public class ConnectorHelper {
      * @param rawConnectorId    String
      * @return String connectorId
      */
-    private static String _getConnectorId(String rawConnectorId) {
-        return ConnectorHelper.KEY_CONNECTOR + "." + rawConnectorId;
+    private static String _getConnectorId(String categoryId, String rawConnectorId) {
+        return categoryId + "." + ConnectorHelper.KEY_CONNECTOR + "." + rawConnectorId;
     }
 
     /**

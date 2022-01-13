@@ -6,7 +6,7 @@ allprojects {
 
 ext.versionMajor = 8
 ext.versionMinor = 0
-ext.versionPatch = 5
+ext.versionPatch = 6
 
 ext.isRelease = System.getenv('IS_RELEASE') == 'YES'
 

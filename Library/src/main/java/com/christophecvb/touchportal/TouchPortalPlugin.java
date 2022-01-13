@@ -362,7 +362,7 @@ public abstract class TouchPortalPlugin {
         if (tpConnectorChangeMessage.connectorId != null && !tpConnectorChangeMessage.connectorId.isEmpty()) {
             Method[] pluginConnectorMethods = Arrays.stream(this.pluginClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Connector.class)).toArray(Method[]::new);
             for (Method method : pluginConnectorMethods) {
-                String methodConnectorId = ConnectorHelper.getConnectorId(method);
+                String methodConnectorId = ConnectorHelper.getConnectorId(this.pluginClass, method);
                 if (tpConnectorChangeMessage.connectorId.equals(methodConnectorId)) {
                     try {
                         Parameter[] parameters = method.getParameters();

@@ -73,7 +73,7 @@ public class DataHelper {
      * @return String dataId
      */
     public static String getConnectorDataId(Element pluginElement, Element categoryElement, Category category, Element connectorElement, Connector connector, Element dataElement, Data data) {
-        return DataHelper._getDataId(ConnectorHelper.getConnectorId(connectorElement, connector), data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id());
+        return DataHelper._getDataId(ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connectorElement, connector), data.id().isEmpty() ? dataElement.getSimpleName().toString() : data.id());
     }
 
     /**
@@ -142,7 +142,7 @@ public class DataHelper {
                     dataId = DataHelper._getDataId(ActionHelper.getActionId(pluginClass, method), data.id().isEmpty() ? methodParameter.getName() : data.id());
                 }
                 else if (method.isAnnotationPresent(Connector.class)) {
-                    dataId = DataHelper._getDataId(ConnectorHelper.getConnectorId(method), data.id().isEmpty() ? methodParameter.getName() : data.id());
+                    dataId = DataHelper._getDataId(ConnectorHelper.getConnectorId(pluginClass, method), data.id().isEmpty() ? methodParameter.getName() : data.id());
                 }
             }
         }
