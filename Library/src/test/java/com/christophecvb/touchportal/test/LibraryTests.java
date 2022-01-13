@@ -613,8 +613,10 @@ public class LibraryTests {
         assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", null, 1, null));
         assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", "", 1, null));
         assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 1, null));
-        assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 1, new HashMap<>()));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 1, new HashMap<>()));
+        assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 2, new HashMap<>()));
         assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 1, data));
+        assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 2, data));
         assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", null, null));
         assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 200, null));
         assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", -13, null));
