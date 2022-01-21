@@ -32,6 +32,8 @@ public class SentMessageHelper {
     public static final String TYPE_REMOVE_STATE = "removeState";
     public static final String TYPE_ACTION_DATA_UPDATE = "updateActionData";
     public static final String TYPE_SETTING_UPDATE = "settingUpdate";
+    public static final String TYPE_SHOW_NOTIFICATION = "showNotification";
+    public static final String TYPE_CONNECTOR_UPDATE = "connectorUpdate";
     public static final String INSTANCE_ID = "instanceId";
     public static final String ID = GenericHelper.ID;
     public static final String VALUE = GenericHelper.VALUE;
@@ -39,4 +41,11 @@ public class SentMessageHelper {
     public static final String NAME = "name";
     public static final String DESCRIPTION = StateHelper.DESC;
     public static final String DEFAULT_VALUE = "defaultValue";
+    public static final String NOTIFICATION_ID = "notificationId";
+    public static final String TITLE = "title";
+    public static final String MSG = "msg";
+    public static final String OPTIONS = "options";
+    public static final String CONNECTOR_ID = "connectorId";
+    public static final String SHORT_ID = "shortId";
+
 }

@@ -38,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -119,6 +120,14 @@ public abstract class TouchPortalPlugin {
      */
     private final HashMap<String, String> currentStates = new HashMap<>();
     /**
+     * Current Connector Values HashMap (Key, Value)
+     */
+    private final HashMap<String, Integer> currentConnectorValues = new HashMap<>();
+    /**
+     * Connector IDs mapping HashMap (ConstructedId, ShortId)
+     */
+    private final HashMap<String, String> connectorIdsMapping = new HashMap<>();
+    /**
      * Last sent Choices HashMap (Key, Value)
      */
     private final HashMap<String, String[]> currentChoices = new HashMap<>();
@@ -182,6 +191,8 @@ public abstract class TouchPortalPlugin {
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_HOLD_DOWN, TPActionMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_HOLD_UP, TPActionMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_CONNECTOR_CHANGE, TPConnectorChangeMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_NOTIFICATION_OPTION_CLICKED, TPNotificationOptionClickedMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_SHORT_CONNECTOR_ID_NOTIFICATION, TPShortConnectorIdNotification.class);
                         this.gson = new GsonBuilder().registerTypeAdapter(TPMessage.class, tpMessageDeserializer).create();
                     }
                     String socketMessage = this.bufferedReader.readLine();
@@ -239,6 +250,18 @@ public abstract class TouchPortalPlugin {
                         if (this.touchPortalPluginListener != null) {
                             this.touchPortalPluginListener.onSettings(tpSettingsMessage);
                         }
+                        break;
+
+                    case ReceivedMessageHelper.TYPE_NOTIFICATION_OPTION_CLICKED:
+                        TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage = (TPNotificationOptionClickedMessage) tpMessage;
+                        if (this.touchPortalPluginListener != null) {
+                            this.touchPortalPluginListener.onNotificationOptionClicked(tpNotificationOptionClickedMessage);
+                        }
+                        break;
+
+                    case ReceivedMessageHelper.TYPE_SHORT_CONNECTOR_ID_NOTIFICATION:
+                        TPShortConnectorIdNotification tpShortConnectorIdNotification = (TPShortConnectorIdNotification) tpMessage;
+                        this.connectorIdsMapping.put(tpShortConnectorIdNotification.connectorId, tpShortConnectorIdNotification.shortId);
                         break;
 
                     default:
@@ -372,6 +395,7 @@ public abstract class TouchPortalPlugin {
                                 throw new MethodDataParameterException(method, parameter);
                             }
                         }
+                        this.currentConnectorValues.put(tpConnectorChangeMessage.getConstructedId(), tpConnectorChangeMessage.value);
                         this.callbacksExecutor.submit(() -> {
                             try {
                                 method.setAccessible(true);
@@ -806,6 +830,84 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Send a Show Notification Message to the Touch Portal Plugin System
+     *
+     * @param notificationId String
+     * @param title          String
+     * @param msg            String
+     * @param options        {@link TPNotificationOption}[]
+     * @return boolean showNotificationMessageSent
+     */
+    public boolean sendShowNotification(String notificationId, String title, String msg, TPNotificationOption[] options) {
+        boolean sent = false;
+        if (notificationId != null && !notificationId.isEmpty() && title != null && !title.isEmpty() && msg != null && !msg.isEmpty() && options != null && options.length >= 1) {
+            JsonObject showNotificationMessage = new JsonObject();
+            showNotificationMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_SHOW_NOTIFICATION);
+            showNotificationMessage.addProperty(SentMessageHelper.NOTIFICATION_ID, notificationId);
+            showNotificationMessage.addProperty(SentMessageHelper.TITLE, title);
+            showNotificationMessage.addProperty(SentMessageHelper.MSG, msg);
+
+            JsonArray jsonOptions = new JsonArray();
+            for (TPNotificationOption option : options) {
+                JsonObject jsonOption = new JsonObject();
+                jsonOption.addProperty(SentMessageHelper.ID, option.id);
+                jsonOption.addProperty(SentMessageHelper.TITLE, option.title);
+
+                jsonOptions.add(jsonOption);
+            }
+            showNotificationMessage.add(SentMessageHelper.OPTIONS, jsonOptions);
+
+            sent = this.send(showNotificationMessage);
+            TouchPortalPlugin.LOGGER.info("Show Notification [" + notificationId + "] Sent [" + sent + "]");
+        }
+
+        return sent;
+    }
+
+    /**
+     * Send a Connector Update Message to the Touch Portal Plugin System
+     *
+     * @param pluginId      String
+     * @param connectorId   String
+     * @param value         Integer
+     * @param data          Map&lt;String, Object&gt;
+     * @return Boolean sent
+     */
+    public boolean sendConnectorUpdate(String pluginId, String connectorId, Integer value, Map<String, Object> data) {
+        return this.sendConnectorUpdate(ConnectorHelper.getConstructedId(pluginId, connectorId, value, data), value);
+    }
+
+    /**
+     * Send a Connector Update Message to the Touch Portal Plugin System
+     *
+     * @param constructedConnectorId    String
+     * @param value                     Integer
+     * @return boolean sendConnectorUpdateSent
+     */
+    private boolean sendConnectorUpdate(String constructedConnectorId, Integer value) {
+        boolean sent = false;
+        if (constructedConnectorId != null && !constructedConnectorId.isEmpty() && value != null && value >= 0 && value <= 100 && !value.equals(this.currentConnectorValues.get(constructedConnectorId))) {
+            JsonObject showNotificationMessage = new JsonObject();
+            showNotificationMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CONNECTOR_UPDATE);
+            if (this.connectorIdsMapping.containsKey(constructedConnectorId)) {
+                showNotificationMessage.addProperty(SentMessageHelper.SHORT_ID, this.connectorIdsMapping.get(constructedConnectorId));
+            }
+            else {
+                showNotificationMessage.addProperty(SentMessageHelper.CONNECTOR_ID, constructedConnectorId);
+            }
+            showNotificationMessage.addProperty(SentMessageHelper.VALUE, value);
+
+            sent = this.send(showNotificationMessage);
+            if (sent) {
+                this.currentConnectorValues.put(constructedConnectorId, value);
+            }
+            TouchPortalPlugin.LOGGER.log(Level.INFO, "Connector Update [" + constructedConnectorId + "] Sent [" + sent + "]");
+        }
+
+        return sent;
+    }
+
+    /**
      * Is the Plugin connected to the Touch Portal Plugin System
      *
      * @return boolean isPluginConnected
@@ -1068,6 +1170,13 @@ public abstract class TouchPortalPlugin {
          * @param tpSettingsMessage TPSettingsMessage
          */
         void onSettings(TPSettingsMessage tpSettingsMessage);
+
+        /**
+         * Called when a Notification Option Clicked Message is received
+         *
+         * @param tpNotificationOptionClickedMessage TPNotificationOptionClickedMessage
+         */
+        void onNotificationOptionClicked(TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage);
     }
 
     /**

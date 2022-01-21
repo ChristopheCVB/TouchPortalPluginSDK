@@ -38,14 +38,17 @@ public class ReceivedMessageHelper {
     public static final String TYPE_HOLD_DOWN = "down";
     public static final String TYPE_HOLD_UP = "up";
     public static final String TYPE_CONNECTOR_CHANGE = "connectorChange";
+    public static final String TYPE_SHORT_CONNECTOR_ID_NOTIFICATION = "shortConnectorIdNotification";
     public static final String TYPE_INFO = "info";
     public static final String TYPE_LIST_CHANGE = "listChange";
     public static final String TYPE_CLOSE_PLUGIN = "closePlugin";
     public static final String TYPE_BROADCAST = "broadcast";
     public static final String TYPE_SETTINGS = "settings";
+    public static final String TYPE_NOTIFICATION_OPTION_CLICKED = "notificationOptionClicked";
     public static final String PLUGIN_ID = "pluginId";
     public static final String ACTION_ID = "actionId";
     public static final String CONNECTOR_ID = "connectorId";
+    public static final String SHORT_ID = "shortId";
     public static final String LIST_ID = "listId";
     public static final String INSTANCE_ID = "instanceId";
     public static final String VALUE = GenericHelper.VALUE;
@@ -173,7 +176,7 @@ public class ReceivedMessageHelper {
      * @return String dataValue
      */
     public static String getActionDataValue(JsonObject jsonMessage, Class<?> pluginClass, String actionMethodName, String actionParameterName) {
-        return ReceivedMessageHelper.getActionDataValue(jsonMessage, DataHelper.getActionDataId(pluginClass, actionMethodName, actionParameterName));
+        return ReceivedMessageHelper.getActionDataValue(jsonMessage, DataHelper.getDataId(pluginClass, actionMethodName, actionParameterName));
     }
 
     /**

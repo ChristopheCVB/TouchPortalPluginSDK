@@ -22,10 +22,7 @@ package com.christophecvb.touchportal.test;
 
 import com.christophecvb.touchportal.TouchPortalPlugin;
 import com.christophecvb.touchportal.helpers.*;
-import com.christophecvb.touchportal.model.TPBroadcastMessage;
-import com.christophecvb.touchportal.model.TPInfoMessage;
-import com.christophecvb.touchportal.model.TPListChangeMessage;
-import com.christophecvb.touchportal.model.TPSettingsMessage;
+import com.christophecvb.touchportal.model.*;
 import com.christophecvb.touchportal.oauth2.OAuth2LocalServerReceiver;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -78,6 +75,10 @@ public class LibraryTests {
 
         @Override
         public void onSettings(TPSettingsMessage tpSettingsMessage) {
+        }
+
+        @Override
+        public void onNotificationOptionClicked(TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage) {
         }
     };
 
@@ -295,6 +296,21 @@ public class LibraryTests {
     }
 
     @Test
+    public void testShowNotification() {
+        assertFalse (this.touchPortalPluginTest.sendShowNotification(null, null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendShowNotification("", null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendShowNotification("", "", null, null));
+        assertFalse(this.touchPortalPluginTest.sendShowNotification("", "", "", null));
+        assertFalse (this.touchPortalPluginTest.sendShowNotification("title", null, null, null));
+        assertFalse (this.touchPortalPluginTest.sendShowNotification("id", "title", null, null));
+        assertFalse (this.touchPortalPluginTest.sendShowNotification("id", "title", "message", null));
+        assertTrue(this.touchPortalPluginTest.sendShowNotification(TouchPortalPluginTestConstants.BaseCategory.ID + ".testNotification", "Test", "This is a test notification", new TPNotificationOption[]{
+                new TPNotificationOption(TouchPortalPluginTestConstants.BaseCategory.ID + ".Option1", "Option 1"),
+                new TPNotificationOption(TouchPortalPluginTestConstants.BaseCategory.ID + ".Option2", "Option 2")
+        }));
+    }
+
+    @Test
     public void testDynamicStates() {
         assertFalse(this.touchPortalPluginTest.sendCreateState(null, null, null, null));
 
@@ -396,6 +412,22 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_CONNECTOR_CHANGE);
         jsonMessage.addProperty(ReceivedMessageHelper.CONNECTOR_ID, "");
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage);
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
+    public void testReceiveShortConnectorIdNotification() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_SHORT_CONNECTOR_ID_NOTIFICATION);
+        jsonMessage.addProperty(ReceivedMessageHelper.CONNECTOR_ID, "pc_VERY_LONG_CONSTRUCTED_ID");
+        jsonMessage.addProperty(ReceivedMessageHelper.SHORT_ID, "SHORT_ID");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -586,6 +618,24 @@ public class LibraryTests {
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
+    public void testUpdateConnectorValue() {
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("dataId", "value");
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate(null, null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", null, 1, null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("", "", 1, null));
+        assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 1, null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 1, new HashMap<>()));
+        assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 2, new HashMap<>()));
+        assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 1, data));
+        assertTrue(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 2, data));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", null, null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", 200, null));
+        assertFalse(this.touchPortalPluginTest.sendConnectorUpdate("pluginId", "connectorId", -13, null));
     }
 
     @Test

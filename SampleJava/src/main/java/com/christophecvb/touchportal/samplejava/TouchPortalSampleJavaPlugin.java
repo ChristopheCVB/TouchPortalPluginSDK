@@ -24,10 +24,7 @@ import com.christophecvb.touchportal.annotations.*;
 import com.christophecvb.touchportal.helpers.PluginHelper;
 import com.christophecvb.touchportal.helpers.ReceivedMessageHelper;
 import com.christophecvb.touchportal.TouchPortalPlugin;
-import com.christophecvb.touchportal.model.TPBroadcastMessage;
-import com.christophecvb.touchportal.model.TPInfoMessage;
-import com.christophecvb.touchportal.model.TPListChangeMessage;
-import com.christophecvb.touchportal.model.TPSettingsMessage;
+import com.christophecvb.touchportal.model.*;
 import com.google.gson.JsonObject;
 
 import java.io.File;
@@ -126,6 +123,21 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
 
                     // Update State Choice
                     touchPortalSampleJavaPlugin.sendChoiceUpdate(TouchPortalSampleJavaPluginConstants.SecondCategory.States.CustomStateChoice.ID, new String[]{"1", "2", "3"});
+                    // Send notification
+                    touchPortalSampleJavaPlugin.sendShowNotification(
+                            TouchPortalSampleJavaPluginConstants.BaseCategory.ID + ".exampleNotification",
+                            "Example notification",
+                            "the message of the notification",
+                            new TPNotificationOption[]{
+                                    new TPNotificationOption(TouchPortalSampleJavaPluginConstants.BaseCategory.ID + ".exampleNotification.options.exampleOption", "example option")
+                            });
+
+                    // Update connector value
+                    touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.ID, TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 90, null);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ignored) {}
+                    touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.ID, TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 50, null);
                 }
             }
         }
@@ -232,12 +244,11 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
                 TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, "actionHoldable has been triggered by a HOLD");
                 try {
                     Thread.sleep(100);
+                } catch (InterruptedException ignored) {
                 }
-                catch (InterruptedException ignored) {}
                 isHeld = this.isActionBeingHeld(TouchPortalSampleJavaPluginConstants.BaseCategory.Actions.ActionHoldable.ID);
             }
-        }
-        else {
+        } else {
             // Action is triggered by a Press
             TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, "actionHoldable has been triggered by a Press");
         }
@@ -253,7 +264,7 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
      */
     @Connector(format = "Connector Simple", categoryId = "BaseCategory")
     private void connectorSimple(@ConnectorValue Integer value) {
-        TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, "Connector connectorSimple received");
+        TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, String.format("Connector connectorSimple received: value[%d]", value));
     }
 
     @Override
@@ -296,5 +307,14 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
 
     @Override
     public void onSettings(TPSettingsMessage tpSettingsMessage) {
+    }
+
+    @Override
+    public void onNotificationOptionClicked(TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage) {
+        if (tpNotificationOptionClickedMessage.notificationId.equals(TouchPortalSampleJavaPluginConstants.BaseCategory.ID + ".exampleNotification")) {
+            if (tpNotificationOptionClickedMessage.optionId.equals(TouchPortalSampleJavaPluginConstants.BaseCategory.ID + ".exampleNotification.options.exampleOption")) {
+                LOGGER.log(Level.INFO, "Example option clicked");
+            }
+        }
     }
 }

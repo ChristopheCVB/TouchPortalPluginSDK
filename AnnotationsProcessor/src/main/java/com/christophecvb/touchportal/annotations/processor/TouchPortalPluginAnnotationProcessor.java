@@ -147,7 +147,7 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         jsonConfiguration.addProperty(PluginHelper.CONFIGURATION_COLOR_DARK, plugin.colorDark());
         jsonConfiguration.addProperty(PluginHelper.CONFIGURATION_COLOR_LIGHT, plugin.colorLight());
         jsonPlugin.add(PluginHelper.CONFIGURATION, jsonConfiguration);
-        jsonPlugin.addProperty(PluginHelper.PLUGIN_START_COMMAND, "java -jar ./" + pluginElement.getSimpleName() + ".jar " + PluginHelper.COMMAND_START);
+        jsonPlugin.addProperty(PluginHelper.PLUGIN_START_COMMAND, "java -Dapple.awt.UIElement=true -jar ./" + pluginElement.getSimpleName() + ".jar " + PluginHelper.COMMAND_START);
 
         TypeSpec.Builder settingsTypeSpecBuilder = TypeSpec.classBuilder("Settings").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         JsonArray jsonSettings = new JsonArray();

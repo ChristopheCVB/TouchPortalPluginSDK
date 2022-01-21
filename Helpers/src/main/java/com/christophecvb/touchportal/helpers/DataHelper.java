@@ -25,7 +25,6 @@ import com.christophecvb.touchportal.annotations.*;
 import javax.lang.model.element.Element;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
 
 /**
  * Touch Portal Plugin Data Helper
@@ -96,14 +95,14 @@ public class DataHelper {
      * @param actionParameterName String
      * @return String actionDataId
      */
-    public static String getActionDataId(Class<?> pluginClass, String actionMethodName, String actionParameterName) {
+    public static String getDataId(Class<?> pluginClass, String actionMethodName, String actionParameterName) {
         String actionDataId = "";
-        for (Method declaredMethod : pluginClass.getDeclaredMethods()) {
-            if (declaredMethod.getName().equals(actionMethodName)) {
-                for (Parameter parameter : declaredMethod.getParameters()) {
+        for (Method method : pluginClass.getDeclaredMethods()) {
+            if (method.getName().equals(actionMethodName)) {
+                for (Parameter parameter : method.getParameters()) {
                     Data data = parameter.getAnnotation(Data.class);
                     if (data != null && parameter.getName().equals(actionParameterName)) {
-                        actionDataId = DataHelper._getDataId(ActionHelper.getActionId(pluginClass, actionMethodName), data.id().isEmpty() ? actionParameterName : data.id());
+                        actionDataId = DataHelper.getDataId(pluginClass, method, parameter);
                     }
                 }
             }
@@ -117,7 +116,7 @@ public class DataHelper {
      * @param pluginClass     Class
      * @param method          Method
      * @param methodParameter Parameter
-     * @return String actionId
+     * @return String dataId
      */
     public static String getDataId(Class<?> pluginClass, Method method, Parameter methodParameter) {
         String dataId = "";
@@ -139,7 +138,12 @@ public class DataHelper {
                 }
             }
             else {
-                dataId = DataHelper._getDataId(ActionHelper.getActionId(pluginClass, method), data.id().isEmpty() ? methodParameter.getName() : data.id());
+                if (method.isAnnotationPresent(Action.class)) {
+                    dataId = DataHelper._getDataId(ActionHelper.getActionId(pluginClass, method), data.id().isEmpty() ? methodParameter.getName() : data.id());
+                }
+                else if (method.isAnnotationPresent(Connector.class)) {
+                    dataId = DataHelper._getDataId(ConnectorHelper.getConnectorId(pluginClass, method), data.id().isEmpty() ? methodParameter.getName() : data.id());
+                }
             }
         }
 
@@ -149,11 +153,11 @@ public class DataHelper {
     /**
      * Internal - Get the formatted Data Id
      *
-     * @param parentId String
-     * @param dataId   String
+     * @param parentId  String
+     * @param rawDataId String
      * @return String dataId
      */
-    private static String _getDataId(String parentId, String dataId) {
-        return parentId + "." + DataHelper.KEY_DATA + "." + dataId;
+    private static String _getDataId(String parentId, String rawDataId) {
+        return parentId + "." + DataHelper.KEY_DATA + "." + rawDataId;
     }
 }
