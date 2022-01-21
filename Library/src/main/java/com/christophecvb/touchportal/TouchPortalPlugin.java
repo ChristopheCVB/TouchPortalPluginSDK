@@ -904,7 +904,9 @@ public abstract class TouchPortalPlugin {
             if (sent) {
                 this.currentConnectorValues.put(constructedConnectorId, value);
             }
-            TouchPortalPlugin.LOGGER.log(Level.INFO, "Connector Update [" + constructedConnectorId + "] Sent [" + sent + "]");
+            if (shortId != null || constructedConnectorId.length() <= 200) {
+                TouchPortalPlugin.LOGGER.log(Level.INFO, "Connector Update [" + constructedConnectorId + "] Sent [" + sent + "]");
+            }
         }
 
         return sent;
