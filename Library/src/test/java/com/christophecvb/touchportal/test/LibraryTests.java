@@ -45,6 +45,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -423,10 +424,15 @@ public class LibraryTests {
 
     @Test
     public void testReceiveShortConnectorIdNotification() throws IOException, InterruptedException {
+        Map<String, Object> dataReceived = new HashMap<>();
+        dataReceived.put(TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.Text.ID + "0", "Text0!");
+        dataReceived.put(TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.Text.ID, "Text!");
+        dataReceived.put(TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.Text.ID + "2", "Text2!");
+
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_SHORT_CONNECTOR_ID_NOTIFICATION);
-        jsonMessage.addProperty(ReceivedMessageHelper.CONNECTOR_ID, "pc_VERY_LONG_CONSTRUCTED_ID");
+        jsonMessage.addProperty(ReceivedMessageHelper.CONNECTOR_ID, ConnectorHelper.getConstructedId(TouchPortalPluginTestConstants.ID, TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.ID, 0, dataReceived));
         jsonMessage.addProperty(ReceivedMessageHelper.SHORT_ID, "SHORT_ID");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
@@ -435,6 +441,12 @@ public class LibraryTests {
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
+
+        Map<String, Object> dataSent = new HashMap<>();
+        dataSent.put(TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.Text.ID + "2", "Text2!");
+        dataSent.put(TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.Text.ID, "Text!");
+        dataSent.put(TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.Text.ID + "0", "Text0!");
+        assertTrue(this.touchPortalPluginTest.sendConnectorUpdate(TouchPortalPluginTestConstants.ID, TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.ID, 10, dataSent));
     }
 
     @Test
