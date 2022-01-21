@@ -131,9 +131,13 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
                             new TPNotificationOption[]{
                                     new TPNotificationOption(TouchPortalSampleJavaPluginConstants.BaseCategory.ID + ".exampleNotification.options.exampleOption", "example option")
                             });
-                  
-                  // Update connector value
-                  touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.ID, TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 10, null);
+
+                    // Update connector value
+                    touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.ID, TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 90, null);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ignored) {}
+                    touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.ID, TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 50, null);
                 }
             }
         }
@@ -240,12 +244,11 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
                 TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, "actionHoldable has been triggered by a HOLD");
                 try {
                     Thread.sleep(100);
+                } catch (InterruptedException ignored) {
                 }
-                catch (InterruptedException ignored) {}
                 isHeld = this.isActionBeingHeld(TouchPortalSampleJavaPluginConstants.BaseCategory.Actions.ActionHoldable.ID);
             }
-        }
-        else {
+        } else {
             // Action is triggered by a Press
             TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, "actionHoldable has been triggered by a Press");
         }
