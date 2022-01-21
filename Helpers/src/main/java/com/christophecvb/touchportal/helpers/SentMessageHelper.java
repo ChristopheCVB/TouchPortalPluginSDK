@@ -46,5 +46,6 @@ public class SentMessageHelper {
     public static final String MSG = "msg";
     public static final String OPTIONS = "options";
     public static final String CONNECTOR_ID = "connectorId";
+    public static final String SHORT_ID = "shortId";
 
 }

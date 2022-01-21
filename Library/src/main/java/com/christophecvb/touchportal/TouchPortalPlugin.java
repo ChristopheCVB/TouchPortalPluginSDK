@@ -124,6 +124,10 @@ public abstract class TouchPortalPlugin {
      */
     private final HashMap<String, Integer> currentConnectorValues = new HashMap<>();
     /**
+     * Connector IDs mapping HashMap (ConstructedId, ShortId)
+     */
+    private final HashMap<String, String> connectorIdsMapping = new HashMap<>();
+    /**
      * Last sent Choices HashMap (Key, Value)
      */
     private final HashMap<String, String[]> currentChoices = new HashMap<>();
@@ -188,6 +192,7 @@ public abstract class TouchPortalPlugin {
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_HOLD_UP, TPActionMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_CONNECTOR_CHANGE, TPConnectorChangeMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_NOTIFICATION_OPTION_CLICKED, TPNotificationOptionClickedMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_SHORT_CONNECTOR_ID_NOTIFICATION, TPShortConnectorIdNotification.class);
                         this.gson = new GsonBuilder().registerTypeAdapter(TPMessage.class, tpMessageDeserializer).create();
                     }
                     String socketMessage = this.bufferedReader.readLine();
@@ -252,6 +257,11 @@ public abstract class TouchPortalPlugin {
                         if (this.touchPortalPluginListener != null) {
                             this.touchPortalPluginListener.onNotificationOptionClicked(tpNotificationOptionClickedMessage);
                         }
+                        break;
+
+                    case ReceivedMessageHelper.TYPE_SHORT_CONNECTOR_ID_NOTIFICATION:
+                        TPShortConnectorIdNotification tpShortConnectorIdNotification = (TPShortConnectorIdNotification) tpMessage;
+                        this.connectorIdsMapping.put(tpShortConnectorIdNotification.connectorId, tpShortConnectorIdNotification.shortId);
                         break;
 
                     default:
@@ -879,7 +889,12 @@ public abstract class TouchPortalPlugin {
         if (constructedConnectorId != null && !constructedConnectorId.isEmpty() && value != null && value >= 0 && value <= 100 && !value.equals(this.currentConnectorValues.get(constructedConnectorId))) {
             JsonObject showNotificationMessage = new JsonObject();
             showNotificationMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CONNECTOR_UPDATE);
-            showNotificationMessage.addProperty(SentMessageHelper.CONNECTOR_ID, constructedConnectorId);
+            if (this.connectorIdsMapping.containsKey(constructedConnectorId)) {
+                showNotificationMessage.addProperty(SentMessageHelper.SHORT_ID, this.connectorIdsMapping.get(constructedConnectorId));
+            }
+            else {
+                showNotificationMessage.addProperty(SentMessageHelper.CONNECTOR_ID, constructedConnectorId);
+            }
             showNotificationMessage.addProperty(SentMessageHelper.VALUE, value);
 
             sent = this.send(showNotificationMessage);

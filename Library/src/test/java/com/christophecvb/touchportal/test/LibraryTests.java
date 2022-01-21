@@ -422,6 +422,22 @@ public class LibraryTests {
     }
 
     @Test
+    public void testReceiveShortConnectorIdNotification() throws IOException, InterruptedException {
+        JsonObject jsonMessage = new JsonObject();
+        jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+        jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_SHORT_CONNECTOR_ID_NOTIFICATION);
+        jsonMessage.addProperty(ReceivedMessageHelper.CONNECTOR_ID, "pc_VERY_LONG_CONSTRUCTED_ID");
+        jsonMessage.addProperty(ReceivedMessageHelper.SHORT_ID, "SHORT_ID");
+        PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
+        out.println(jsonMessage);
+
+        Thread.sleep(10);
+
+        assertTrue(this.touchPortalPluginTest.isConnected());
+        assertTrue(this.touchPortalPluginTest.isListening());
+    }
+
+    @Test
     public void testReceiveDummyWithDataTextAndNumberAction() throws IOException, InterruptedException {
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
