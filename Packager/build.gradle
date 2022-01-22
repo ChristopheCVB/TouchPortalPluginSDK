@@ -7,7 +7,7 @@ plugins {
 
 group 'com.christophecvb.touchportal'
 def localArchiveBaseName = 'plugin-packager'
-version versionName
+version versionName + (isRelease ? '' : '-' + System.currentTimeMillis())
 
 pluginBundle {
     website = 'https://github.com/ChristopheCVB/TouchPortalPluginSDK'

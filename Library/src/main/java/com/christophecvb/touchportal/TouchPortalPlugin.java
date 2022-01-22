@@ -887,24 +887,48 @@ public abstract class TouchPortalPlugin {
     private boolean sendConnectorUpdate(String constructedConnectorId, Integer value) {
         boolean sent = false;
         if (constructedConnectorId != null && !constructedConnectorId.isEmpty() && value != null && value >= 0 && value <= 100 && !value.equals(this.currentConnectorValues.get(constructedConnectorId))) {
-            JsonObject showNotificationMessage = new JsonObject();
-            showNotificationMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CONNECTOR_UPDATE);
-            if (this.connectorIdsMapping.containsKey(constructedConnectorId)) {
-                showNotificationMessage.addProperty(SentMessageHelper.SHORT_ID, this.connectorIdsMapping.get(constructedConnectorId));
+            JsonObject connectorUpdateMessage = new JsonObject();
+            connectorUpdateMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_CONNECTOR_UPDATE);
+            String shortId = this.getConnectorShortId(constructedConnectorId);
+            if (shortId != null) {
+                connectorUpdateMessage.addProperty(SentMessageHelper.SHORT_ID, shortId);
             }
-            else {
-                showNotificationMessage.addProperty(SentMessageHelper.CONNECTOR_ID, constructedConnectorId);
+            else if (constructedConnectorId.length() <= 200){
+                connectorUpdateMessage.addProperty(SentMessageHelper.CONNECTOR_ID, constructedConnectorId);
             }
-            showNotificationMessage.addProperty(SentMessageHelper.VALUE, value);
+            connectorUpdateMessage.addProperty(SentMessageHelper.VALUE, value);
 
-            sent = this.send(showNotificationMessage);
+            if (connectorUpdateMessage.has(SentMessageHelper.SHORT_ID) || connectorUpdateMessage.has(SentMessageHelper.CONNECTOR_ID)) {
+                sent = this.send(connectorUpdateMessage);
+            }
             if (sent) {
                 this.currentConnectorValues.put(constructedConnectorId, value);
             }
-            TouchPortalPlugin.LOGGER.log(Level.INFO, "Connector Update [" + constructedConnectorId + "] Sent [" + sent + "]");
+            if (shortId != null || constructedConnectorId.length() <= 200) {
+                TouchPortalPlugin.LOGGER.log(Level.INFO, "Connector Update [" + constructedConnectorId + "] Sent [" + sent + "]");
+            }
         }
 
         return sent;
+    }
+
+    private String getConnectorShortId(String constructedConnectorId) {
+        String shortId = null;
+        HashMap<String, String> deconstructedConnectorId = this.deconstructConnectorId(constructedConnectorId);
+        for (String mappedConnectorId : this.connectorIdsMapping.keySet()) {
+            HashMap<String, String> deconstructedMappedConnectorId = this.deconstructConnectorId(mappedConnectorId);
+            if (deconstructedConnectorId.equals(deconstructedMappedConnectorId)) {
+                shortId = this.connectorIdsMapping.get(mappedConnectorId);
+                break;
+            }
+        }
+        return shortId;
+    }
+
+    private HashMap<String, String> deconstructConnectorId(String constructedConnectorId) {
+        HashMap<String, String> deconstructedConnectorId = new HashMap<>();
+        Arrays.stream(constructedConnectorId.split("\\|")).map(elem -> elem.split("=")).forEach(pair -> deconstructedConnectorId.put(pair[0], pair.length > 1 ? pair[1] : null));
+        return deconstructedConnectorId;
     }
 
     /**
