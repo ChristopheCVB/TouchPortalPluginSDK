@@ -712,7 +712,21 @@ public abstract class TouchPortalPlugin {
      * @return boolean stateUpdateMessageSent
      */
     public boolean sendCreateState(String categoryId, String stateId, String description, Object value) {
-        return this.sendCreateState(categoryId, stateId, description, value, false, false);
+        return this.sendCreateState(categoryId, stateId, description, value, false, false, null);
+    }
+
+    /**
+     * Send a Create a State Message to the Touch Portal Plugin System not allowing empty value
+     *
+     * @param categoryId  String
+     * @param stateId     String
+     * @param description String
+     * @param value       Object
+     * @param parentGroup String
+     * @return boolean stateUpdateMessageSent
+     */
+    public boolean sendCreateState(String categoryId, String stateId, String description, Object value, String parentGroup) {
+        return this.sendCreateState(categoryId, stateId, description, value, false, false, parentGroup);
     }
 
     /**
@@ -727,6 +741,22 @@ public abstract class TouchPortalPlugin {
      * @return boolean stateCreateSent
      */
     public boolean sendCreateState(String categoryId, String stateId, String description, Object value, boolean allowEmptyValue, boolean forceUpdate) {
+        return this.sendCreateState(categoryId, stateId, description, value, allowEmptyValue, forceUpdate, null);
+    }
+
+    /**
+     * Send a Create a State Message to the Touch Portal Plugin System
+     *
+     * @param categoryId        String
+     * @param stateId           String
+     * @param description       String
+     * @param value             Object
+     * @param allowEmptyValue   boolean
+     * @param forceUpdate       boolean
+     * @param parentGroup       String
+     * @return boolean stateCreateSent
+     */
+    public boolean sendCreateState(String categoryId, String stateId, String description, Object value, boolean allowEmptyValue, boolean forceUpdate, String parentGroup) {
         boolean sent = false;
         String valueStr = value != null ? String.valueOf(value) : null;
         if (categoryId != null && !categoryId.isEmpty() && stateId != null && !stateId.isEmpty() && description != null && !description.isEmpty() && valueStr != null && (allowEmptyValue || !valueStr.isEmpty())) {
@@ -737,6 +767,9 @@ public abstract class TouchPortalPlugin {
                 createStateMessage.addProperty(SentMessageHelper.ID, stateId);
                 createStateMessage.addProperty(SentMessageHelper.DESCRIPTION, description);
                 createStateMessage.addProperty(SentMessageHelper.DEFAULT_VALUE, valueStr);
+                if (parentGroup != null && !parentGroup.isEmpty()) {
+                    createStateMessage.addProperty(SentMessageHelper.PARENT_GROUP, parentGroup);
+                }
                 sent = this.send(createStateMessage);
                 if (sent) {
                     this.currentStates.put(stateId, valueStr);
