@@ -712,7 +712,7 @@ public abstract class TouchPortalPlugin {
      * @return boolean stateUpdateMessageSent
      */
     public boolean sendCreateState(String categoryId, String stateId, String description, Object value) {
-        return this.sendCreateState(categoryId, stateId, description, value, false, false, null);
+        return this.sendCreateState(categoryId, stateId, null, description, value, false, false);
     }
 
     /**
@@ -720,13 +720,13 @@ public abstract class TouchPortalPlugin {
      *
      * @param categoryId  String
      * @param stateId     String
+     * @param parentGroup String
      * @param description String
      * @param value       Object
-     * @param parentGroup String
      * @return boolean stateUpdateMessageSent
      */
-    public boolean sendCreateState(String categoryId, String stateId, String description, Object value, String parentGroup) {
-        return this.sendCreateState(categoryId, stateId, description, value, false, false, parentGroup);
+    public boolean sendCreateState(String categoryId, String stateId, String parentGroup, String description, Object value) {
+        return this.sendCreateState(categoryId, stateId, parentGroup, description, value, false, false);
     }
 
     /**
@@ -741,7 +741,7 @@ public abstract class TouchPortalPlugin {
      * @return boolean stateCreateSent
      */
     public boolean sendCreateState(String categoryId, String stateId, String description, Object value, boolean allowEmptyValue, boolean forceUpdate) {
-        return this.sendCreateState(categoryId, stateId, description, value, allowEmptyValue, forceUpdate, null);
+        return this.sendCreateState(categoryId, stateId, null, description, value, allowEmptyValue, forceUpdate);
     }
 
     /**
@@ -749,14 +749,14 @@ public abstract class TouchPortalPlugin {
      *
      * @param categoryId        String
      * @param stateId           String
+     * @param parentGroup       String
      * @param description       String
      * @param value             Object
      * @param allowEmptyValue   boolean
      * @param forceUpdate       boolean
-     * @param parentGroup       String
      * @return boolean stateCreateSent
      */
-    public boolean sendCreateState(String categoryId, String stateId, String description, Object value, boolean allowEmptyValue, boolean forceUpdate, String parentGroup) {
+    public boolean sendCreateState(String categoryId, String stateId, String parentGroup, String description, Object value, boolean allowEmptyValue, boolean forceUpdate) {
         boolean sent = false;
         String valueStr = value != null ? String.valueOf(value) : null;
         if (categoryId != null && !categoryId.isEmpty() && stateId != null && !stateId.isEmpty() && description != null && !description.isEmpty() && valueStr != null && (allowEmptyValue || !valueStr.isEmpty())) {
