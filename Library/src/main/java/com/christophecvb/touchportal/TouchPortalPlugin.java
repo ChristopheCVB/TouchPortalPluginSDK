@@ -767,9 +767,22 @@ public abstract class TouchPortalPlugin {
                 createStateMessage.addProperty(SentMessageHelper.ID, stateId);
                 createStateMessage.addProperty(SentMessageHelper.DESCRIPTION, description);
                 createStateMessage.addProperty(SentMessageHelper.DEFAULT_VALUE, valueStr);
-                if (parentGroup != null && !parentGroup.isEmpty()) {
+                if (parentGroup == null || parentGroup.isEmpty()) {
+                    for (Class<?> subClass : this.pluginClass.getDeclaredClasses()) {
+                        for (Field subClassField : subClass.getDeclaredFields()) {
+                            if (subClassField.isAnnotationPresent(Category.class)) {
+                                Category category = subClassField.getAnnotation(Category.class);
+
+                                if(category.name().equals(categoryId) || category.id().equals(categoryId) || subClassField.getName().equals(categoryId)) {
+                                    createStateMessage.addProperty(SentMessageHelper.PARENT_GROUP, category.name());
+                                }
+                            }
+                        }
+                    }
+                } else {
                     createStateMessage.addProperty(SentMessageHelper.PARENT_GROUP, parentGroup);
                 }
+
                 sent = this.send(createStateMessage);
                 if (sent) {
                     this.currentStates.put(stateId, valueStr);

@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
  *
  * @see <a href="https://www.touch-portal.com/sdk/index.php?section=categories">TP Documentation: Categories</a>
  */
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Category {
     /**
