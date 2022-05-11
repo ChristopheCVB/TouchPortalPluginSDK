@@ -773,8 +773,8 @@ public abstract class TouchPortalPlugin {
                             if (subClassField.isAnnotationPresent(Category.class)) {
                                 Category category = subClassField.getAnnotation(Category.class);
 
-                                if(category.name().equals(categoryId) || category.id().equals(categoryId) || subClassField.getName().equals(categoryId)) {
-                                    createStateMessage.addProperty(SentMessageHelper.PARENT_GROUP, category.name());
+                                if(category.name().equals(categoryId) || category.id().equals(categoryId) || subClassField.getName().equals(categoryId) || categoryId.equals(CategoryHelper.getCategoryId(this.pluginClass, subClassField.getName()))) {
+                                    createStateMessage.addProperty(SentMessageHelper.PARENT_GROUP, CategoryHelper.getCategoryName(subClassField, category));
                                 }
                             }
                         }
