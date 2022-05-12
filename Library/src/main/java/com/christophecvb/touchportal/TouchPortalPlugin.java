@@ -768,6 +768,7 @@ public abstract class TouchPortalPlugin {
                 createStateMessage.addProperty(SentMessageHelper.DESCRIPTION, description);
                 createStateMessage.addProperty(SentMessageHelper.DEFAULT_VALUE, valueStr);
                 if (parentGroup == null || parentGroup.isEmpty()) {
+                    classLoop:
                     for (Class<?> subClass : this.pluginClass.getDeclaredClasses()) {
                         for (Field subClassField : subClass.getDeclaredFields()) {
                             if (subClassField.isAnnotationPresent(Category.class)) {
@@ -775,6 +776,7 @@ public abstract class TouchPortalPlugin {
 
                                 if(category.name().equals(categoryId) || category.id().equals(categoryId) || subClassField.getName().equals(categoryId) || categoryId.equals(CategoryHelper.getCategoryId(this.pluginClass, subClassField.getName()))) {
                                     createStateMessage.addProperty(SentMessageHelper.PARENT_GROUP, CategoryHelper.getCategoryName(subClassField, category));
+                                    break classLoop;
                                 }
                             }
                         }
