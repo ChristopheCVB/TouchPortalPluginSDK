@@ -50,6 +50,17 @@ public class CategoryHelper {
     }
 
     /**
+     * Get Category Short ID
+     *
+     * @param categoryField {@link Field}
+     * @param category      {@link Category}
+     * @return String categoryId
+     */
+    public static String getCategoryShortId(Field categoryField, Category category) {
+        return category.id().isEmpty() ? categoryField.getName() : category.id();
+    }
+
+    /**
      * Get the generated Category Name
      *
      * @param categoryElement Element

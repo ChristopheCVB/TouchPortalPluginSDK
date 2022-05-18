@@ -774,7 +774,7 @@ public abstract class TouchPortalPlugin {
                             if (subClassField.isAnnotationPresent(Category.class)) {
                                 Category category = subClassField.getAnnotation(Category.class);
 
-                                if(category.name().equals(categoryId) || category.id().equals(categoryId) || subClassField.getName().equals(categoryId) || categoryId.equals(CategoryHelper.getCategoryId(this.pluginClass, subClassField.getName()))) {
+                                if(categoryId.equals(CategoryHelper.getCategoryShortId(subClassField, category))) {
                                     createStateMessage.addProperty(SentMessageHelper.PARENT_GROUP, CategoryHelper.getCategoryName(subClassField, category));
                                     break classLoop;
                                 }
