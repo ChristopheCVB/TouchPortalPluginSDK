@@ -321,37 +321,43 @@ public class LibraryTests {
         assertFalse(this.touchPortalPluginTest.sendCreateState(null, null, null, ""));
         assertFalse(this.touchPortalPluginTest.sendCreateState("", "", "", ""));
 
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", null, null, null));
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "", null, null));
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", null, "", null));
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", null, null, ""));
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "", "", ""));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", null, null, null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", "", null, null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", null, "", null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", null, null, ""));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", "", "", ""));
 
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", null, null));
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "", null));
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", null, ""));
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "", ""));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", null, null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "", null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", null, ""));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "", ""));
 
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", null));
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", ""));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "Dynamically Created State", null));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "Dynamically Created State", ""));
 
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "StateId", "Dynamically Created State", null, true, false));
-        assertTrue(this.touchPortalPluginTest.sendCreateState("CategoryId", "StateId", "Dynamically Created State", "", true, false));
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "StateId", "Dynamically Created State", "", true, false));
-        assertTrue(this.touchPortalPluginTest.sendCreateState("CategoryId", "StateId", "Dynamically Created State", "", true, true));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "Dynamically Created State", null, true, false));
+        assertTrue(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "Dynamically Created State", "", true, false));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "Dynamically Created State", "", true, false));
+        assertTrue(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "Dynamically Created State", "", true, true));
 
-        assertTrue(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", "Default Value 01"));
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", "Default Value 01"));
-        assertTrue(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", "Default Value 02"));
+        assertTrue(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "Dynamically Created State", "Default Value 01"));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "Dynamically Created State", "Default Value 01"));
+        assertTrue(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "Dynamically Created State", "Default Value 02"));
+
+        assertTrue(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "Parent", "Dynamically Created State", "Default Value 01"));
+        assertTrue(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "", "Dynamically Created State", "Default Value 02"));
+        assertTrue(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", null, "Dynamically Created State", "Default Value 03"));
+        assertTrue(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "Parent", "Dynamically Created State", "Default Value 04", true, false));
+
 
         assertFalse(this.touchPortalPluginTest.sendRemoveState(null, null));
         assertFalse(this.touchPortalPluginTest.sendRemoveState("", null));
         assertFalse(this.touchPortalPluginTest.sendRemoveState(null, ""));
         assertFalse(this.touchPortalPluginTest.sendRemoveState("", ""));
-        assertFalse(this.touchPortalPluginTest.sendRemoveState("CategoryId", null));
-        assertFalse(this.touchPortalPluginTest.sendRemoveState("CategoryId", ""));
+        assertFalse(this.touchPortalPluginTest.sendRemoveState("BaseCategory", null));
+        assertFalse(this.touchPortalPluginTest.sendRemoveState("BaseCategory", ""));
 
-        assertTrue(this.touchPortalPluginTest.sendRemoveState("CategoryId", "SateId"));
+        assertTrue(this.touchPortalPluginTest.sendRemoveState("BaseCategory", "StateId"));
     }
 
     @Test
@@ -360,8 +366,8 @@ public class LibraryTests {
         assertFalse(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "New Value"));
         assertFalse(this.touchPortalPluginTest.sendChoiceUpdate("listId", null, true));
         assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("listId", "instanceId", null, true));
-        assertFalse(this.touchPortalPluginTest.sendCreateState("CategoryId", "SateId", "Dynamically Created State", "Default Value 01"));
-        assertFalse(this.touchPortalPluginTest.sendRemoveState("CategoryId", "SateId"));
+        assertFalse(this.touchPortalPluginTest.sendCreateState("BaseCategory", "StateId", "Dynamically Created State", "Default Value 01"));
+        assertFalse(this.touchPortalPluginTest.sendRemoveState("BaseCategory", "StateId"));
     }
 
     @Test
