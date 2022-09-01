@@ -23,6 +23,7 @@ package com.christophecvb.touchportal.helpers;
 import com.christophecvb.touchportal.annotations.Category;
 
 import javax.lang.model.element.Element;
+import java.lang.reflect.Field;
 
 /**
  * Touch Portal Plugin Category Helper
@@ -49,6 +50,17 @@ public class CategoryHelper {
     }
 
     /**
+     * Get Category Short ID
+     *
+     * @param categoryField {@link Field}
+     * @param category      {@link Category}
+     * @return String categoryId
+     */
+    public static String getCategoryShortId(Field categoryField, Category category) {
+        return category.id().isEmpty() ? categoryField.getName() : category.id();
+    }
+
+    /**
      * Get the generated Category Name
      *
      * @param categoryElement Element
@@ -57,6 +69,17 @@ public class CategoryHelper {
      */
     public static String getCategoryName(Element categoryElement, Category category) {
         return category.name().isEmpty() ? categoryElement.getSimpleName().toString() : category.name();
+    }
+
+    /**
+     * Get the generated Category Name
+     *
+     * @param categoryField {@link Field}
+     * @param category      {@link Category}
+     * @return String categoryName
+     */
+    public static String getCategoryName(Field categoryField, Category category) {
+        return category.name().isEmpty() ? categoryField.getName() : category.name();
     }
 
     /**
