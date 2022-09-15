@@ -1,3 +1,11 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = 'TouchPortalPluginSDK'
 include 'Annotations'
 include 'Helpers'
@@ -6,4 +14,3 @@ include 'Library'
 include 'SampleJava'
 include 'SampleKotlin'
 include 'Packager'
-
