@@ -5,8 +5,24 @@ on:
     branches: [ develop ]
 
 jobs:
+  prepare-maven-local:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+          java-package: jdk
+      - name: Gradle Plugin Publish Local
+        run: |
+          ./gradlew :Packager:publishToMavenLocal
+
   build:
 
+    needs: prepare-maven-local
     runs-on: ubuntu-latest
 
     steps:
