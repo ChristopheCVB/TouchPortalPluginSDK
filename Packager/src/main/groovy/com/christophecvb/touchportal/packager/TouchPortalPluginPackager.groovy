@@ -37,6 +37,8 @@ class TouchPortalPluginPackager implements Plugin<Project> {
         project.tasks.withType(Jar) { task ->
             task.dependsOn project.configurations.runtimeClasspath
 
+            task.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
             task.doFirst {
                 manifest {
                     attributes 'Implementation-Title': "${extension.mainClassSimpleName.get()}",
