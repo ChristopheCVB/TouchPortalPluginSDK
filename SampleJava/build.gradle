@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'com.github.gmazzo.buildconfig' version '3.0.0'
-    id 'com.christophecvb.touchportal.plugin-packager' version '8.3.0-SNAPSHOT+'
+    id 'com.christophecvb.touchportal.plugin-packager' version "$versionName+"
 }
 
 def mainClassSimpleName = 'TouchPortalSampleJavaPlugin'
