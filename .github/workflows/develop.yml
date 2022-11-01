@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 1.8
+          java-version: 8
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Gradle Plugin Publish Local
@@ -33,7 +33,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 1.8
+          java-version: 8
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Build with Gradle
@@ -50,7 +50,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 1.8
+          java-version: 8
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Gradle Maven Publish
