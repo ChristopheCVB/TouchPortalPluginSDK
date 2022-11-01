@@ -21,6 +21,9 @@ jobs:
       - name: Gradle Plugin Publish Local
         run: |
           ./gradlew :Packager:publishToMavenLocal
+        env:
+          PGP_KEY: ${{ secrets.PGP_KEY }}
+          PGP_PWD: ${{ secrets.PGP_PWD }}
 
   build:
 
