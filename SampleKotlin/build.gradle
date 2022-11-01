@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.kapt' version '1.5.0'
     id 'java'
     id 'com.github.gmazzo.buildconfig' version '3.0.0'
-    id 'com.christophecvb.touchportal.plugin-packager' version "$versionName+"
+    id 'com.christophecvb.touchportal.plugin-packager' version "+"
 }
 
 def mainClassSimpleName = 'TouchPortalSampleKotlinPlugin'
