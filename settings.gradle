@@ -14,7 +14,7 @@ dependencyResolutionManagement {
             library('autoservice', 'com.google.auto.service:auto-service:1.0.1')
             library('javapoet', 'com.squareup:javapoet:1.13.0')
             library('junit', 'junit:junit:4.13.2')
-            library('kotlinstdlibjdk8', 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.1')
+            library('kotlinstdlibjdk8', 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.10')
         }
     }
 }
