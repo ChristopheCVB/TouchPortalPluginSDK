@@ -50,6 +50,7 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 public class LibraryTests {
+    private static final long REASONABLE_TIME = 100;
     private ServerSocket serverSocket;
     private Socket serverSocketClient;
     private TouchPortalPluginTest touchPortalPluginTest;
@@ -113,7 +114,7 @@ public class LibraryTests {
             }
         }).start();
         try {
-            Thread.sleep(100);
+            Thread.sleep(REASONABLE_TIME);
         }
         catch (InterruptedException ignored) {}
     }
@@ -137,7 +138,7 @@ public class LibraryTests {
             ioException.printStackTrace();
         }
         try {
-            Thread.sleep(10);
+            Thread.sleep(REASONABLE_TIME);
         }
         catch (InterruptedException e) {
             e.printStackTrace();
@@ -150,7 +151,7 @@ public class LibraryTests {
     @Test
     public void testConnection() {
         try {
-            Thread.sleep(500);
+            Thread.sleep(REASONABLE_TIME);
         }
         catch (InterruptedException e) {
             e.printStackTrace();
@@ -208,7 +209,7 @@ public class LibraryTests {
     public void testServerSocketCloses() throws IOException, InterruptedException {
         this.serverSocketClient.close();
         this.serverSocket.close();
-        Thread.sleep(100);
+        Thread.sleep(REASONABLE_TIME);
         assertFalse(this.touchPortalPluginTest.isConnected());
     }
 
@@ -378,7 +379,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -392,7 +393,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -407,7 +408,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -422,7 +423,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -443,7 +444,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -474,7 +475,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -500,7 +501,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -515,7 +516,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -530,7 +531,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -545,7 +546,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -561,7 +562,7 @@ public class LibraryTests {
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
         out.println(jsonMessageHoldDown);
 
-        Thread.sleep(150);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isActionBeingHeld(TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID));
 
@@ -571,7 +572,7 @@ public class LibraryTests {
         jsonMessageHoldUp.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
         out.println(jsonMessageHoldUp);
 
-        Thread.sleep(150);
+        Thread.sleep(REASONABLE_TIME);
 
         assertNull(this.touchPortalPluginTest.isActionBeingHeld(TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID));
 
@@ -589,7 +590,7 @@ public class LibraryTests {
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
         out.println(jsonMessageHoldDown);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertNull(this.touchPortalPluginTest.isActionBeingHeld(TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID));
 
@@ -609,7 +610,7 @@ public class LibraryTests {
 
         out.println(jsonMessageConnectorForSlider);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -632,7 +633,7 @@ public class LibraryTests {
 
         out.println(jsonMessageConnectorForSliderWithData);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -668,7 +669,7 @@ public class LibraryTests {
 
         out.println(jsonMessageConnectorForSliderWithNonData);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -682,7 +683,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -697,7 +698,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -712,7 +713,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -726,7 +727,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -739,7 +740,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -753,7 +754,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -782,7 +783,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -805,7 +806,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -828,7 +829,7 @@ public class LibraryTests {
         out.println(jsonMessage);
 
         // Wait for the listenerThread to catch up
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertFalse(this.touchPortalPluginTest.isConnected());
         assertFalse(this.touchPortalPluginTest.isListening());
@@ -839,7 +840,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println("Not a JSON Object");
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -850,7 +851,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println();
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -865,7 +866,7 @@ public class LibraryTests {
         out.print("data");
         out.println();
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -911,7 +912,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -929,7 +930,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertTrue(this.touchPortalPluginTest.isConnected());
         assertTrue(this.touchPortalPluginTest.isListening());
@@ -958,7 +959,7 @@ public class LibraryTests {
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
-        Thread.sleep(10);
+        Thread.sleep(REASONABLE_TIME);
 
         assertFalse(this.touchPortalPluginTest.sendSettingUpdate(null, null, false));
         assertFalse(this.touchPortalPluginTest.sendSettingUpdate("", null, false));
