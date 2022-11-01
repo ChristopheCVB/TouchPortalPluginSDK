@@ -81,11 +81,11 @@ dependencies {
     api project(':Annotations')
     api project(':Helpers')
 
-    api group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
+    api libs.gson
 
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
+    implementation libs.okhttp
 
-    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+    testImplementation libs.junit
     testAnnotationProcessor project(':AnnotationsProcessor')
 }
 

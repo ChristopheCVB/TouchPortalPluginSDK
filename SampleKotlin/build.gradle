@@ -24,7 +24,7 @@ buildConfig {
 }
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation libs.kotlinstdlibjdk8
 
     implementation project(':Library')
 

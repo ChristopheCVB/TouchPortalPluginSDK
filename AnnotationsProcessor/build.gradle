@@ -77,11 +77,11 @@ javadoc {
 }
 
 dependencies {
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
-    implementation 'com.google.auto.service:auto-service:1.0.1'
-    implementation group: 'com.squareup', name: 'javapoet', version: '1.13.0'
+    implementation libs.gson
+    implementation libs.autoservice
+    implementation libs.javapoet
     implementation project(':Annotations')
     implementation project(':Helpers')
 
-    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+    testImplementation libs.junit
 }
