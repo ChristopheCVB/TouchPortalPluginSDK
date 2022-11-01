@@ -1,13 +1,12 @@
 plugins {
     id 'groovy-gradle-plugin'
-    id 'com.gradle.plugin-publish' version '1.0.0'
+    id 'com.gradle.plugin-publish' version '0.15.0'
     id 'maven-publish'
     id 'signing'
 }
 
 group 'com.christophecvb.touchportal'
 def localArchiveBaseName = 'plugin-packager'
-//version versionName + (isRelease ? '' : '-' + System.currentTimeSeconds())
 version isRelease ? versionName : versionName.replace('-SNAPSHOT', '-' + System.currentTimeSeconds())
 
 pluginBundle {
