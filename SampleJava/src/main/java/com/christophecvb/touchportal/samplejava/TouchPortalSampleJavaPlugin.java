@@ -32,7 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
-@Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
+@Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example", parentCategory = ParentCategory.CONTENT)
 public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
     /**
      * Logger

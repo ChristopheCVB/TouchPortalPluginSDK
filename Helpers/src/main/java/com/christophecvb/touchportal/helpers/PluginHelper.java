@@ -36,6 +36,7 @@ public class PluginHelper {
     public static final String CONFIGURATION = "configuration";
     public static final String CONFIGURATION_COLOR_DARK = "colorDark";
     public static final String CONFIGURATION_COLOR_LIGHT = "colorLight";
+    public static final String CONFIGURATION_PARENT_CATEGORY = "parentCategory";
     public static final String PLUGIN_START_COMMAND = "plugin_start_cmd";
     public static final String CATEGORIES = "categories";
     public static final String SETTINGS = "settings";
@@ -43,7 +44,7 @@ public class PluginHelper {
     /**
      * Touch Portal Plugin System version
      */
-    public static final int TOUCH_PORTAL_PLUGIN_VERSION = 6;
+    public static final int TOUCH_PORTAL_PLUGIN_VERSION = 7;
     /**
      * Argument passed to the jar to start the plugin
      */

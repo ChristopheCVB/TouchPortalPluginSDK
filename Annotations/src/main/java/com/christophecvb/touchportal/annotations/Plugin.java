@@ -72,4 +72,14 @@ public @interface Plugin {
      * @return String colorLight
      */
     String colorLight();
+
+    /**
+     * Plugin Parent Category
+     * <p>
+     * Value from enum {@link ParentCategory}
+     * </p>
+     *
+     * @return ParentCategory parentCategory
+     */
+    ParentCategory parentCategory() default ParentCategory.MISC;
 }
