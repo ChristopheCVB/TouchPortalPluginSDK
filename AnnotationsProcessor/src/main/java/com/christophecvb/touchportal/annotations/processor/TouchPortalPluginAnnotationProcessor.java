@@ -355,6 +355,25 @@ public class TouchPortalPluginAnnotationProcessor extends AbstractProcessor {
         }
         jsonAction.addProperty(ActionHelper.HAS_HOLD_FUNCTIONALITY, action.hasHoldFunctionality());
 
+        ActionTranslation[] actionTranslations = actionElement.getAnnotationsByType(ActionTranslation.class);
+        if (actionTranslations.length > 0) {
+            for (ActionTranslation actionTranslation : actionTranslations) {
+                String languageCode = actionTranslation.language().getCode();
+                if (!actionTranslation.name().isEmpty()) {
+                    jsonAction.addProperty(ActionHelper.NAME + "_" + languageCode, actionTranslation.name());
+                }
+                if (!actionTranslation.prefix().isEmpty()) {
+                    jsonAction.addProperty(ActionHelper.PREFIX + "_" + languageCode, actionTranslation.prefix());
+                }
+                if (!actionTranslation.description().isEmpty()) {
+                    jsonAction.addProperty(ActionHelper.DESCRIPTION + "_" + languageCode, actionTranslation.description());
+                }
+                if (!actionTranslation.format().isEmpty()) {
+                    jsonAction.addProperty(ActionHelper.FORMAT + "_" + languageCode, actionTranslation.format());
+                }
+            }
+        }
+
         JsonArray jsonActionData = new JsonArray();
         Set<? extends Element> dataElements = roundEnv.getElementsAnnotatedWith(Data.class);
         for (Element dataElement : dataElements) {

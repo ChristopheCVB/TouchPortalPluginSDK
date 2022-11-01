@@ -147,6 +147,8 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
      * Action example with no parameter
      */
     @Action(description = "Long Description of Action Simple", format = "Do a simple action", categoryId = "BaseCategory")
+    @ActionTranslation(language = Language.FRENCH, description = "Description longue de Action Simple", format = "Exécute une action simple", prefix = "Mon préfixe", name = "Action Simple")
+    @ActionTranslation(language = Language.PORTUGUESE, description = "Descrição longa da Acção Simples", format = "Realiza uma acção simples", prefix = "Meu prefixo", name = "Acção Simples")
     private void actionSimple() {
         TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, "Action actionSimple received");
     }

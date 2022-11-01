@@ -53,6 +53,8 @@ class TouchPortalPluginPackager implements Plugin<Project> {
         }
 
         def copyResources = project.tasks.register('copyResources', Copy) {
+            dependsOn project.processResources
+
             group = 'Touch Portal Plugin'
             from(project.file("${project.buildDir}/resources/main/"))
             into("${project.buildDir}/plugin/${extension.mainClassSimpleName.get()}/")
