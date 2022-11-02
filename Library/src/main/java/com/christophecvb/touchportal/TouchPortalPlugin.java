@@ -27,6 +27,8 @@ import com.christophecvb.touchportal.model.deserializer.TPMessageDeserializer;
 import com.google.gson.*;
 import okhttp3.*;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -34,12 +36,10 @@ import java.lang.reflect.Parameter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.*;
@@ -135,6 +135,10 @@ public abstract class TouchPortalPlugin {
      * Current Held Actions States
      */
     private final HashMap<String, Boolean> heldActionsStates = new HashMap<>();
+    /**
+     * Map containing image urls and their base64 representation
+     */
+    private final HashMap<String, String> base64Images = new HashMap<>();
     /**
      * Executor Service for callbacks
      */
@@ -1195,6 +1199,41 @@ public abstract class TouchPortalPlugin {
      */
     public Boolean isActionBeingHeld(String actionId) {
         return this.heldActionsStates.get(actionId);
+    }
+
+    /**
+     * Convert an image url to a base64 representation
+     *
+     * @param imageUrl String
+     * @return String base64Image
+     */
+    public String getBase64ImageFromUrl(String imageUrl) {
+        String base64Image = "";
+        if (this.base64Images.containsKey(imageUrl)) {
+            base64Image = this.base64Images.get(imageUrl);
+        }
+        else {
+            ByteArrayOutputStream byteArrayOutputStream = null;
+            try {
+                BufferedImage bufferedImage = ImageIO.read(new URL(imageUrl));
+
+                ImageIO.write(bufferedImage, "jpg", byteArrayOutputStream = new ByteArrayOutputStream());
+                base64Image = Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+                this.base64Images.put(imageUrl, base64Image);
+            }
+            catch (Exception exception) {
+                LOGGER.warning(exception.getMessage() + " for Image URL: " + imageUrl);
+            }
+            finally {
+                if (byteArrayOutputStream != null) {
+                    try {
+                        byteArrayOutputStream.close();
+                    }
+                    catch (IOException ignored) {}
+                }
+            }
+        }
+        return base64Image;
     }
 
     /**
