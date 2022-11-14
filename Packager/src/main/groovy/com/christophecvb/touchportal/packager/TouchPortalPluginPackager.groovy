@@ -17,8 +17,9 @@ class TouchPortalPluginPackager implements Plugin<Project> {
 
         project.tasks.withType(JavaCompile) { task ->
             task.doFirst {
-                println('Adding -parameters to Compiler Args')
+                println('Adding -parameters to Compiler Args and setting encoding to UTF-8')
                 options.compilerArgs.add('-parameters')
+                options.encoding = "UTF-8"
             }
         }
 
