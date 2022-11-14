@@ -38,6 +38,9 @@ public class PluginHelper {
     public static final String CONFIGURATION_COLOR_LIGHT = "colorLight";
     public static final String CONFIGURATION_PARENT_CATEGORY = "parentCategory";
     public static final String PLUGIN_START_COMMAND = "plugin_start_cmd";
+    public static final String PLUGIN_START_COMMAND_SUFFIX_WIN = "_windows";
+    public static final String PLUGIN_START_COMMAND_SUFFIX_MACOS = "_mac";
+    public static final String PLUGIN_START_COMMAND_SUFFIX_LINUX = "_linux";
     public static final String CATEGORIES = "categories";
     public static final String SETTINGS = "settings";
 

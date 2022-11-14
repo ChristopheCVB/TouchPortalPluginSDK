@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'com.github.gmazzo.buildconfig' version '3.0.0'
+    id 'com.github.gmazzo.buildconfig' version '3.1.0'
     id 'com.christophecvb.touchportal.plugin-packager' version "+"
 }
 

@@ -18,26 +18,24 @@ Once you have cloned this project, you can run the `gradlew javaDoc` and browse 
 
 ## Releases
 
-Latest is 8.0.0
-
-Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
+Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases) to check which is the latest
 
 ### Maven Central
 
-Latest version is `8.0.0`
-
-Prior versions were not published to Maven Central
+Versions before `7.0.0` were not published to Maven Central
 
 #### Gradle
 
 ```groovy
 plugins {
-  id 'com.christophecvb.touchportal.plugin-packager' version '8.0.0'
+  id 'com.christophecvb.touchportal.plugin-packager' version 'X.Y.Z'
 }
 
+tpPlugin.mainClassSimpleName = 'MyTouchPortalPlugin'
+
 dependencies {
-  implementation 'com.christophecvb.touchportal:plugin-sdk:8.0.0'
-  annotationProcessor 'com.christophecvb.touchportal:plugin-sdk-annotations-processor:8.0.0'
+  implementation 'com.christophecvb.touchportal:plugin-sdk:X.Y.Z'
+  annotationProcessor 'com.christophecvb.touchportal:plugin-sdk-annotations-processor:X.Y.Z'
 }
 ```
 
@@ -262,7 +260,3 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
     - Arguments: `start`
     - Working Directory: `YourModule/build/plugin/YourTouchPortalPlugin`
 [![Touch Portal Plugin SDK Gradle Application Configuration](https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/resources/TP%20Plugin%20SDK%20Gradle%20Application%20Configuration.png)](#debugging-tips)
-
-## ROADMAP
-
-The roadmap can be found [here](https://github.com/ChristopheCVB/TouchPortalPluginSDK/projects/1)

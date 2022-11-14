@@ -20,10 +20,10 @@
 
 package com.christophecvb.touchportal.samplejava;
 
+import com.christophecvb.touchportal.TouchPortalPlugin;
 import com.christophecvb.touchportal.annotations.*;
 import com.christophecvb.touchportal.helpers.PluginHelper;
 import com.christophecvb.touchportal.helpers.ReceivedMessageHelper;
-import com.christophecvb.touchportal.TouchPortalPlugin;
 import com.christophecvb.touchportal.model.*;
 import com.google.gson.JsonObject;
 
