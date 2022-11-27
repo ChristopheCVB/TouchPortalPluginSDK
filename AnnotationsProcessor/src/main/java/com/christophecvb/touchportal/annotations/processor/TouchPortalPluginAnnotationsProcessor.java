@@ -126,7 +126,7 @@ public class TouchPortalPluginAnnotationsProcessor extends AbstractProcessor {
      * @param categoryElement Element
      * @param category        {@link Category}
      * @param actionElement   Element
-     * @return Pair<JsonObject, TypeSpec.Builder> actionPair
+     * @return Pair&lt;JsonObject, TypeSpec.Builder&gt; actionPair
      */
     public Pair<JsonObject, TypeSpec.Builder> processAction(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement) throws Exception {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Action: " + actionElement.getSimpleName());
@@ -195,7 +195,7 @@ public class TouchPortalPluginAnnotationsProcessor extends AbstractProcessor {
      * @param categoryElement   Element
      * @param category          {@link Category}
      * @param connectorElement  Element
-     * @return Pair<JsonObject, TypeSpec.Builder> actionPair
+     * @return Pair&lt;JsonObject, TypeSpec.Builder&gt; actionPair
      */
     public Pair<JsonObject, TypeSpec.Builder> processConnector(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element connectorElement) throws Exception {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Connector: " + connectorElement.getSimpleName());
@@ -255,7 +255,7 @@ public class TouchPortalPluginAnnotationsProcessor extends AbstractProcessor {
      * @param categoryElement Element
      * @param category        {@link Category}
      * @param stateElement    Element
-     * @return Pair<JsonObject, TypeSpec.Builder> statePair
+     * @return Pair&lt;JsonObject, TypeSpec.Builder&gt; statePair
      * @throws GenericHelper.TPTypeException If a used type is not Supported
      */
     public Pair<JsonObject, TypeSpec.Builder> processState(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element stateElement) throws Exception {
@@ -300,7 +300,7 @@ public class TouchPortalPluginAnnotationsProcessor extends AbstractProcessor {
      * @param categoryElement Element
      * @param category        {@link Category}
      * @param eventElement    Element
-     * @return Pair<JsonObject, TypeSpec.Builder> eventPair
+     * @return Pair&lt;JsonObject, TypeSpec.Builder&gt; eventPair
      * @throws GenericHelper.TPTypeException If any used type is not Supported
      */
     public Pair<JsonObject, TypeSpec.Builder> processEvent(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element eventElement) throws Exception {
@@ -350,7 +350,7 @@ public class TouchPortalPluginAnnotationsProcessor extends AbstractProcessor {
      * @param action          {@link Action}
      * @param jsonAction      JsonObject
      * @param dataElement     Element
-     * @return Pair<JsonObject, TypeSpec.Builder> dataPair
+     * @return Pair&lt;JsonObject, TypeSpec.Builder&gt; dataPair
      */
     private Pair<JsonObject, TypeSpec.Builder> processActionData(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element actionElement, Action action, JsonObject jsonAction, Element dataElement) throws Exception {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Action Data: " + dataElement.getSimpleName());
@@ -490,7 +490,7 @@ public class TouchPortalPluginAnnotationsProcessor extends AbstractProcessor {
      * @param connector         {@link Connector}
      * @param jsonConnector     JsonObject
      * @param dataElement       Element
-     * @return Pair<JsonObject, TypeSpec.Builder> dataPair
+     * @return Pair&lt;JsonObject, TypeSpec.Builder&gt; dataPair
      */
     private Pair<JsonObject, TypeSpec.Builder> processConnectorData(RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement, Category category, Element connectorElement, Connector connector, JsonObject jsonConnector, Element dataElement) throws Exception {
         this.messager.printMessage(Diagnostic.Kind.NOTE, "Process Connector Data: " + dataElement.getSimpleName());

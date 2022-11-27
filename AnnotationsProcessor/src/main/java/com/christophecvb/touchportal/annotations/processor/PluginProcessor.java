@@ -23,7 +23,7 @@ public class PluginProcessor {
      *
      * @param roundEnv      RoundEnvironment
      * @param pluginElement Element
-     * @return Pair<JsonObject, TypeSpec.Builder> pluginPair
+     * @return Pair&lt;JsonObject, TypeSpec.Builder&gt; pluginPair
      * @throws GenericHelper.TPTypeException If a used type is not Supported
      */
     public static Pair<JsonObject, TypeSpec.Builder> process(TouchPortalPluginAnnotationsProcessor processor, RoundEnvironment roundEnv, Element pluginElement) throws Exception {

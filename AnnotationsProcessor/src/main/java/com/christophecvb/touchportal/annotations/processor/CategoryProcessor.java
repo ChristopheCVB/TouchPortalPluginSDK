@@ -24,7 +24,7 @@ public class CategoryProcessor {
      * @param pluginElement   Element
      * @param plugin          {@link Plugin}
      * @param categoryElement Element
-     * @return Pair<JsonObject, TypeSpec.Builder> categoryPair
+     * @return Pair&lt;JsonObject, TypeSpec.Builder&gt; categoryPair
      * @throws GenericHelper.TPTypeException If a used type is not Supported
      */
     public static Pair<JsonObject, TypeSpec.Builder> process(TouchPortalPluginAnnotationsProcessor processor, RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement) throws Exception {
