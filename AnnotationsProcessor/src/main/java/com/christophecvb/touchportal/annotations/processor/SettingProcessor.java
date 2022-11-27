@@ -19,7 +19,7 @@ public class SettingProcessor {
      * @return Pair&lt;JsonObject, TypeSpec.Builder&gt; statePair
      * @throws GenericHelper.TPTypeException If a used type is not Supported
      */
-    public static Pair<JsonObject, TypeSpec.Builder> process(TouchPortalPluginAnnotationsProcessor processor, Element settingElement) throws Exception {
+    public static Pair<JsonObject, TypeSpec.Builder> process(TouchPortalPluginAnnotationsProcessor processor, Element settingElement) throws GenericHelper.TPTypeException {
         processor.getMessager().printMessage(Diagnostic.Kind.NOTE, "Process Setting: " + settingElement.getSimpleName());
         Setting setting = settingElement.getAnnotation(Setting.class);
 

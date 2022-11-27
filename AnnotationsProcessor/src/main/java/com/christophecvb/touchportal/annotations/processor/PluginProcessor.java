@@ -25,8 +25,9 @@ public class PluginProcessor {
      * @param pluginElement Element
      * @return Pair&lt;JsonObject, TypeSpec.Builder&gt; pluginPair
      * @throws GenericHelper.TPTypeException If a used type is not Supported
+     * @throws TPAnnotationException If an Annotation is misused
      */
-    public static Pair<JsonObject, TypeSpec.Builder> process(TouchPortalPluginAnnotationsProcessor processor, RoundEnvironment roundEnv, Element pluginElement) throws Exception {
+    public static Pair<JsonObject, TypeSpec.Builder> process(TouchPortalPluginAnnotationsProcessor processor, RoundEnvironment roundEnv, Element pluginElement) throws GenericHelper.TPTypeException, TPAnnotationException {
         processor.getMessager().printMessage(Diagnostic.Kind.NOTE, "Process Plugin: " + pluginElement.getSimpleName());
         Plugin plugin = pluginElement.getAnnotation(Plugin.class);
 

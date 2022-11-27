@@ -26,8 +26,9 @@ public class CategoryProcessor {
      * @param categoryElement Element
      * @return Pair&lt;JsonObject, TypeSpec.Builder&gt; categoryPair
      * @throws GenericHelper.TPTypeException If a used type is not Supported
+     * @throws TPAnnotationException If an Annotation is misused
      */
-    public static Pair<JsonObject, TypeSpec.Builder> process(TouchPortalPluginAnnotationsProcessor processor, RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement) throws Exception {
+    public static Pair<JsonObject, TypeSpec.Builder> process(TouchPortalPluginAnnotationsProcessor processor, RoundEnvironment roundEnv, Element pluginElement, Plugin plugin, Element categoryElement) throws GenericHelper.TPTypeException, TPAnnotationException {
         processor.getMessager().printMessage(Diagnostic.Kind.NOTE, "Process Category: " + categoryElement.getSimpleName());
         Category category = categoryElement.getAnnotation(Category.class);
 
