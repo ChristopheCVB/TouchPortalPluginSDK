@@ -46,10 +46,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 
 public class LibraryTests {
+    private static final Logger LOGGER = Logger.getLogger(LibraryTests.class.getSimpleName());
     private static final long REASONABLE_TIME = 100;
     private ServerSocket serverSocket;
     private Socket serverSocketClient;
@@ -83,6 +86,11 @@ public class LibraryTests {
         public void onNotificationOptionClicked(TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage) {
         }
     };
+
+    static {
+        LOGGER.setUseParentHandlers(false);
+        LOGGER.addHandler(new TouchPortalPlugin.CustomConsoleHandler());
+    }
 
     @Before
     public void initialize() throws IOException {
@@ -150,6 +158,7 @@ public class LibraryTests {
 
     @Test
     public void testConnection() {
+        LOGGER.log(Level.FINE, "Now");
         try {
             Thread.sleep(REASONABLE_TIME);
         }
@@ -162,6 +171,7 @@ public class LibraryTests {
 
     @Test
     public void testConnectionFail() {
+        LOGGER.log(Level.FINE, "Now");
         this.close();
 
         boolean connectedPairedAndListening = this.touchPortalPluginTest.connectThenPairAndListen(null);
@@ -177,6 +187,7 @@ public class LibraryTests {
 
     @Test
     public void testMultipleConnect() {
+        LOGGER.log(Level.FINE, "Now");
         // A connectThenPairAndListen is already done in the @Before
         assertTrue(this.touchPortalPluginTest.connectThenPairAndListen(null));
         assertTrue(this.touchPortalPluginTest.connectThenPairAndListen(this.touchPortalPluginListener));
@@ -184,6 +195,7 @@ public class LibraryTests {
 
     @Test
     public void testCloseAndReConnect() {
+        LOGGER.log(Level.FINE, "Now");
         this.touchPortalPluginTest.close(null);
 
         boolean connectedPairedAndListening = this.touchPortalPluginTest.connectThenPairAndListen(null);
@@ -193,6 +205,7 @@ public class LibraryTests {
 
     @Test
     public void testConnectionNoListener() {
+        LOGGER.log(Level.FINE, "Now");
         this.touchPortalPluginTest.close(null);
 
         boolean connectedPairedAndListening = this.touchPortalPluginTest.connectThenPairAndListen(null);
@@ -202,11 +215,13 @@ public class LibraryTests {
 
     @Test
     public void testClose() {
+        LOGGER.log(Level.FINE, "Now");
         this.touchPortalPluginTest.close(null);
     }
 
     @Test
     public void testServerSocketCloses() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         this.serverSocketClient.close();
         this.serverSocket.close();
         Thread.sleep(REASONABLE_TIME);
@@ -215,6 +230,7 @@ public class LibraryTests {
 
     @Test
     public void testSend() {
+        LOGGER.log(Level.FINE, "Now");
         // Send State Update by ID from Constants
         assertTrue(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "New Value 01"));
 
@@ -227,6 +243,7 @@ public class LibraryTests {
 
     @Test
     public void testSendStates() {
+        LOGGER.log(Level.FINE, "Now");
         assertFalse(this.touchPortalPluginTest.sendStateUpdate(null, null));
         assertFalse(this.touchPortalPluginTest.sendStateUpdate("", null));
         assertFalse(this.touchPortalPluginTest.sendStateUpdate("", ""));
@@ -240,6 +257,7 @@ public class LibraryTests {
 
     @Test
     public void testSendChoices() {
+        LOGGER.log(Level.FINE, "Now");
         assertFalse(this.touchPortalPluginTest.sendChoiceUpdate(null, null));
         assertFalse(this.touchPortalPluginTest.sendChoiceUpdate("", new String[0]));
         assertFalse(this.touchPortalPluginTest.sendChoiceUpdate(null, new String[0]));
@@ -254,6 +272,7 @@ public class LibraryTests {
 
     @Test
     public void testSendSpecificChoices() {
+        LOGGER.log(Level.FINE, "Now");
         assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate(null, null, null));
         assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("", null, null));
         assertFalse(this.touchPortalPluginTest.sendSpecificChoiceUpdate("", "", null));
@@ -273,6 +292,7 @@ public class LibraryTests {
 
     @Test
     public void testSendActionDataUpdate() {
+        LOGGER.log(Level.FINE, "Now");
         HashMap<String, Number> props = new HashMap<>();
         assertFalse(this.touchPortalPluginTest.sendActionDataUpdate(null, null, null));
         assertFalse(this.touchPortalPluginTest.sendActionDataUpdate("", null, null));
@@ -291,6 +311,7 @@ public class LibraryTests {
 
     @Test
     public void testLastStateValue() {
+        LOGGER.log(Level.FINE, "Now");
         String stateValue = System.currentTimeMillis() + "";
         assertTrue(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, stateValue));
         assertFalse(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, stateValue));
@@ -299,6 +320,7 @@ public class LibraryTests {
 
     @Test
     public void testShowNotification() {
+        LOGGER.log(Level.FINE, "Now");
         assertFalse (this.touchPortalPluginTest.sendShowNotification(null, null, null, null));
         assertFalse(this.touchPortalPluginTest.sendShowNotification("", null, null, null));
         assertFalse(this.touchPortalPluginTest.sendShowNotification("", "", null, null));
@@ -314,6 +336,7 @@ public class LibraryTests {
 
     @Test
     public void testDynamicStates() {
+        LOGGER.log(Level.FINE, "Now");
         assertFalse(this.touchPortalPluginTest.sendCreateState(null, null, null, null));
 
         assertFalse(this.touchPortalPluginTest.sendCreateState("", null, null, null));
@@ -363,6 +386,7 @@ public class LibraryTests {
 
     @Test
     public void testSendFail() {
+        LOGGER.log(Level.FINE, "Now");
         this.touchPortalPluginTest.close(null);
         assertFalse(this.touchPortalPluginTest.sendStateUpdate(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "New Value"));
         assertFalse(this.touchPortalPluginTest.sendChoiceUpdate("listId", null, true));
@@ -373,9 +397,11 @@ public class LibraryTests {
 
     @Test
     public void testReceiveActionNoId() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+        
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -387,9 +413,11 @@ public class LibraryTests {
 
     @Test
     public void testReceiveConnectorNoId() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_CONNECTOR_CHANGE);
+        
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -401,10 +429,12 @@ public class LibraryTests {
 
     @Test
     public void testReceiveActionEmptyId() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, "");
+        
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -416,10 +446,12 @@ public class LibraryTests {
 
     @Test
     public void testReceiveConnectorEmptyId() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_CONNECTOR_CHANGE);
         jsonMessage.addProperty(ReceivedMessageHelper.CONNECTOR_ID, "");
+        
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -431,6 +463,7 @@ public class LibraryTests {
 
     @Test
     public void testReceiveShortConnectorIdNotification() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         Map<String, Object> dataReceived = new HashMap<>();
         dataReceived.put(TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.Text.ID + "0", "Text0!");
         dataReceived.put(TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.Text.ID, "Text!");
@@ -441,6 +474,7 @@ public class LibraryTests {
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_SHORT_CONNECTOR_ID_NOTIFICATION);
         jsonMessage.addProperty(ReceivedMessageHelper.CONNECTOR_ID, ConnectorHelper.getConstructedId(TouchPortalPluginTestConstants.ID, TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.ID, 0, dataReceived));
         jsonMessage.addProperty(ReceivedMessageHelper.SHORT_ID, "SHORT_ID");
+        
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -458,6 +492,7 @@ public class LibraryTests {
 
     @Test
     public void testReceiveDummyWithDataTextAndNumberAction() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
@@ -472,6 +507,7 @@ public class LibraryTests {
         numberDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_VALUE, 42);
         data.add(numberDataItem);
         jsonMessage.add(ActionHelper.DATA, data);
+        
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -483,6 +519,7 @@ public class LibraryTests {
 
     @Test
     public void testReceiveDummyWithDataFileAction() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
@@ -498,6 +535,7 @@ public class LibraryTests {
         directoryDataItem.addProperty(ReceivedMessageHelper.ACTION_DATA_VALUE, "/");
         data.add(directoryDataItem);
         jsonMessage.add(ActionHelper.DATA, data);
+        
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -508,11 +546,13 @@ public class LibraryTests {
     }
 
     @Test
-    public void testReceiveDummyDummyWithJsonObject() throws IOException, InterruptedException {
+    public void testReceiveDummyWithJsonObject() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithJsonObject.ID);
+        
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -523,11 +563,13 @@ public class LibraryTests {
     }
 
     @Test
-    public void testReceiveDummyDummyWithTPActionMessage() throws IOException, InterruptedException {
+    public void testReceiveDummyWithTPActionMessage() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithTPActionMessage.ID);
+        
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -538,11 +580,13 @@ public class LibraryTests {
     }
 
     @Test
-    public void testReceiveDummyDummyWithParam() throws IOException, InterruptedException {
+    public void testReceiveDummyWithParamNotData() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         jsonMessage.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithParam.ID);
+
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -554,12 +598,14 @@ public class LibraryTests {
 
     @Test
     public void testReceiveActionHoldableDownAndUp() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
 
         JsonObject jsonMessageHoldDown = new JsonObject();
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_HOLD_DOWN);
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
+        
         out.println(jsonMessageHoldDown);
 
         Thread.sleep(REASONABLE_TIME);
@@ -570,6 +616,7 @@ public class LibraryTests {
         jsonMessageHoldUp.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessageHoldUp.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_HOLD_UP);
         jsonMessageHoldUp.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
+        
         out.println(jsonMessageHoldUp);
 
         Thread.sleep(REASONABLE_TIME);
@@ -582,12 +629,14 @@ public class LibraryTests {
 
     @Test
     public void testReceiveActionHoldablePress() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
 
         JsonObject jsonMessageHoldDown = new JsonObject();
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
         jsonMessageHoldDown.addProperty(ReceivedMessageHelper.ACTION_ID, TouchPortalPluginTestConstants.BaseCategory.Actions.ActionHoldable.ID);
+        
         out.println(jsonMessageHoldDown);
 
         Thread.sleep(REASONABLE_TIME);
@@ -600,6 +649,7 @@ public class LibraryTests {
 
     @Test
     public void testReceiveConnectorForSlider() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
 
         JsonObject jsonMessageConnectorForSlider = new JsonObject();
@@ -618,6 +668,7 @@ public class LibraryTests {
 
     @Test
     public void testReceiveConnectorForSliderWithData() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
 
         JsonObject jsonMessageConnectorForSliderWithData = new JsonObject();
@@ -629,6 +680,7 @@ public class LibraryTests {
         JsonObject dataText = new JsonObject();
         dataText.addProperty(ReceivedMessageHelper.ACTION_DATA_ID, TouchPortalPluginTestConstants.BaseCategory.Connectors.ConnectorForSliderWithData.Text.ID);
         dataText.addProperty(ReceivedMessageHelper.ACTION_DATA_VALUE, "Sliding!");
+        data.add(dataText);
         jsonMessageConnectorForSliderWithData.add(ConnectorHelper.DATA, data);
 
         out.println(jsonMessageConnectorForSliderWithData);
@@ -641,6 +693,7 @@ public class LibraryTests {
 
     @Test
     public void testUpdateConnectorValue() {
+        LOGGER.log(Level.FINE, "Now");
         HashMap<String, Object> data = new HashMap<>();
         data.put("dataId", "value");
         assertFalse(this.touchPortalPluginTest.sendConnectorUpdate(null, null, null, null));
@@ -659,6 +712,7 @@ public class LibraryTests {
 
     @Test
     public void testReceiveConnectorForSliderWithNonData() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
 
         JsonObject jsonMessageConnectorForSliderWithNonData = new JsonObject();
@@ -677,9 +731,11 @@ public class LibraryTests {
 
     @Test
     public void testReceiveListChange() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_LIST_CHANGE);
+
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -691,10 +747,12 @@ public class LibraryTests {
 
     @Test
     public void testReceiveListChangeNoListener() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         this.touchPortalPluginTest.connectThenPairAndListen(null);
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_LIST_CHANGE);
+
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -706,10 +764,12 @@ public class LibraryTests {
 
     @Test
     public void testReceiveActionNoListener() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         this.touchPortalPluginTest.connectThenPairAndListen(null);
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -721,9 +781,11 @@ public class LibraryTests {
 
     @Test
     public void testReceiveBadPlugin() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, "falsePluginId");
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_ACTION);
+
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -735,8 +797,10 @@ public class LibraryTests {
 
     @Test
     public void testReceiveNoMessageType() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
+
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -748,9 +812,11 @@ public class LibraryTests {
 
     @Test
     public void testReceiveUnknownMessageType() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, "unknown");
+
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -762,6 +828,7 @@ public class LibraryTests {
 
     @Test
     public void testReceiveInfo() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         TPInfoMessage sentTPInfoMessage = new TPInfoMessage();
         sentTPInfoMessage.status = "paired";
         sentTPInfoMessage.sdkVersion = 3L;
@@ -800,9 +867,11 @@ public class LibraryTests {
 
     @Test
     public void testReceiveInfoMissingPropsAndNoListener() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         this.touchPortalPluginTest.connectThenPairAndListen(null);
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_INFO);
+
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -822,9 +891,11 @@ public class LibraryTests {
 
     @Test
     public void testReceiveClose() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_CLOSE_PLUGIN);
+
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -837,6 +908,7 @@ public class LibraryTests {
 
     @Test
     public void testReceiveJSONFail() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println("Not a JSON Object");
 
@@ -848,6 +920,7 @@ public class LibraryTests {
 
     @Test
     public void testReceiveEmpty() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println();
 
@@ -859,6 +932,7 @@ public class LibraryTests {
 
     @Test
     public void testReceivePart() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.print("This");
         out.print("is");
@@ -874,25 +948,30 @@ public class LibraryTests {
 
     @Test
     public void testReceiveBroadcast() throws IOException {
+        LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_BROADCAST);
         jsonMessage.addProperty(ReceivedMessageHelper.EVENT, ReceivedMessageHelper.EVENT_PAGE_CHANGE);
         jsonMessage.addProperty(ReceivedMessageHelper.PAGE_NAME, "Page ONE");
+
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
     }
 
     @Test
     public void testReceiveBroadcastMissingPropsAndNoListener() throws IOException {
+        LOGGER.log(Level.FINE, "Now");
         this.touchPortalPluginTest.connectThenPairAndListen(null);
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_BROADCAST);
+
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
     }
 
     @Test
     public void testReceiveSettings() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         JsonArray jsonSettings = new JsonArray();
 
         JsonObject jsonSettingIP = new JsonObject();
@@ -923,10 +1002,12 @@ public class LibraryTests {
 
     @Test
     public void testReceiveSettingsNoListener() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         this.touchPortalPluginTest.connectThenPairAndListen(null);
         JsonObject jsonMessage = new JsonObject();
         jsonMessage.addProperty(ReceivedMessageHelper.PLUGIN_ID, TouchPortalPluginTestConstants.ID);
         jsonMessage.addProperty(ReceivedMessageHelper.TYPE, ReceivedMessageHelper.TYPE_SETTINGS);
+
         PrintWriter out = new PrintWriter(this.serverSocketClient.getOutputStream(), true);
         out.println(jsonMessage);
 
@@ -938,6 +1019,7 @@ public class LibraryTests {
 
     @Test
     public void testSendSettingUpdate() throws IOException, InterruptedException {
+        LOGGER.log(Level.FINE, "Now");
         assertFalse(this.touchPortalPluginTest.sendSettingUpdate("DOES NOT EXISTS", "VALUE", false));
 
         TPInfoMessage sentTPInfoMessage = new TPInfoMessage();
@@ -982,6 +1064,7 @@ public class LibraryTests {
 
     @Test
     public void testAnnotations() {
+        LOGGER.log(Level.FINE, "Now");
         assertEquals(TouchPortalPluginTestConstants.ID, "com.christophecvb.touchportal.test.TouchPortalPluginTest");
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.ID, "com.christophecvb.touchportal.test.TouchPortalPluginTest.BaseCategory");
         assertEquals(TouchPortalPluginTestConstants.BaseCategory.Actions.DummyWithDataTextAndNumber.ID, "com.christophecvb.touchportal.test.TouchPortalPluginTest.BaseCategory.action.dummyWithDataTextAndNumber");
@@ -992,6 +1075,7 @@ public class LibraryTests {
 
     @Test
     public void testEntryTPAndConstants() throws IOException {
+        LOGGER.log(Level.FINE, "Now");
         File testGeneratedResourcesDirectory = new File("../../../../build/generated/sources/annotationProcessor/java/test/resources");
 
         BufferedReader reader = Files.newBufferedReader(Paths.get(new File(testGeneratedResourcesDirectory.getAbsolutePath() + "/entry.tp").getAbsolutePath()));
@@ -1071,6 +1155,7 @@ public class LibraryTests {
 
     @Test
     public void testProperties() {
+        LOGGER.log(Level.FINE, "Now");
         // Test reloadProperties without a Properties File
         assertFalse(this.touchPortalPluginTest.reloadProperties());
 
@@ -1099,11 +1184,13 @@ public class LibraryTests {
 
     @Test
     public void testPropertiesFail() {
+        LOGGER.log(Level.FINE, "Now");
         assertFalse(this.touchPortalPluginTest.loadProperties("doesNot.exists"));
     }
 
     @Test
     public void testPropertiesAccess() {
+        LOGGER.log(Level.FINE, "Now");
         // No Loaded Properties File
         assertNull(this.touchPortalPluginTest.removeProperty("non existent"));
         assertNull(this.touchPortalPluginTest.getProperty("non existent"));
@@ -1112,6 +1199,7 @@ public class LibraryTests {
 
     @Test
     public void testIsUpdateAvailable() {
+        LOGGER.log(Level.FINE, "Now");
         assertFalse(this.touchPortalPluginTest.isUpdateAvailable("", 0));
         assertFalse(this.touchPortalPluginTest.isUpdateAvailable("https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/Library/src/test/resources/TouchPortalPluginTest/plugin.config", 1)); // Uses plugin.version
         assertTrue(this.touchPortalPluginTest.isUpdateAvailable("https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/Library/src/test/resources/TouchPortalPluginTest/plugin.config", 0)); // Uses plugin.version
@@ -1119,6 +1207,7 @@ public class LibraryTests {
 
     @Test
     public void testOAuth2() throws IOException {
+        LOGGER.log(Level.FINE, "Now");
         String host = "localhost";
         String callbackPath = "/oauth";
         int port = -1;

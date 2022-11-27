@@ -1307,7 +1307,7 @@ public abstract class TouchPortalPlugin {
     /**
      * Custom ConsoleHandler
      */
-    private static class CustomConsoleHandler extends ConsoleHandler {
+    public static class CustomConsoleHandler extends ConsoleHandler {
         public CustomConsoleHandler() {
             super();
             setFormatter(new SimpleFormatter() {
@@ -1317,7 +1317,7 @@ public abstract class TouchPortalPlugin {
                 public synchronized String format(LogRecord lr) {
                     String[] path =  lr.getSourceClassName().split("\\.");
                     return String.format(format,
-                            lr.getLevel().getLocalizedName(),
+                            lr.getLevel().getName(),
                             path[path.length - 1] + "." + lr.getSourceMethodName(),
                             lr.getMessage()
                     );
