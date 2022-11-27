@@ -21,6 +21,7 @@ public class PluginProcessor {
     /**
      * Generates a JsonObject and a TypeSpec.Builder representing the {@link Plugin}
      *
+     * @param processor     {@link TouchPortalPluginAnnotationsProcessor}
      * @param roundEnv      RoundEnvironment
      * @param pluginElement Element
      * @return Pair&lt;JsonObject, TypeSpec.Builder&gt; pluginPair

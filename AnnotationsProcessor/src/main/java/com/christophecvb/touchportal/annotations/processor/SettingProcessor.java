@@ -15,6 +15,7 @@ public class SettingProcessor {
     /**
      * Generates a JsonObject and a TypeSpec.Builder representing the {@link Setting}
      *
+     * @param processor      {@link TouchPortalPluginAnnotationsProcessor}
      * @param settingElement Element
      * @return Pair&lt;JsonObject, TypeSpec.Builder&gt; statePair
      * @throws GenericHelper.TPTypeException If a used type is not Supported

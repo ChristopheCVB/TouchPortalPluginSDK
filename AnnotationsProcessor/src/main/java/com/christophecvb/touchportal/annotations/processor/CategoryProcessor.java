@@ -20,6 +20,7 @@ public class CategoryProcessor {
     /**
      * Generates a JsonObject and a TypeSpec.Builder representing the {@link Category}
      *
+     * @param processor       {@link TouchPortalPluginAnnotationsProcessor}
      * @param roundEnv        RoundEnvironment
      * @param pluginElement   Element
      * @param plugin          {@link Plugin}
