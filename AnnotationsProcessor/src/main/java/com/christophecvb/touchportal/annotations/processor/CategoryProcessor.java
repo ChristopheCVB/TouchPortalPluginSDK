@@ -47,7 +47,7 @@ public class CategoryProcessor {
             Action action = actionElement.getAnnotation(Action.class);
             String categoryId = category.id().isEmpty() ? categoryElement.getSimpleName().toString() : category.id();
             if (categoryId.equals(action.categoryId())) {
-                Pair<JsonObject, TypeSpec.Builder> actionResult = processor.processAction(roundEnv, pluginElement, plugin, categoryElement, category, actionElement);
+                Pair<JsonObject, TypeSpec.Builder> actionResult = ActionProcessor.process(processor, roundEnv, pluginElement, plugin, categoryElement, category, actionElement);
                 jsonActions.add(actionResult.first);
                 actionsTypeSpecBuilder.addType(actionResult.second.build());
             }
@@ -62,7 +62,7 @@ public class CategoryProcessor {
             Connector connector = connectorElement.getAnnotation(Connector.class);
             String categoryId = category.id().isEmpty() ? categoryElement.getSimpleName().toString() : category.id();
             if (categoryId.equals(connector.categoryId())) {
-                Pair<JsonObject, TypeSpec.Builder> connectorResult = processor.processConnector(roundEnv, pluginElement, plugin, categoryElement, category, connectorElement);
+                Pair<JsonObject, TypeSpec.Builder> connectorResult = ConnectorProcessor.process(processor, roundEnv, pluginElement, plugin, categoryElement, category, connectorElement);
                 jsonConnectors.add(connectorResult.first);
                 connectorsTypeSpecBuilder.addType(connectorResult.second.build());
             }
@@ -77,7 +77,7 @@ public class CategoryProcessor {
             State state = stateElement.getAnnotation(State.class);
             String categoryId = category.id().isEmpty() ? categoryElement.getSimpleName().toString() : category.id();
             if (categoryId.equals(state.categoryId())) {
-                Pair<JsonObject, TypeSpec.Builder> stateResult = processor.processState(roundEnv, pluginElement, plugin, categoryElement, category, stateElement);
+                Pair<JsonObject, TypeSpec.Builder> stateResult = StateProcessor.process(processor, roundEnv, pluginElement, plugin, categoryElement, category, stateElement);
                 jsonStates.add(stateResult.first);
                 statesTypeSpecBuilder.addType(stateResult.second.build());
             }
@@ -93,7 +93,7 @@ public class CategoryProcessor {
             String categoryId = category.id().isEmpty() ? categoryElement.getSimpleName().toString() : category.id();
             if (state != null) {
                 if (categoryId.equals(state.categoryId())) {
-                    Pair<JsonObject, TypeSpec.Builder> eventResult = processor.processEvent(roundEnv, pluginElement, plugin, categoryElement, category, eventElement);
+                    Pair<JsonObject, TypeSpec.Builder> eventResult = EventProcessor.process(processor, roundEnv, pluginElement, plugin, categoryElement, category, eventElement);
                     jsonEvents.add(eventResult.first);
                     eventsTypeSpecBuilder.addType(eventResult.second.build());
                 }
