@@ -29,6 +29,7 @@ import java.lang.annotation.*;
  * </p>
  */
 @Repeatable(ActionTranslations.class)
+@Target({ElementType.METHOD, ElementType.TYPE})
 public @interface ActionTranslation {
     /**
      * ActionTranslation Language

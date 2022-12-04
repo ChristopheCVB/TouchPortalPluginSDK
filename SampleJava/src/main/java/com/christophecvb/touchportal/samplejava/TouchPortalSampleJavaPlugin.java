@@ -25,6 +25,8 @@ import com.christophecvb.touchportal.annotations.*;
 import com.christophecvb.touchportal.helpers.PluginHelper;
 import com.christophecvb.touchportal.helpers.ReceivedMessageHelper;
 import com.christophecvb.touchportal.model.*;
+import com.christophecvb.touchportal.samplejava.invokable.action.ExampleClassAction;
+import com.christophecvb.touchportal.samplejava.invokable.connector.ExampleClassConnector;
 import com.google.gson.JsonObject;
 
 import java.io.File;
@@ -98,14 +100,23 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
             if (PluginHelper.COMMAND_START.equals(args[0])) {
                 // Initialize the Plugin
                 TouchPortalSampleJavaPlugin touchPortalSampleJavaPlugin = new TouchPortalSampleJavaPlugin();
+
+                // Register Invokable
+                touchPortalSampleJavaPlugin.registerInvokable(TouchPortalSampleJavaPluginConstants.BaseCategory.Actions.ExampleClassAction.ID, ExampleClassAction.class);
+                touchPortalSampleJavaPlugin.registerInvokable(TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ExampleClassConnector.ID, ExampleClassConnector.class);
+
                 // Load a properties File
                 touchPortalSampleJavaPlugin.loadProperties("plugin.config");
+
                 // Get a property
                 TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, touchPortalSampleJavaPlugin.getProperty("samplekey"));
+
                 // Set a property
                 touchPortalSampleJavaPlugin.setProperty("samplekey", "Value set from Plugin");
+
                 // Store the properties
                 touchPortalSampleJavaPlugin.storeProperties();
+
                 // Initiate the connection with the Touch Portal Plugin System
                 boolean connectedPairedAndListening = touchPortalSampleJavaPlugin.connectThenPairAndListen(touchPortalSampleJavaPlugin);
 
@@ -300,7 +311,7 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
     }
 
     @Override
-    public void onListChanged(TPListChangeMessage tpListChangeMessage) {
+    public void onListChanged(TPListChangedMessage tpListChangedMessage) {
     }
 
     @Override

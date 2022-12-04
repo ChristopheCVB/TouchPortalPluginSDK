@@ -71,7 +71,7 @@ public class LibraryTests {
         }
 
         @Override
-        public void onListChanged(TPListChangeMessage tpListChangeMessage) {
+        public void onListChanged(TPListChangedMessage tpListChangedMessage) {
         }
 
         @Override

@@ -91,7 +91,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
     /**
      * Called when a List Change Message is received
      */
-    public void onListChanged(TPListChangeMessage tpListChangeMessage) { }
+    public void onListChanged(TPListChangeMessage tpListChangedMessage) { }
 
     /**
      * Called when a Broadcast Message is received

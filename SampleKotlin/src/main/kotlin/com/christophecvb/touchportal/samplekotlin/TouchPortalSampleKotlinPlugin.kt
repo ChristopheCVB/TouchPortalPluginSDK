@@ -82,7 +82,7 @@ class TouchPortalSampleKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPl
     }
 
     override fun onReceived(jsonMessage: JsonObject) {}
-    override fun onListChanged(tpListChangeMessage: TPListChangeMessage) {}
+    override fun onListChanged(tpListChangedMessage: TPListChangedMessage) {}
     override fun onInfo(tpInfoMessage: TPInfoMessage) {}
     override fun onBroadcast(tpBroadcastMessage: TPBroadcastMessage) {}
     override fun onSettings(tpSettingsMessage: TPSettingsMessage) {}

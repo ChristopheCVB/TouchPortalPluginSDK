@@ -38,6 +38,6 @@ import java.lang.annotation.Target;
  * @see <a href="https://www.touch-portal.com/api/index.php?section=connectors">TP Documentation: Connectors</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.FIELD})
 public @interface ConnectorValue {
 }

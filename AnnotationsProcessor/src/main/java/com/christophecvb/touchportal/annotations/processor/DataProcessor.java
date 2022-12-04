@@ -19,6 +19,7 @@ public class DataProcessor {
     /**
      * Generates a JsonObject and a TypeSpec.Builder representing the {@link Data} for an {@link Action} or a {@link Connector}
      *
+     * @param <T>             Action or Connector Annotation
      * @param processor       {@link TouchPortalPluginAnnotationsProcessor}
      * @param roundEnv        RoundEnvironment
      * @param pluginElement   Element

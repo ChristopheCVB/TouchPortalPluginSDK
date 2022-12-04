@@ -24,6 +24,7 @@ import com.christophecvb.touchportal.annotations.Action;
 import com.christophecvb.touchportal.annotations.Category;
 
 import javax.lang.model.element.Element;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
@@ -104,6 +105,24 @@ public class ActionHelper {
         if (actionMethod.isAnnotationPresent(Action.class)) {
             Action action = actionMethod.getDeclaredAnnotation(Action.class);
             actionId = ActionHelper._getActionId(CategoryHelper.getCategoryId(pluginClass, action.categoryId()), (!action.id().isEmpty() ? action.id() : actionMethod.getName()));
+        }
+
+        return actionId;
+    }
+
+    /**
+     * Get the generated Action ID
+     *
+     * @param pluginClass  Class
+     * @param actionField  Field
+     * @return String actionId
+     */
+    public static String getActionId(Class<?> pluginClass, Field actionField) {
+        String actionId = "";
+
+        if (actionField.getDeclaringClass().isAnnotationPresent(Action.class)) {
+            Action action = actionField.getDeclaringClass().getDeclaredAnnotation(Action.class);
+            actionId = ActionHelper._getActionId(CategoryHelper.getCategoryId(pluginClass, action.categoryId()), (!action.id().isEmpty() ? action.id() : actionField.getDeclaringClass().getSimpleName()));
         }
 
         return actionId;
