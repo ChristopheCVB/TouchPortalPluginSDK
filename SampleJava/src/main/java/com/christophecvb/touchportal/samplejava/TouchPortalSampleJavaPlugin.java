@@ -33,8 +33,13 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@SuppressWarnings("unused")
-@Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example", parentCategory = ParentCategory.CONTENT)
+@Plugin(
+        version = BuildConfig.VERSION_CODE,
+        colorDark = "#203060",
+        colorLight = "#4070F0",
+        name = BuildConfig.NAME,
+        parentCategory = ParentCategory.CONTENT
+)
 public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
     /**
      * Logger
@@ -80,7 +85,7 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
      * Setting of type number definition example
      */
     @Setting(name = "Update Delay", defaultValue = "10", minValue = 10, maxValue = 30)
-    private int updateDelaySetting;
+    private int updateDelaySetting = 10;
 
     /**
      * Setting of type String and is read only definition example
@@ -122,7 +127,7 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
 
                 if (connectedPairedAndListening) {
                     // Update a State with the ID from the Generated Constants Class
-                    boolean stateUpdated = touchPortalSampleJavaPlugin.sendStateUpdate(TouchPortalSampleJavaPluginConstants.BaseCategory.States.CustomStateWithEvent.ID, "2");
+                    touchPortalSampleJavaPlugin.sendStateUpdate(TouchPortalSampleJavaPluginConstants.BaseCategory.States.CustomStateWithEvent.ID, "2");
 
                     // Create a new State
                     touchPortalSampleJavaPlugin.sendCreateState("BaseCategory", "createdState1", "Created State 01", System.currentTimeMillis() + "1");
@@ -147,7 +152,8 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
                     touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.ID, TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 90, null);
                     try {
                         Thread.sleep(1000);
-                    } catch (InterruptedException ignored) {}
+                    } catch (InterruptedException ignored) {
+                    }
                     touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.ID, TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 50, null);
                 }
             }
