@@ -347,12 +347,25 @@ public abstract class TouchPortalPlugin {
                         }
                     }
 
-                    tpInvokable.onInvoke();
+                    this.heldActionsStates.put(tpActionMessage.actionId, held);
+                    this.callbacksExecutor.submit(() -> {
+                        try {
+                            tpInvokable.onInvoke();
+                        }
+                        catch (Exception e) {
+                            TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Action could not be invoked", e);
+                        }
+                        finally {
+                            if (held == null || !held) {
+                                this.heldActionsStates.remove(tpActionMessage.actionId);
+                            }
+                        }
+                    });
 
                     invoked = true;
                 }
                 catch (ReflectiveOperationException e) {
-                    TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Action could not be created or invoked", e);
+                    TouchPortalPlugin.LOGGER.log(Level.WARNING, "Action could not be instanced", e);
                 }
             }
             else {
@@ -396,7 +409,7 @@ public abstract class TouchPortalPlugin {
                             invoked = true;
                         }
                         catch (MethodDataParameterException e) {
-                            TouchPortalPlugin.LOGGER.log(Level.WARNING, e.getMessage(), e);
+                            TouchPortalPlugin.LOGGER.log(Level.WARNING, "Action method data parameters could not be retrieved", e);
                         }
                         break;
                     }
@@ -436,12 +449,20 @@ public abstract class TouchPortalPlugin {
                         }
                     }
 
-                    tpInvokable.onInvoke();
+                    this.currentConnectorValues.put(tpConnectorChangeMessage.getConstructedId(), tpConnectorChangeMessage.value);
+                    this.callbacksExecutor.submit(() -> {
+                        try {
+                            tpInvokable.onInvoke();
+                        }
+                        catch (Exception e) {
+                            TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Connector could not be invoked", e);
+                        }
+                    });
 
                     invoked = true;
                 }
                 catch (ReflectiveOperationException e) {
-                    TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Action could not be created or invoked", e);
+                    TouchPortalPlugin.LOGGER.log(Level.WARNING, "Connector could not be created or invoked", e);
                 }
             }
             else {
@@ -470,6 +491,7 @@ public abstract class TouchPortalPlugin {
                                     throw new MethodDataParameterException(method, parameter);
                                 }
                             }
+
                             this.currentConnectorValues.put(tpConnectorChangeMessage.getConstructedId(), tpConnectorChangeMessage.value);
                             this.callbacksExecutor.submit(() -> {
                                 try {
@@ -480,6 +502,7 @@ public abstract class TouchPortalPlugin {
                                     TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Connector method could not be invoked", e);
                                 }
                             });
+
                             invoked = true;
                         }
                         catch (MethodDataParameterException e) {

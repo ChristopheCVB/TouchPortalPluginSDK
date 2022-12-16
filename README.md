@@ -164,7 +164,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
   
     public void onInfo(TPInfoMessage tpInfoMessage) {
         // TPInfoMessage will contain the initial settings stored by TP
-        // -> Note that your annotated Settings fields will be up to date at this point
+        // -> Note that your annotated Settings fields will be up-to-date at this point
       
         // continue plugin initialization
     }
