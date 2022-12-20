@@ -26,6 +26,7 @@ import com.christophecvb.touchportal.model.*;
 import com.christophecvb.touchportal.model.deserializer.TPMessageDeserializer;
 import com.google.gson.*;
 import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -190,7 +191,7 @@ public abstract class TouchPortalPlugin {
                         TPMessageDeserializer tpMessageDeserializer = new TPMessageDeserializer();
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_CLOSE_PLUGIN, TPClosePluginMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_INFO, TPInfoMessage.class);
-                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_LIST_CHANGE, TPListChangedMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_LIST_CHANGED, TPListChangedMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_BROADCAST, TPBroadcastMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_SETTINGS, TPSettingsMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_ACTION, TPActionMessage.class);
@@ -230,21 +231,40 @@ public abstract class TouchPortalPlugin {
                         this.updateSettingFields(this.tpInfoMessage.settings);
 
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onInfo(this.tpInfoMessage);
+                            this.callbacksExecutor.submit(() -> {
+                                this.touchPortalPluginListener.onInfo(this.tpInfoMessage);
+                            });
                         }
                         break;
 
-                    case ReceivedMessageHelper.TYPE_LIST_CHANGE:
-                        TPListChangedMessage listChangeMessage = (TPListChangedMessage) tpMessage;
+                    case ReceivedMessageHelper.TYPE_LIST_CHANGED:
+                        TPListChangedMessage tpListChangedMessage = (TPListChangedMessage) tpMessage;
+                        if (this.registeredInvokables.containsKey(tpListChangedMessage.actionId)) {
+                            Class<? extends TPInvokable> invokableClass = this.registeredInvokables.get(tpListChangedMessage.actionId);
+                            try {
+                                TPInvokable tpInvokable = this.instantiateTPInvokable(invokableClass);
+
+                                this.callbacksExecutor.submit(() -> {
+                                    tpInvokable.onListChanged(tpListChangedMessage);
+                                });
+                            }
+                            catch (ReflectiveOperationException e) {
+                                TouchPortalPlugin.LOGGER.log(Level.WARNING, "Invokable could not be created or its onListChanged could not be invoked", e);
+                            }
+                        }
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onListChanged(listChangeMessage);
+                            this.callbacksExecutor.submit(() -> {
+                                this.touchPortalPluginListener.onListChanged(tpListChangedMessage);
+                            });
                         }
                         break;
 
                     case ReceivedMessageHelper.TYPE_BROADCAST:
                         TPBroadcastMessage tpBroadcastMessage = (TPBroadcastMessage) tpMessage;
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onBroadcast(tpBroadcastMessage);
+                            this.callbacksExecutor.submit(() -> {
+                                this.touchPortalPluginListener.onBroadcast(tpBroadcastMessage);
+                            });
                         }
                         break;
 
@@ -254,14 +274,18 @@ public abstract class TouchPortalPlugin {
                         this.updateSettingFields(tpSettingsMessage.settings);
 
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onSettings(tpSettingsMessage);
+                            this.callbacksExecutor.submit(() -> {
+                                this.touchPortalPluginListener.onSettings(tpSettingsMessage);
+                            });
                         }
                         break;
 
                     case ReceivedMessageHelper.TYPE_NOTIFICATION_OPTION_CLICKED:
                         TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage = (TPNotificationOptionClickedMessage) tpMessage;
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onNotificationOptionClicked(tpNotificationOptionClickedMessage);
+                            this.callbacksExecutor.submit(() -> {
+                                this.touchPortalPluginListener.onNotificationOptionClicked(tpNotificationOptionClickedMessage);
+                            });
                         }
                         break;
 
@@ -293,7 +317,9 @@ public abstract class TouchPortalPlugin {
                             }
                             if (!called) {
                                 if (this.touchPortalPluginListener != null) {
-                                    this.touchPortalPluginListener.onReceived(jsonMessage);
+                                    this.callbacksExecutor.submit(() -> {
+                                        this.touchPortalPluginListener.onReceived(jsonMessage);
+                                    });
                                 }
                             }
                         }
@@ -301,6 +327,13 @@ public abstract class TouchPortalPlugin {
                 }
             }
         }
+    }
+
+    private TPInvokable instantiateTPInvokable(Class<? extends TPInvokable> invokableClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        Class<? extends TouchPortalPlugin> typedTouchPortalPlugin = (Class<? extends TouchPortalPlugin>) ((ParameterizedType) invokableClass.getGenericSuperclass()).getActualTypeArguments()[0];
+        Constructor<? extends TPInvokable> constructor = invokableClass.getConstructor(typedTouchPortalPlugin);
+        TPInvokable tpInvokable = constructor.newInstance(this);
+        return tpInvokable;
     }
 
     private void updateSettingFields(HashMap<String, String> settings) {
@@ -327,9 +360,7 @@ public abstract class TouchPortalPlugin {
             if (this.registeredInvokables.containsKey(tpActionMessage.actionId)) {
                 Class<? extends TPInvokable> invokableClass = this.registeredInvokables.get(tpActionMessage.actionId);
                 try {
-                    Class<? extends TouchPortalPlugin> typedTouchPortalPlugin = (Class<? extends TouchPortalPlugin>) ((ParameterizedType) invokableClass.getGenericSuperclass()).getActualTypeArguments()[0];
-                    Constructor<? extends TPInvokable> constructor = invokableClass.getConstructor(typedTouchPortalPlugin);
-                    TPInvokable tpInvokable = constructor.newInstance(this);
+                    TPInvokable tpInvokable = this.instantiateTPInvokable(invokableClass);
 
                     for (Field declaredField : invokableClass.getDeclaredFields()) {
                         if (declaredField.isAnnotationPresent(Data.class)) {
@@ -425,9 +456,7 @@ public abstract class TouchPortalPlugin {
             if (this.registeredInvokables.containsKey(tpConnectorChangeMessage.connectorId)) {
                 Class<? extends TPInvokable> invokableClass = this.registeredInvokables.get(tpConnectorChangeMessage.connectorId);
                 try {
-                    Class<? extends TouchPortalPlugin> typedTouchPortalPlugin = (Class<? extends TouchPortalPlugin>) ((ParameterizedType) invokableClass.getGenericSuperclass()).getActualTypeArguments()[0];
-                    Constructor<? extends TPInvokable> constructor = invokableClass.getConstructor(typedTouchPortalPlugin);
-                    TPInvokable tpInvokable = constructor.newInstance(this);
+                    TPInvokable tpInvokable = this.instantiateTPInvokable(invokableClass);
 
                     for (Field declaredField : invokableClass.getDeclaredFields()) {
                         if (declaredField.isAnnotationPresent(Data.class)) {
