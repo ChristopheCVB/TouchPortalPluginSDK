@@ -59,7 +59,7 @@ public class PluginHelper {
     /**
      * Touch Portal Plugin System TP_JAVA_FILE
      */
-    public static final String TP_JAVA = "java";
+    public static final String TP_JAVA = "%TP_JAVA_FILE%";
     /**
      * Touch Portal entry file
      */
