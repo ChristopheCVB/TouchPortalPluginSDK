@@ -49,6 +49,7 @@ public class SentMessageHelper {
     public static final String CONNECTOR_ID = "connectorId";
     public static final String SHORT_ID = "shortId";
     public static final String PARENT_GROUP = "parentGroup";
+    public static final String FORCE_UPDATE = "forceUpdate";
     public static final String EVENT_ID = "eventId";
     public static final String STATES = "states";
 
