@@ -905,6 +905,7 @@ public abstract class TouchPortalPlugin {
                 createStateMessage.addProperty(SentMessageHelper.ID, stateId);
                 createStateMessage.addProperty(SentMessageHelper.DESCRIPTION, description);
                 createStateMessage.addProperty(SentMessageHelper.DEFAULT_VALUE, valueStr);
+                createStateMessage.addProperty(SentMessageHelper.FORCE_UPDATE, true);
                 if (parentGroup == null || parentGroup.isEmpty()) {
                     classLoop:
                     for (Class<?> subClass : this.pluginClass.getDeclaredClasses()) {
