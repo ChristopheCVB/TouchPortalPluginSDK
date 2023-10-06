@@ -30,6 +30,8 @@ import com.christophecvb.touchportal.samplejava.invokable.connector.ExampleClass
 import com.google.gson.JsonObject;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -155,6 +157,10 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
                     } catch (InterruptedException ignored) {
                     }
                     touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.ID, TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 50, null);
+
+                    HashMap<String, Object> states = new HashMap<>();
+                    states.put(TouchPortalSampleJavaPluginConstants.BaseCategory.States.CustomStateWithEvent.ID, "Value");
+                    touchPortalSampleJavaPlugin.sendTriggerEvent(TouchPortalSampleJavaPluginConstants.BaseCategory.Events.CustomStateWithEvent.ID, states);
                 }
             }
         }
