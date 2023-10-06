@@ -34,6 +34,7 @@ public class SentMessageHelper {
     public static final String TYPE_SETTING_UPDATE = "settingUpdate";
     public static final String TYPE_SHOW_NOTIFICATION = "showNotification";
     public static final String TYPE_CONNECTOR_UPDATE = "connectorUpdate";
+    public static final String TYPE_TRIGGER_EVENT = "triggerEvent";
     public static final String INSTANCE_ID = "instanceId";
     public static final String ID = GenericHelper.ID;
     public static final String VALUE = GenericHelper.VALUE;
@@ -49,4 +50,7 @@ public class SentMessageHelper {
     public static final String SHORT_ID = "shortId";
     public static final String PARENT_GROUP = "parentGroup";
     public static final String FORCE_UPDATE = "forceUpdate";
+    public static final String EVENT_ID = "eventId";
+    public static final String STATES = "states";
+
 }
