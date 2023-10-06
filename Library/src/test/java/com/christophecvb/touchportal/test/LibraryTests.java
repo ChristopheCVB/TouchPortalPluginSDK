@@ -396,6 +396,19 @@ public class LibraryTests {
     }
 
     @Test
+    public void testTriggerEvent() {
+        LOGGER.log(Level.FINE, "Now");
+        assertFalse(this.touchPortalPluginTest.sendTriggerEvent(null, null));
+        assertFalse(this.touchPortalPluginTest.sendTriggerEvent("", null));
+
+        assertTrue(this.touchPortalPluginTest.sendTriggerEvent(TouchPortalPluginTestConstants.BaseCategory.Events.CustomState.ID, null));
+
+        HashMap<String, Object> states = new HashMap<>();
+        states.put(TouchPortalPluginTestConstants.BaseCategory.States.CustomState.ID, "StateValue");
+        assertTrue(this.touchPortalPluginTest.sendTriggerEvent(TouchPortalPluginTestConstants.BaseCategory.Events.CustomState.ID, states));
+    }
+
+    @Test
     public void testReceiveActionNoId() throws IOException, InterruptedException {
         LOGGER.log(Level.FINE, "Now");
         JsonObject jsonMessage = new JsonObject();

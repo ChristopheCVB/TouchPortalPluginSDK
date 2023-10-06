@@ -26,7 +26,6 @@ import com.christophecvb.touchportal.model.*;
 import com.christophecvb.touchportal.model.deserializer.TPMessageDeserializer;
 import com.google.gson.*;
 import okhttp3.*;
-import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -1045,6 +1044,36 @@ public abstract class TouchPortalPlugin {
 
             sent = this.send(showNotificationMessage);
             TouchPortalPlugin.LOGGER.info("Show Notification [" + notificationId + "] Sent [" + sent + "]");
+        }
+
+        return sent;
+    }
+
+    /**
+     * Send a Trigger Event message to the Touch Portal Plugin System
+     *
+     * @param eventId String
+     * @param states  Map&lt;String, Object&gt; Key value pair of state id and value
+     * @return Boolean sent
+     */
+    public boolean sendTriggerEvent(String eventId, Map<String, Object> states) {
+        boolean sent = false;
+        if (eventId != null && !eventId.isEmpty()) {
+            JsonObject triggerEventMessage = new JsonObject();
+            triggerEventMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_TRIGGER_EVENT);
+            triggerEventMessage.addProperty(SentMessageHelper.EVENT_ID, eventId);
+
+            if (states != null && !states.isEmpty()) {
+                JsonObject jsonStates = new JsonObject();
+
+                states.forEach((id, value) -> {
+                    jsonStates.addProperty(id, String.valueOf(value));
+                });
+                triggerEventMessage.add(SentMessageHelper.STATES, jsonStates);
+            }
+
+            sent = this.send(triggerEventMessage);
+            TouchPortalPlugin.LOGGER.info("Trigger Event [" + eventId + "] Sent [" + sent + "]");
         }
 
         return sent;
