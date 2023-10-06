@@ -35,7 +35,7 @@ public class PluginProcessor {
         TypeSpec.Builder pluginTypeSpecBuilder = SpecUtils.createPluginTypeSpecBuilder(pluginElement, plugin);
 
         JsonObject jsonPlugin = new JsonObject();
-        jsonPlugin.addProperty(PluginHelper.SDK, PluginHelper.TOUCH_PORTAL_PLUGIN_VERSION);
+        jsonPlugin.addProperty(PluginHelper.API, PluginHelper.TOUCH_PORTAL_PLUGIN_VERSION);
         jsonPlugin.addProperty(PluginHelper.VERSION, plugin.version());
         jsonPlugin.addProperty(PluginHelper.NAME, PluginHelper.getPluginName(pluginElement, plugin));
         jsonPlugin.addProperty(PluginHelper.ID, PluginHelper.getPluginId(pluginElement));
