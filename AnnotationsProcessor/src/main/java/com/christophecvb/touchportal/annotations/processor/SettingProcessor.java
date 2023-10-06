@@ -35,7 +35,7 @@ public class SettingProcessor {
         jsonSetting.addProperty(SettingHelper.DEFAULT, setting.defaultValue());
         jsonSetting.addProperty(SettingHelper.IS_READ_ONLY, setting.isReadOnly());
 
-        if (!setting.tooltip().body().isBlank()) {
+        if (!setting.tooltip().body().isEmpty()) {
             JsonObject tooltip = new JsonObject();
 
             tooltip.addProperty(SettingHelper.Tooltip.TITLE, setting.tooltip().title());

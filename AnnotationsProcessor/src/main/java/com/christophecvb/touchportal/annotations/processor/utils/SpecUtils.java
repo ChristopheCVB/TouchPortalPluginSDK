@@ -197,7 +197,7 @@ public class SpecUtils {
             stateTypeSpecBuilder.addField(SpecUtils.getStaticFinalDoubleFieldSpec("max_value", setting.maxValue()));
         }
 
-        if (!setting.tooltip().body().isBlank()) {
+        if (!setting.tooltip().body().isEmpty()) {
             stateTypeSpecBuilder.addType(createSettingTooltipTypeSpecBuilder(setting.tooltip()).build());
         }
 
