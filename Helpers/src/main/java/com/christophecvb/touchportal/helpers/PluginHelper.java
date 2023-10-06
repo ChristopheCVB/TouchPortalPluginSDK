@@ -29,7 +29,7 @@ import javax.lang.model.element.PackageElement;
  * Touch Portal Plugin Plugin Helper
  */
 public class PluginHelper {
-    public static final String SDK = "sdk";
+    public static final String API = "api";
     public static final String VERSION = "version";
     public static final String NAME = GenericHelper.NAME;
     public static final String ID = GenericHelper.ID;
