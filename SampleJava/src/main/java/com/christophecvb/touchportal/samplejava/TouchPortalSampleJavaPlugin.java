@@ -31,7 +31,6 @@ import com.google.gson.JsonObject;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -80,7 +79,11 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
     /**
      * Setting of type text definition example
      */
-    @Setting(name = "IP", defaultValue = "localhost", maxLength = 15)
+    @Setting(name = "IP", defaultValue = "localhost", maxLength = 15, tooltip = @Setting.Tooltip(
+            title = "IP address",
+            body = "ip address to connect to",
+            docUrl = "https://example.com"
+    ))
     private String ipSetting;
 
     /**

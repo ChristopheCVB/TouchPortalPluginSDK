@@ -34,6 +34,17 @@ public class SettingProcessor {
         jsonSetting.addProperty(SettingHelper.TYPE, desiredTPType);
         jsonSetting.addProperty(SettingHelper.DEFAULT, setting.defaultValue());
         jsonSetting.addProperty(SettingHelper.IS_READ_ONLY, setting.isReadOnly());
+
+        if (!setting.tooltip().body().isBlank()) {
+            JsonObject tooltip = new JsonObject();
+
+            tooltip.addProperty(SettingHelper.Tooltip.TITLE, setting.tooltip().title());
+            tooltip.addProperty(SettingHelper.Tooltip.BODY, setting.tooltip().body());
+            tooltip.addProperty(SettingHelper.Tooltip.DOC_URL, setting.tooltip().docUrl());
+
+            jsonSetting.add(SettingHelper.TOOLTIP, tooltip);
+        }
+
         switch (desiredTPType) {
             case SettingHelper.TYPE_TEXT:
                 if (setting.maxLength() > 0) {
@@ -65,6 +76,8 @@ public class SettingProcessor {
             default:
                 throw new GenericHelper.TPTypeException.Builder(className).typeUnsupported(desiredTPType).forAnnotation(GenericHelper.TPTypeException.ForAnnotation.SETTING).build();
         }
+
+
 
         return Pair.create(jsonSetting, settingTypeSpecBuilder);
     }
