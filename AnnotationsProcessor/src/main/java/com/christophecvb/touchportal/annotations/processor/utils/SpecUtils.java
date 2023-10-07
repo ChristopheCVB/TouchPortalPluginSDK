@@ -127,7 +127,12 @@ public class SpecUtils {
         TypeSpec.Builder actionTypeSpecBuilder = TypeSpec.classBuilder(SpecUtils.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         actionTypeSpecBuilder.addModifiers(Modifier.PUBLIC);
 
-        actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connectorElement, connector)));
+        if (!connector.subCategoryId().isEmpty()) {
+            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connector.subCategoryId(), connectorElement, connector)));
+            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("sub_category_id", SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, connector.subCategoryId())));
+        } else {
+            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connectorElement, connector)));
+        }
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("name", ConnectorHelper.getConnectorName(connectorElement, connector)));
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("format", connector.format()));
 

@@ -120,7 +120,7 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
 
                 // Register Invokable
                 touchPortalSampleJavaPlugin.registerInvokable(TouchPortalSampleJavaPluginConstants.BaseCategory.Actions.ExampleClassAction.ID, ExampleClassAction.class);
-                touchPortalSampleJavaPlugin.registerInvokable(TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ExampleClassConnector.ID, ExampleClassConnector.class);
+                touchPortalSampleJavaPlugin.registerInvokable(TouchPortalSampleJavaPluginConstants.CategoryWithSubs.SubCategories.SubCat1.ID, ExampleClassConnector.class);
 
                 // Load a properties File
                 touchPortalSampleJavaPlugin.loadProperties("plugin.config");
