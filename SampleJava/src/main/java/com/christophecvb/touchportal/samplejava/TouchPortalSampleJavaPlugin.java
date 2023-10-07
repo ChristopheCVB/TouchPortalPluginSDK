@@ -62,8 +62,15 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
      * State and Event definition example
      */
     @State(defaultValue = "1", categoryId = "BaseCategory")
-    @Event(valueChoices = {"1", "2"}, format = "When customStateWithEvent becomes $val")
+    @Event(valueChoices = {"1", "2"}, valueType = ValueType.CHOICE, format = "When customStateWithEvent becomes $val")
     private String customStateWithEvent;
+
+    /**
+     * State and Event definition example
+     */
+    @State(defaultValue = "1", categoryId = "BaseCategory")
+    @Event(valueType = ValueType.TEXT, format = "When customStateWithEvent becomes $val")
+    private String stateWithEventTypeText;
 
     /**
      * State of type choice definition example
