@@ -77,8 +77,6 @@ public class SettingProcessor {
                 throw new GenericHelper.TPTypeException.Builder(className).typeUnsupported(desiredTPType).forAnnotation(GenericHelper.TPTypeException.ForAnnotation.SETTING).build();
         }
 
-
-
         return Pair.create(jsonSetting, settingTypeSpecBuilder);
     }
 }
