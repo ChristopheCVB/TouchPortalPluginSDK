@@ -1,9 +1,6 @@
 package com.christophecvb.touchportal.annotations.processor;
 
-import com.christophecvb.touchportal.annotations.Category;
-import com.christophecvb.touchportal.annotations.Event;
-import com.christophecvb.touchportal.annotations.Plugin;
-import com.christophecvb.touchportal.annotations.State;
+import com.christophecvb.touchportal.annotations.*;
 import com.christophecvb.touchportal.annotations.processor.utils.Pair;
 import com.christophecvb.touchportal.annotations.processor.utils.SpecUtils;
 import com.christophecvb.touchportal.helpers.EventHelper;
@@ -37,8 +34,6 @@ public class EventProcessor {
         State state = eventElement.getAnnotation(State.class);
         Event event = eventElement.getAnnotation(Event.class);
 
-        String reference = eventElement.getEnclosingElement().getSimpleName() + "." + eventElement.getSimpleName();
-
         if (state == null) {
             throw new TPAnnotationException.Builder(State.class).isMissing(true).forElement(eventElement).build();
         }
@@ -50,18 +45,15 @@ public class EventProcessor {
         jsonEvent.addProperty(EventHelper.TYPE, EventHelper.TYPE_COMMUNICATE);
         jsonEvent.addProperty(EventHelper.NAME, EventHelper.getEventName(eventElement, event));
         jsonEvent.addProperty(EventHelper.FORMAT, event.format());
-        String desiredTPType = GenericHelper.getTouchPortalType(reference, eventElement);
-        if (desiredTPType.equals(StateHelper.TYPE_TEXT)) {
-            jsonEvent.addProperty(EventHelper.VALUE_TYPE, EventHelper.VALUE_TYPE_CHOICE);
+        jsonEvent.addProperty(EventHelper.VALUE_STATE_ID, StateHelper.getStateId(pluginElement, categoryElement, category, eventElement, state));
+        jsonEvent.addProperty(EventHelper.VALUE_TYPE, event.valueType().getKey());
+
+        if (event.valueType().equals(ValueType.CHOICE)) {
             JsonArray eventValueChoices = new JsonArray();
             for (String valueChoice : event.valueChoices()) {
                 eventValueChoices.add(valueChoice);
             }
             jsonEvent.add(EventHelper.VALUE_CHOICES, eventValueChoices);
-            jsonEvent.addProperty(EventHelper.VALUE_STATE_ID, StateHelper.getStateId(pluginElement, categoryElement, category, eventElement, state));
-        }
-        else {
-            throw new GenericHelper.TPTypeException.Builder(reference).typeUnsupported(desiredTPType).forAnnotation(GenericHelper.TPTypeException.ForAnnotation.EVENT).build();
         }
 
         return Pair.create(jsonEvent, eventTypeSpecBuilder);

@@ -240,6 +240,7 @@ public class SpecUtils {
         eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("name", EventHelper.getEventName(eventElement, event)));
         eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("format", event.format()));
         eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringArrayFieldSpec("value_choices", event.valueChoices()));
+        eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("value_type", event.valueType().getKey()));
 
         return eventTypeSpecBuilder;
     }
