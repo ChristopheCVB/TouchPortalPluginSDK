@@ -97,6 +97,7 @@ public class SpecUtils {
 
         if (!action.subCategoryId().isEmpty()) {
             actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ActionHelper.getActionId(pluginElement, categoryElement, category, action.subCategoryId(), actionElement, action)));
+            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("sub_category_id", SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, action.subCategoryId())));
         } else {
             actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action)));
         }
@@ -106,9 +107,6 @@ public class SpecUtils {
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("type", action.type()));
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("format", action.format()));
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalBooleanFieldSpec("has_hold_functionality", action.hasHoldFunctionality()));
-        if (!action.subCategoryId().isEmpty()) {
-            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("sub_category_id", SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, action.subCategoryId())));
-        }
 
         return actionTypeSpecBuilder;
     }

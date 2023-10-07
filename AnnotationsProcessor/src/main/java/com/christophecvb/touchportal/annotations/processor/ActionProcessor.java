@@ -38,6 +38,7 @@ public class ActionProcessor {
         JsonObject jsonAction = new JsonObject();
         if (!action.subCategoryId().isEmpty()) {
             jsonAction.addProperty(ActionHelper.ID, ActionHelper.getActionId(pluginElement, categoryElement, category, action.subCategoryId(), actionElement, action));
+            jsonAction.addProperty(ActionHelper.SUB_CATEGORY_ID, SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, action.subCategoryId()));
         } else {
             jsonAction.addProperty(ActionHelper.ID, ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action));
         }
@@ -52,9 +53,6 @@ public class ActionProcessor {
             jsonAction.addProperty(ActionHelper.TRY_INLINE, true);
         }
         jsonAction.addProperty(ActionHelper.HAS_HOLD_FUNCTIONALITY, action.hasHoldFunctionality());
-        if (!action.subCategoryId().isEmpty()) {
-            jsonAction.addProperty(ActionHelper.SUB_CATEGORY_ID, SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, action.subCategoryId()));
-        }
 
         ActionTranslation[] actionTranslations = actionElement.getAnnotationsByType(ActionTranslation.class);
         if (actionTranslations.length > 0) {
