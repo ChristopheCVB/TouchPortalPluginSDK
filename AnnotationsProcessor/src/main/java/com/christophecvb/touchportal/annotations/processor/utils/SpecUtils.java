@@ -211,7 +211,7 @@ public class SpecUtils {
      * @return TypeSpec.Builder tooltipTypeSpecBuilder
      */
     public static TypeSpec.Builder createSettingTooltipTypeSpecBuilder(Setting.Tooltip tooltip) {
-        TypeSpec.Builder tooltipTypeSpecBuilder = TypeSpec.classBuilder("TOOLTIP").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        TypeSpec.Builder tooltipTypeSpecBuilder = TypeSpec.classBuilder("Tooltip").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         tooltipTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("title", tooltip.title()));
         tooltipTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("body", tooltip.body()));
         tooltipTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("docUrl", tooltip.docUrl()));
