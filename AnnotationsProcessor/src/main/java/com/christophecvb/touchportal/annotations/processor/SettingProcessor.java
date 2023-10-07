@@ -38,9 +38,14 @@ public class SettingProcessor {
         if (!setting.tooltip().body().isEmpty()) {
             JsonObject tooltip = new JsonObject();
 
-            tooltip.addProperty(SettingHelper.Tooltip.TITLE, setting.tooltip().title());
             tooltip.addProperty(SettingHelper.Tooltip.BODY, setting.tooltip().body());
-            tooltip.addProperty(SettingHelper.Tooltip.DOC_URL, setting.tooltip().docUrl());
+
+            if (!setting.tooltip().title().isEmpty()) {
+                tooltip.addProperty(SettingHelper.Tooltip.TITLE, setting.tooltip().title());
+            }
+            if (!setting.tooltip().docUrl().isEmpty()) {
+                tooltip.addProperty(SettingHelper.Tooltip.DOC_URL, setting.tooltip().docUrl());
+            }
 
             jsonSetting.add(SettingHelper.TOOLTIP, tooltip);
         }
