@@ -69,6 +69,13 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
     private String customStateWithEvent;
 
     /**
+     * State and Event in Subcategory definition example
+     */
+    @State(defaultValue = "1", categoryId = "CategoryWithSubs")
+    @Event(valueChoices = {"1", "2"}, format = "When customStateWithEventInSubCat becomes $val", subCategoryId = "Cat1")
+    private String customStateWithEventInSubCat;
+
+    /**
      * State of type choice definition example
      */
     @State(valueChoices = {"1", "2"}, defaultValue = "1", categoryId = "SecondCategory")

@@ -44,7 +44,7 @@ public class ActionHelper {
     public static final String TRY_INLINE = "tryInline";
     public static final String FORMAT = "format";
     public static final String HAS_HOLD_FUNCTIONALITY = "hasHoldFunctionality";
-    public static final String SUB_CATEGORY_ID = "subCategoryId";
+    public static final String SUB_CATEGORY_ID = GenericHelper.SUB_CATEGORY_ID;
 
     protected static final String KEY_ACTION = "action";
 

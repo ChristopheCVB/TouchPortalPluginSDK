@@ -261,7 +261,12 @@ public class SpecUtils {
         String simpleClassName = event.id().isEmpty() ? eventElement.getSimpleName().toString() : event.id();
 
         TypeSpec.Builder eventTypeSpecBuilder = TypeSpec.classBuilder(SpecUtils.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", EventHelper.getEventId(pluginElement, categoryElement, category, eventElement, event)));
+        if (!event.subCategoryId().isEmpty()) {
+            eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", EventHelper.getEventId(pluginElement, categoryElement, category, event.subCategoryId(), eventElement, event)));
+            eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("sub_category_id", SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, event.subCategoryId())));
+        } else {
+            eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", EventHelper.getEventId(pluginElement, categoryElement, category, eventElement, event)));
+        }
         eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("name", EventHelper.getEventName(eventElement, event)));
         eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("format", event.format()));
         eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringArrayFieldSpec("value_choices", event.valueChoices()));
