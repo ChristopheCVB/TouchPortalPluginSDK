@@ -44,6 +44,7 @@ public class ActionHelper {
     public static final String TRY_INLINE = "tryInline";
     public static final String FORMAT = "format";
     public static final String HAS_HOLD_FUNCTIONALITY = "hasHoldFunctionality";
+    public static final String SUB_CATEGORY_ID = "subCategoryId";
 
     protected static final String KEY_ACTION = "action";
 
@@ -59,6 +60,21 @@ public class ActionHelper {
      */
     public static String getActionId(Element pluginElement, Element categoryElement, Category category, Element actionElement, Action action) {
         return ActionHelper._getActionId(CategoryHelper.getCategoryId(pluginElement, categoryElement, category), action.id().isEmpty() ? actionElement.getSimpleName().toString() : action.id());
+    }
+
+    /**
+     * Get the generated Action ID
+     *
+     * @param pluginElement   Element
+     * @param categoryElement Element
+     * @param category        {@link Category}
+     * @param subCategoryId   String
+     * @param actionElement   Element
+     * @param action          {@link Action}
+     * @return String actionId
+     */
+    public static String getActionId(Element pluginElement, Element categoryElement, Category category, String subCategoryId, Element actionElement, Action action) {
+        return ActionHelper._getActionId(SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, subCategoryId), action.id().isEmpty() ? actionElement.getSimpleName().toString() : action.id());
     }
 
     /**

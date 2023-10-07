@@ -59,6 +59,26 @@ public class SpecUtils {
         return categoryTypeSpecBuilder;
     }
 
+
+    /**
+     * Generates a TypeSpec.Builder with Constants for the {@link Category.SubCategory}
+     *
+     * @param pluginElement   Element
+     * @param categoryElement Element
+     * @param category        {@link Category}
+     * @param subCategory     {@link Category.SubCategory}
+     * @return TypeSpec.Builder subCategoryTypeSpecBuilder
+     */
+    public static TypeSpec.Builder createSubCategoryTypeSpecBuilder(Element pluginElement, Element categoryElement, Category category, Category.SubCategory subCategory) {
+        TypeSpec.Builder subCategoryTypeSpecBuilder = TypeSpec.classBuilder(SpecUtils.capitalize(subCategory.id())).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
+        subCategoryTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, subCategory)));
+        subCategoryTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("name", subCategory.name()));
+        subCategoryTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("iconRelativePath", subCategory.iconRelativePath()));
+
+        return subCategoryTypeSpecBuilder;
+    }
+
     /**
      * Generates a TypeSpec.Builder with Constants for the {@link Action}
      *
@@ -75,13 +95,20 @@ public class SpecUtils {
         TypeSpec.Builder actionTypeSpecBuilder = TypeSpec.classBuilder(SpecUtils.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         actionTypeSpecBuilder.addModifiers(Modifier.PUBLIC);
 
-        actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action)));
+        if (!action.subCategoryId().isEmpty()) {
+            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ActionHelper.getActionId(pluginElement, categoryElement, category, action.subCategoryId(), actionElement, action)));
+        } else {
+            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action)));
+        }
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("name", ActionHelper.getActionName(actionElement, action)));
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("prefix", action.prefix()));
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("description", action.description()));
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("type", action.type()));
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("format", action.format()));
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalBooleanFieldSpec("has_hold_functionality", action.hasHoldFunctionality()));
+        if (!action.subCategoryId().isEmpty()) {
+            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("sub_category_id", SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, action.subCategoryId())));
+        }
 
         return actionTypeSpecBuilder;
     }

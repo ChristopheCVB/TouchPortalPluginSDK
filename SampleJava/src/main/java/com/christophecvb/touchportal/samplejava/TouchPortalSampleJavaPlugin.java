@@ -31,7 +31,6 @@ import com.google.gson.JsonObject;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,7 +54,11 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
         @Category(name = "Touch Portal Plugin Example Base Category", imagePath = "images/icon-24.png")
         BaseCategory,
         @Category(name = "Touch Portal Plugin Example Second Category", imagePath = "images/icon-24.png")
-        SecondCategory
+        SecondCategory,
+        @Category(name = "Touch Portal Plugin Example Category With Subcategories", imagePath = "images/icon-24.png", subCategories = {
+                @Category.SubCategory(id = "SubCat1", name = "SubCategory 1", iconRelativePath = "%TP_PLUGIN_FOLDER%/images/icon-24.png")
+        })
+        CategoryWithSubs
     }
 
     /**
@@ -279,7 +282,7 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
         }
     }
 
-    @Action(format = "Do Action with Choice {$choices$}", categoryId = "SecondCategory")
+    @Action(format = "Do Action with Choice {$choices$}", categoryId = "CategoryWithSubs", subCategoryId = "SubCat1")
     private void actionWithDataStateId(@Data(stateId = "customStateChoice") String[] choices) {
         LOGGER.log(Level.INFO, "Action with Data State Id received: " + choices[0]);
     }

@@ -36,6 +36,7 @@ public class CategoryHelper {
     public static final String EVENTS = "events";
     public static final String STATES = "states";
     public static final String CONNECTORS = "connectors";
+    public static final String SUB_CATEGORIES = "subCategories";
 
     /**
      * Get the generated Category ID
