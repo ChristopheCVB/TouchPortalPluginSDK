@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.squareup.javapoet.TypeSpec;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 import javax.tools.Diagnostic;
 
 public class SubCategoryProcessor {
@@ -15,7 +16,7 @@ public class SubCategoryProcessor {
     public static Pair<JsonObject, TypeSpec.Builder> process(TouchPortalPluginAnnotationsProcessor processor, Element pluginElement, Category category, Element categoryElement, Category.SubCategory subCategory) {
         processor.getMessager().printMessage(Diagnostic.Kind.NOTE, "Process SubCategory: " + subCategory.id());
 
-        TypeSpec.Builder categoryTypeSpecBuilder = SpecUtils.createSubCategoryTypeSpecBuilder(pluginElement, categoryElement, category, subCategory);
+        TypeSpec.Builder categoryTypeSpecBuilder = SpecUtils.createSubCategoryTypeSpecBuilder(pluginElement, categoryElement, category, subCategory).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
         JsonObject jsonSubCategory = new JsonObject();
 
