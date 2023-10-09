@@ -212,10 +212,13 @@ public class SpecUtils {
      */
     public static TypeSpec.Builder createSettingTooltipTypeSpecBuilder(Setting.Tooltip tooltip) {
         TypeSpec.Builder tooltipTypeSpecBuilder = TypeSpec.classBuilder("Tooltip").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        tooltipTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("title", tooltip.title()));
         tooltipTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("body", tooltip.body()));
-        tooltipTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("docUrl", tooltip.docUrl()));
-
+        if (!tooltip.title().isEmpty()) {
+            tooltipTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("title", tooltip.title()));
+        }
+        if (!tooltip.title().isEmpty()) {
+            tooltipTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("docUrl", tooltip.docUrl()));
+        }
         return tooltipTypeSpecBuilder;
     }
 
