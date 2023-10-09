@@ -74,7 +74,7 @@ public class SpecUtils {
 
         subCategoryTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, subCategory)));
         subCategoryTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("name", subCategory.name()));
-        subCategoryTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("iconRelativePath", subCategory.iconRelativePath()));
+        subCategoryTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("imagepath", subCategory.imagePath()));
 
         return subCategoryTypeSpecBuilder;
     }

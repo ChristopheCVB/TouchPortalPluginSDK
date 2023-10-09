@@ -56,7 +56,7 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
         @Category(name = "Touch Portal Plugin Example Second Category", imagePath = "images/icon-24.png")
         SecondCategory,
         @Category(name = "Touch Portal Plugin Example Category With Subcategories", imagePath = "images/icon-24.png", subCategories = {
-                @Category.SubCategory(id = "SubCat1", name = "SubCategory 1", iconRelativePath = "%TP_PLUGIN_FOLDER%/images/icon-24.png")
+                @Category.SubCategory(id = "SubCat1", name = "SubCategory 1", imagePath = "%TP_PLUGIN_FOLDER%/images/icon-24.png")
         })
         CategoryWithSubs
     }

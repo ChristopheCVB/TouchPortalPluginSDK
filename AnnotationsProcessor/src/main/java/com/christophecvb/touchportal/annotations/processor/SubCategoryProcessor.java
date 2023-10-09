@@ -21,8 +21,8 @@ public class SubCategoryProcessor {
 
         jsonSubCategory.addProperty(SubCategoryHelper.ID, SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, subCategory));
         jsonSubCategory.addProperty(SubCategoryHelper.NAME, subCategory.name());
-        if (!subCategory.iconRelativePath().isEmpty()) {
-            jsonSubCategory.addProperty(SubCategoryHelper.ICON_RELATIVE_PATH, subCategory.iconRelativePath());
+        if (!subCategory.imagePath().isEmpty()) {
+            jsonSubCategory.addProperty(SubCategoryHelper.IMAGE_PATH, subCategory.imagePath());
         }
 
         return Pair.create(jsonSubCategory, categoryTypeSpecBuilder);

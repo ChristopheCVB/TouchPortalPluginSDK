@@ -71,6 +71,6 @@ public @interface Category {
     @interface SubCategory {
         String id();
         String name();
-        String iconRelativePath() default "";
+        String imagePath() default "";
     }
 }

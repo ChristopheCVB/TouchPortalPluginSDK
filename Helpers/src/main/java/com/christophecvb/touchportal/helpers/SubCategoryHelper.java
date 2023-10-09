@@ -7,7 +7,7 @@ import javax.lang.model.element.Element;
 public class SubCategoryHelper {
     public static final String ID = GenericHelper.ID;
     public static final String NAME = GenericHelper.NAME;
-    public static final String ICON_RELATIVE_PATH = "iconRelativePath";
+    public static final String IMAGE_PATH = "imagepath";
 
 
     /**
