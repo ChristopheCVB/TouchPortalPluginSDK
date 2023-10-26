@@ -4,8 +4,8 @@ allprojects {
     }
 }
 
-ext.versionMajor = 8
-ext.versionMinor = 3
+ext.versionMajor = 9
+ext.versionMinor = 0
 ext.versionPatch = 0
 
 ext.isRelease = System.getenv('IS_RELEASE') == 'YES'

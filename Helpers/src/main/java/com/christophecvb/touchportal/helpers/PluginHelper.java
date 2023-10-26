@@ -29,21 +29,25 @@ import javax.lang.model.element.PackageElement;
  * Touch Portal Plugin Plugin Helper
  */
 public class PluginHelper {
-    public static final String SDK = "sdk";
+    public static final String API = "api";
     public static final String VERSION = "version";
     public static final String NAME = GenericHelper.NAME;
     public static final String ID = GenericHelper.ID;
     public static final String CONFIGURATION = "configuration";
     public static final String CONFIGURATION_COLOR_DARK = "colorDark";
     public static final String CONFIGURATION_COLOR_LIGHT = "colorLight";
+    public static final String CONFIGURATION_PARENT_CATEGORY = "parentCategory";
     public static final String PLUGIN_START_COMMAND = "plugin_start_cmd";
+    public static final String PLUGIN_START_COMMAND_SUFFIX_WIN = "_windows";
+    public static final String PLUGIN_START_COMMAND_SUFFIX_MACOS = "_mac";
+    public static final String PLUGIN_START_COMMAND_SUFFIX_LINUX = "_linux";
     public static final String CATEGORIES = "categories";
     public static final String SETTINGS = "settings";
 
     /**
      * Touch Portal Plugin System version
      */
-    public static final int TOUCH_PORTAL_PLUGIN_VERSION = 6;
+    public static final int TOUCH_PORTAL_PLUGIN_VERSION = 7;
     /**
      * Argument passed to the jar to start the plugin
      */
@@ -52,6 +56,10 @@ public class PluginHelper {
      * Touch Portal Plugin System TP_PLUGIN_FOLDER
      */
     public static final String TP_PLUGIN_FOLDER = "%TP_PLUGIN_FOLDER%";
+    /**
+     * Touch Portal Plugin System TP_JAVA_FILE
+     */
+    public static final String TP_JAVA = "%TP_JAVA_FILE%";
     /**
      * Touch Portal entry file
      */

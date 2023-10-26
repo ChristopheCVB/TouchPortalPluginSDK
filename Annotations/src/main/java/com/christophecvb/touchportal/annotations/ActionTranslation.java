@@ -20,26 +20,28 @@
 
 package com.christophecvb.touchportal.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
- * Plugin Annotation
+ * ActionTranslation Annotation
  * <p>
- * Target is a Class
+ * Target is a Method
  * </p>
- *
- * @see <a href="https://www.touch-portal.com/sdk/index.php?section=structure">TP Documentation: Plugin Structure</a>
  */
-@Retention(RetentionPolicy.SOURCE)
-@Target(ElementType.TYPE)
-public @interface Plugin {
+@Repeatable(ActionTranslations.class)
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface ActionTranslation {
     /**
-     * Plugin name
+     * ActionTranslation Language
+     *
+     * @return Language language
+     */
+    Language language();
+
+    /**
+     * ActionTranslation name
      * <p>
-     * Default is Class SimpleName
+     * Default is ""
      * </p>
      *
      * @return String name
@@ -47,39 +49,32 @@ public @interface Plugin {
     String name() default "";
 
     /**
-     * Plugin version
-     *
-     * @return long version
-     */
-    long version();
-
-    /**
-     * Plugin colorDark
+     * ActionTranslation prefix
      * <p>
-     * Format is HTML like `#RRGGBB`
+     * Default is ""
      * </p>
      *
-     * @return String colorDark
+     * @return String prefix
      */
-    String colorDark();
+    String prefix() default "";
 
     /**
-     * Plugin colorLight
+     * ActionTranslation description
      * <p>
-     * Format is HTML like `#RRGGBB`
+     * Default is ""
      * </p>
      *
-     * @return String colorLight
+     * @return String description
      */
-    String colorLight();
+    String description() default "";
 
     /**
-     * Plugin Parent Category
+     * ActionTranslation format
      * <p>
-     * Value from enum {@link ParentCategory}
+     * Default is ""
      * </p>
      *
-     * @return ParentCategory parentCategory
+     * @return String format
      */
-    ParentCategory parentCategory() default ParentCategory.MISC;
+    String format() default "";
 }

@@ -24,6 +24,7 @@ import com.christophecvb.touchportal.helpers.ConnectorHelper;
 import com.christophecvb.touchportal.helpers.DataHelper;
 import com.christophecvb.touchportal.helpers.ReceivedMessageHelper;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -42,6 +43,10 @@ public class TPConnectorChangeMessage extends TPMessage {
 
     public Object getTypedDataValue(Class<?> pluginClass, Method actionMethod, Parameter connectorMethodParameter) {
         return this.getTypedDataValue(connectorMethodParameter.getParameterizedType().getTypeName(), DataHelper.getDataId(pluginClass, actionMethod, connectorMethodParameter));
+    }
+
+    public Object getTypedDataValue(Class<?> pluginClass, Field actionField) {
+        return this.getTypedDataValue(actionField.getType().getTypeName(), DataHelper.getDataId(pluginClass, actionField));
     }
 
     public Object getTypedDataValue(String connectorDataType, String connectorDataId) {

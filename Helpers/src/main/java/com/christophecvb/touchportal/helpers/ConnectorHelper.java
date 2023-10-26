@@ -24,6 +24,7 @@ import com.christophecvb.touchportal.annotations.Category;
 import com.christophecvb.touchportal.annotations.Connector;
 
 import javax.lang.model.element.Element;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -109,12 +110,42 @@ public class ConnectorHelper {
      * Get the generated Connector ID
      *
      * @param pluginClass       Class
+     * @param connectorField    Field
+     * @return String connectorId
+     */
+    public static String getConnectorId(Class<?> pluginClass, Field connectorField) {
+        String connectorId = "";
+
+        if (connectorField.getDeclaringClass().isAnnotationPresent(Connector.class)) {
+            Connector connector = connectorField.getDeclaringClass().getDeclaredAnnotation(Connector.class);
+            connectorId = ConnectorHelper.getConnectorId(pluginClass, connectorField.getDeclaringClass(), connector);
+        }
+
+        return connectorId;
+    }
+
+    /**
+     * Get the generated Connector ID
+     *
+     * @param pluginClass       Class
      * @param connectorMethod   Method
      * @param connector         {@link Connector}
      * @return String connectorId
      */
     public static String getConnectorId(Class<?> pluginClass, Method connectorMethod, Connector connector) {
         return ConnectorHelper._getConnectorId(CategoryHelper.getCategoryId(pluginClass, connector.categoryId()), !connector.id().isEmpty() ? connector.id() : connectorMethod.getName());
+    }
+
+    /**
+     * Get the generated Connector ID
+     *
+     * @param pluginClass       Class
+     * @param connectorClass    Class
+     * @param connector         {@link Connector}
+     * @return String connectorId
+     */
+    public static String getConnectorId(Class<?> pluginClass, Class connectorClass, Connector connector) {
+        return ConnectorHelper._getConnectorId(CategoryHelper.getCategoryId(pluginClass, connector.categoryId()), !connector.id().isEmpty() ? connector.id() : connectorClass.getSimpleName());
     }
 
     /**

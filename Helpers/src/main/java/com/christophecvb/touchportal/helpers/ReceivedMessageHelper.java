@@ -40,7 +40,7 @@ public class ReceivedMessageHelper {
     public static final String TYPE_CONNECTOR_CHANGE = "connectorChange";
     public static final String TYPE_SHORT_CONNECTOR_ID_NOTIFICATION = "shortConnectorIdNotification";
     public static final String TYPE_INFO = "info";
-    public static final String TYPE_LIST_CHANGE = "listChange";
+    public static final String TYPE_LIST_CHANGED = "listChange";
     public static final String TYPE_CLOSE_PLUGIN = "closePlugin";
     public static final String TYPE_BROADCAST = "broadcast";
     public static final String TYPE_SETTINGS = "settings";
@@ -87,7 +87,7 @@ public class ReceivedMessageHelper {
      * @return boolean isMessageAListChange
      */
     public static boolean isTypeListChange(JsonObject jsonMessage) {
-        return ReceivedMessageHelper.TYPE_LIST_CHANGE.equals(ReceivedMessageHelper.getType(jsonMessage));
+        return ReceivedMessageHelper.TYPE_LIST_CHANGED.equals(ReceivedMessageHelper.getType(jsonMessage));
     }
 
     /**

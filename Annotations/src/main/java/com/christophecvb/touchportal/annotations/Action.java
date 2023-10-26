@@ -28,17 +28,30 @@ import java.lang.annotation.Target;
 /**
  * Action Annotation
  * <p>
- * Target is a Method
+ * Target is a Method or a Class extending TPAction
  * </p>
- * <p>
- * <b>If your method only has @Data annotated parameters, it will be called automatically by the SDK.</b>
- * <i>If it is not the case, the SDK will call the TouchPortalPluginListener.onReceive(JsonObject jsonMessage) instead.</i>
- * </p>
+ * <ul>
+ *     <li>
+ *         If used on a Method
+ *         <ul>
+ *             <li>If the method only has @Data annotated parameters, it will be called automatically by the SDK.</li>
+ *             <li>If it is not the case, the SDK will call the TouchPortalPluginListener.onReceive(JsonObject jsonMessage) instead.</li>
+ *         </ul>
+ *     </li>
+ *     <li>
+ *         If used on a Class, the SDK will
+ *         <ul>
+ *             <li>Create a new instance of the Class</li>
+ *             <li>Set the instance's {@link Data} annotated fields</li>
+ *             <li>Call the onInvoke method</li>
+ *         </ul>
+ *     </li>
+ * </ul>
  *
  * @see <a href="https://www.touch-portal.com/sdk/index.php?section=dynamic-actions">TP Documentation: Dynamic Actions</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 public @interface Action {
     /**
      * Action id

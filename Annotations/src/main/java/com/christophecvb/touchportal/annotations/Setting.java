@@ -99,4 +99,17 @@ public @interface Setting {
      * @return boolean isReadOnly
      */
     boolean isReadOnly() default false;
+
+    /**
+     * Setting Tooltip
+     *
+     * @return {@link Tooltip} tooltip
+     */
+    Tooltip tooltip() default @Tooltip(body = "");
+
+    @interface Tooltip {
+        String title() default "";
+        String body();
+        String docUrl() default "";
+    }
 }

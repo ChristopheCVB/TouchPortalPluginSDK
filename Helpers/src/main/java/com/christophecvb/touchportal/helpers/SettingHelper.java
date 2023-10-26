@@ -39,6 +39,13 @@ public class SettingHelper {
     public static final String MIN_VALUE = "minValue";
     public static final String MAX_VALUE = "maxValue";
     public static final String IS_READ_ONLY = "readOnly";
+    public static final String TOOLTIP = "tooltip";
+
+    public static class Tooltip {
+        public static final String TITLE = "title";
+        public static final String BODY = "body";
+        public static final String DOC_URL = "docUrl";
+    }
 
     /**
      * Get the generated Setting Name
