@@ -197,7 +197,29 @@ public class SpecUtils {
             stateTypeSpecBuilder.addField(SpecUtils.getStaticFinalDoubleFieldSpec("max_value", setting.maxValue()));
         }
 
+        if (!setting.tooltip().body().isEmpty()) {
+            stateTypeSpecBuilder.addType(createSettingTooltipTypeSpecBuilder(setting.tooltip()).build());
+        }
+
         return stateTypeSpecBuilder;
+    }
+
+    /**
+     * Generates a TypeSpec.Builder with Constants for the {@link Setting.Tooltip}
+     *
+     * @param tooltip         {@link Setting.Tooltip}
+     * @return TypeSpec.Builder tooltipTypeSpecBuilder
+     */
+    public static TypeSpec.Builder createSettingTooltipTypeSpecBuilder(Setting.Tooltip tooltip) {
+        TypeSpec.Builder tooltipTypeSpecBuilder = TypeSpec.classBuilder("Tooltip").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        tooltipTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("body", tooltip.body()));
+        if (!tooltip.title().isEmpty()) {
+            tooltipTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("title", tooltip.title()));
+        }
+        if (!tooltip.title().isEmpty()) {
+            tooltipTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("docUrl", tooltip.docUrl()));
+        }
+        return tooltipTypeSpecBuilder;
     }
 
     /**
