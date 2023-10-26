@@ -37,6 +37,7 @@ public class ConnectorHelper {
     public static final String TYPE = GenericHelper.TYPE;
     public static final String DATA = "data";
     public static final String FORMAT = "format";
+    public static final String SUB_CATEGORY_ID = GenericHelper.SUB_CATEGORY_ID;
     public static final String UPDATE_PREFIX = "pc";
     public static final String UPDATE_ID_SEPARATOR = "_";
     public static final String UPDATE_DATA_SEPARATOR = "|";
@@ -55,6 +56,21 @@ public class ConnectorHelper {
      */
     public static String getConnectorId(Element pluginElement, Element categoryElement, Category category, Element connectorElement, Connector connector) {
         return ConnectorHelper._getConnectorId(CategoryHelper.getCategoryId(pluginElement, categoryElement, category), connector.id().isEmpty() ? connectorElement.getSimpleName().toString() : connector.id());
+    }
+
+    /**
+     * Get the generated Connector ID
+     *
+     * @param pluginElement     Element
+     * @param categoryElement   Element
+     * @param category          {@link Category}
+     * @param subCategoryId     String
+     * @param connectorElement  Element
+     * @param connector         {@link Connector}
+     * @return String connectorId
+     */
+    public static String getConnectorId(Element pluginElement, Element categoryElement, Category category, String subCategoryId, Element connectorElement, Connector connector) {
+        return ConnectorHelper._getConnectorId(SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, subCategoryId), connector.id().isEmpty() ? connectorElement.getSimpleName().toString() : connector.id());
     }
 
     /**

@@ -40,6 +40,14 @@ public class CategoryProcessor {
         jsonCategory.addProperty(CategoryHelper.NAME, CategoryHelper.getCategoryName(categoryElement, category));
         jsonCategory.addProperty(CategoryHelper.IMAGE_PATH, PluginHelper.TP_PLUGIN_FOLDER + pluginElement.getSimpleName() + "/" + category.imagePath());
 
+        JsonArray jsonSubCategories = new JsonArray();
+        for (Category.SubCategory subCategory : category.subCategories()) {
+            Pair<JsonObject, TypeSpec.Builder> subCategoriesResult = SubCategoryProcessor.process(processor, pluginElement, category, categoryElement, subCategory);
+            jsonSubCategories.add(subCategoriesResult.first);
+            categoryTypeSpecBuilder.addType(subCategoriesResult.second.build());
+        }
+        jsonCategory.add(CategoryHelper.SUB_CATEGORIES, jsonSubCategories);
+
         TypeSpec.Builder actionsTypeSpecBuilder = TypeSpec.classBuilder("Actions").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         JsonArray jsonActions = new JsonArray();
         Set<? extends Element> actionElements = roundEnv.getElementsAnnotatedWith(Action.class);

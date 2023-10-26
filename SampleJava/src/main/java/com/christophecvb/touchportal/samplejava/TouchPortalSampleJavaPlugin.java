@@ -54,7 +54,11 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
         @Category(name = "Touch Portal Plugin Example Base Category", imagePath = "images/icon-24.png")
         BaseCategory,
         @Category(name = "Touch Portal Plugin Example Second Category", imagePath = "images/icon-24.png")
-        SecondCategory
+        SecondCategory,
+        @Category(name = "Touch Portal Plugin Example Category With Subcategories", imagePath = "images/icon-24.png", subCategories = {
+                @Category.SubCategory(id = "SubCat1", name = "SubCategory 1", imagePath = "%TP_PLUGIN_FOLDER%/images/icon-24.png")
+        })
+        CategoryWithSubs
     }
 
     /**
@@ -63,6 +67,13 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
     @State(defaultValue = "1", categoryId = "BaseCategory")
     @Event(valueChoices = {"1", "2"}, format = "When customStateWithEvent becomes $val")
     private String customStateWithEvent;
+
+    /**
+     * State and Event in Subcategory definition example
+     */
+    @State(defaultValue = "1", categoryId = "CategoryWithSubs")
+    @Event(valueChoices = {"1", "2"}, format = "When customStateWithEventInSubCat becomes $val", subCategoryId = "Cat1")
+    private String customStateWithEventInSubCat;
 
     /**
      * State of type choice definition example
@@ -113,7 +124,7 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
 
                 // Register Invokable
                 touchPortalSampleJavaPlugin.registerInvokable(TouchPortalSampleJavaPluginConstants.BaseCategory.Actions.ExampleClassAction.ID, ExampleClassAction.class);
-                touchPortalSampleJavaPlugin.registerInvokable(TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ExampleClassConnector.ID, ExampleClassConnector.class);
+                touchPortalSampleJavaPlugin.registerInvokable(TouchPortalSampleJavaPluginConstants.CategoryWithSubs.SubCat1.ID, ExampleClassConnector.class);
 
                 // Load a properties File
                 touchPortalSampleJavaPlugin.loadProperties("plugin.config");
@@ -282,7 +293,7 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
         }
     }
 
-    @Action(format = "Do Action with Choice {$choices$}", categoryId = "SecondCategory")
+    @Action(format = "Do Action with Choice {$choices$}", categoryId = "CategoryWithSubs", subCategoryId = "SubCat1")
     private void actionWithDataStateId(@Data(stateId = "customStateChoice") String[] choices) {
         LOGGER.log(Level.INFO, "Action with Data State Id received: " + choices[0]);
     }

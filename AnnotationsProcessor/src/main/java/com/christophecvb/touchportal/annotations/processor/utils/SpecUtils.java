@@ -59,6 +59,26 @@ public class SpecUtils {
         return categoryTypeSpecBuilder;
     }
 
+
+    /**
+     * Generates a TypeSpec.Builder with Constants for the {@link Category.SubCategory}
+     *
+     * @param pluginElement   Element
+     * @param categoryElement Element
+     * @param category        {@link Category}
+     * @param subCategory     {@link Category.SubCategory}
+     * @return TypeSpec.Builder subCategoryTypeSpecBuilder
+     */
+    public static TypeSpec.Builder createSubCategoryTypeSpecBuilder(Element pluginElement, Element categoryElement, Category category, Category.SubCategory subCategory) {
+        TypeSpec.Builder subCategoryTypeSpecBuilder = TypeSpec.classBuilder(SpecUtils.capitalize(subCategory.id())).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
+        subCategoryTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, subCategory)));
+        subCategoryTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("name", subCategory.name()));
+        subCategoryTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("imagepath", subCategory.imagePath()));
+
+        return subCategoryTypeSpecBuilder;
+    }
+
     /**
      * Generates a TypeSpec.Builder with Constants for the {@link Action}
      *
@@ -75,7 +95,12 @@ public class SpecUtils {
         TypeSpec.Builder actionTypeSpecBuilder = TypeSpec.classBuilder(SpecUtils.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         actionTypeSpecBuilder.addModifiers(Modifier.PUBLIC);
 
-        actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action)));
+        if (!action.subCategoryId().isEmpty()) {
+            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ActionHelper.getActionId(pluginElement, categoryElement, category, action.subCategoryId(), actionElement, action)));
+            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("sub_category_id", SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, action.subCategoryId())));
+        } else {
+            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action)));
+        }
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("name", ActionHelper.getActionName(actionElement, action)));
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("prefix", action.prefix()));
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("description", action.description()));
@@ -102,7 +127,12 @@ public class SpecUtils {
         TypeSpec.Builder actionTypeSpecBuilder = TypeSpec.classBuilder(SpecUtils.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         actionTypeSpecBuilder.addModifiers(Modifier.PUBLIC);
 
-        actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connectorElement, connector)));
+        if (!connector.subCategoryId().isEmpty()) {
+            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connector.subCategoryId(), connectorElement, connector)));
+            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("sub_category_id", SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, connector.subCategoryId())));
+        } else {
+            actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connectorElement, connector)));
+        }
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("name", ConnectorHelper.getConnectorName(connectorElement, connector)));
         actionTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("format", connector.format()));
 
@@ -258,7 +288,12 @@ public class SpecUtils {
         String simpleClassName = event.id().isEmpty() ? eventElement.getSimpleName().toString() : event.id();
 
         TypeSpec.Builder eventTypeSpecBuilder = TypeSpec.classBuilder(SpecUtils.capitalize(simpleClassName)).addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", EventHelper.getEventId(pluginElement, categoryElement, category, eventElement, event)));
+        if (!event.subCategoryId().isEmpty()) {
+            eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", EventHelper.getEventId(pluginElement, categoryElement, category, event.subCategoryId(), eventElement, event)));
+            eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("sub_category_id", SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, event.subCategoryId())));
+        } else {
+            eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("id", EventHelper.getEventId(pluginElement, categoryElement, category, eventElement, event)));
+        }
         eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("name", EventHelper.getEventName(eventElement, event)));
         eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringFieldSpec("format", event.format()));
         eventTypeSpecBuilder.addField(SpecUtils.getStaticFinalStringArrayFieldSpec("value_choices", event.valueChoices()));

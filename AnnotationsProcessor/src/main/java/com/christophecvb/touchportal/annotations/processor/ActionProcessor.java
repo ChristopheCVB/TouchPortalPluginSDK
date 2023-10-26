@@ -5,6 +5,7 @@ import com.christophecvb.touchportal.annotations.processor.utils.Pair;
 import com.christophecvb.touchportal.annotations.processor.utils.SpecUtils;
 import com.christophecvb.touchportal.helpers.ActionHelper;
 import com.christophecvb.touchportal.helpers.GenericHelper;
+import com.christophecvb.touchportal.helpers.SubCategoryHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.squareup.javapoet.TypeSpec;
@@ -35,7 +36,12 @@ public class ActionProcessor {
         TypeSpec.Builder actionTypeSpecBuilder = SpecUtils.createActionTypeSpecBuilder(pluginElement, categoryElement, category, actionElement, action);
 
         JsonObject jsonAction = new JsonObject();
-        jsonAction.addProperty(ActionHelper.ID, ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action));
+        if (!action.subCategoryId().isEmpty()) {
+            jsonAction.addProperty(ActionHelper.ID, ActionHelper.getActionId(pluginElement, categoryElement, category, action.subCategoryId(), actionElement, action));
+            jsonAction.addProperty(ActionHelper.SUB_CATEGORY_ID, SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, action.subCategoryId()));
+        } else {
+            jsonAction.addProperty(ActionHelper.ID, ActionHelper.getActionId(pluginElement, categoryElement, category, actionElement, action));
+        }
         jsonAction.addProperty(ActionHelper.NAME, ActionHelper.getActionName(actionElement, action));
         jsonAction.addProperty(ActionHelper.PREFIX, action.prefix());
         jsonAction.addProperty(ActionHelper.TYPE, action.type());

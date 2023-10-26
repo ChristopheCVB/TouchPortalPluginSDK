@@ -41,6 +41,7 @@ public class GenericHelper {
     protected static final String VALUE = "value";
     protected static final String DEFAULT = "default";
     protected static final String VALUE_CHOICES = "valueChoices";
+    protected static final String SUB_CATEGORY_ID = "subCategoryId";
 
     /**
      * Retrieve the Touch Portal type according to the Java's element type

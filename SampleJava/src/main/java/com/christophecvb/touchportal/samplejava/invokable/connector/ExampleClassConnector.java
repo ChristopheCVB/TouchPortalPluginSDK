@@ -12,8 +12,9 @@ import java.util.logging.Logger;
 
 @Connector(
         name = "Example Class Connector",
-        categoryId = "BaseCategory",
-        format = "Connect Example Class Connector with param {$param$}"
+        categoryId = "CategoryWithSubs",
+        format = "Connect Example Class Connector with param {$param$}",
+        subCategoryId = "Cat1"
 )
 public class ExampleClassConnector extends TPConnector<TouchPortalSampleJavaPlugin> {
     private final static Logger LOGGER = Logger.getLogger(TouchPortalPlugin.class.getName());

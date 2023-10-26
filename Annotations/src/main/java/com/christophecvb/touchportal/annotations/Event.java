@@ -75,4 +75,11 @@ public @interface Event {
      * @return String[] valueChoices
      */
     String[] valueChoices() default {};
+
+    /**
+     * Event subCategoryId
+     *
+     * @return String subCategoryId
+     */
+    String subCategoryId() default "";
 }

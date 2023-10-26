@@ -38,7 +38,7 @@ public class EventHelper {
     public static final String VALUE_TYPE_CHOICE = GenericHelper.TP_TYPE_CHOICE;
     public static final String VALUE_CHOICES = GenericHelper.VALUE_CHOICES;
     public static final String VALUE_STATE_ID = "valueStateId";
-
+    public static final String SUB_CATEGORY_ID = GenericHelper.SUB_CATEGORY_ID;
     private static final String KEY_EVENT = "event";
 
     /**
@@ -53,6 +53,20 @@ public class EventHelper {
      */
     public static String getEventId(Element pluginElement, Element categoryElement, Category category, Element eventElement, Event event) {
         return EventHelper._getEventId(CategoryHelper.getCategoryId(pluginElement, categoryElement, category), event.id().isEmpty() ? eventElement.getSimpleName().toString() : event.id());
+    }
+
+    /**
+     * Get the generated Event ID
+     *
+     * @param pluginElement   Element
+     * @param categoryElement Element
+     * @param category        {@link Category}
+     * @param eventElement    Element
+     * @param event           {@link Event}
+     * @return String eventId
+     */
+    public static String getEventId(Element pluginElement, Element categoryElement, Category category, String subCategoryId, Element eventElement, Event event) {
+        return EventHelper._getEventId(SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, subCategoryId), event.id().isEmpty() ? eventElement.getSimpleName().toString() : event.id());
     }
 
     /**

@@ -121,6 +121,13 @@ public @interface Action {
     String categoryId();
 
     /**
+     * Action subCategoryId
+     *
+     * @return String subCategoryId
+     */
+    String subCategoryId() default "";
+
+    /**
      * Action hasHoldFunctionality
      * <p>
      * Default is false

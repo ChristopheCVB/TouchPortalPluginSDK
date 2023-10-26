@@ -86,4 +86,11 @@ public @interface Connector {
      * @return String categoryId
      */
     String categoryId();
+
+    /**
+     * Connector subConnectorId
+     *
+     * @return String subConnectorId
+     */
+    String subCategoryId() default "";
 }

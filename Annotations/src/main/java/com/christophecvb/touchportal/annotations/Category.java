@@ -65,4 +65,12 @@ public @interface Category {
      * @return String imagePath
      */
     String imagePath() default "";
+
+    SubCategory[] subCategories() default {};
+
+    @interface SubCategory {
+        String id();
+        String name();
+        String imagePath() default "";
+    }
 }
