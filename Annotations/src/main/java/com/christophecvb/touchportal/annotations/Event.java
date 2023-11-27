@@ -67,13 +67,6 @@ public @interface Event {
     String format();
 
     /**
-     * Event valueType
-     *
-     * @return {@link ValueType} valueType
-     */
-    ValueType valueType() default ValueType.TEXT;
-
-    /**
      * State valueChoices
      * <p>
      * Default is an empty Array

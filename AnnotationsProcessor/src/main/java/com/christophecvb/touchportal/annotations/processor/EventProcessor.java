@@ -38,6 +38,8 @@ public class EventProcessor {
             throw new TPAnnotationException.Builder(State.class).isMissing(true).forElement(eventElement).build();
         }
 
+        String reference = eventElement.getEnclosingElement().getSimpleName() + "." + eventElement.getSimpleName();
+
         TypeSpec.Builder eventTypeSpecBuilder = SpecUtils.createEventTypeSpecBuilder(pluginElement, categoryElement, category, eventElement, event);
 
         JsonObject jsonEvent = new JsonObject();
@@ -46,14 +48,20 @@ public class EventProcessor {
         jsonEvent.addProperty(EventHelper.NAME, EventHelper.getEventName(eventElement, event));
         jsonEvent.addProperty(EventHelper.FORMAT, event.format());
         jsonEvent.addProperty(EventHelper.VALUE_STATE_ID, StateHelper.getStateId(pluginElement, categoryElement, category, eventElement, state));
-        jsonEvent.addProperty(EventHelper.VALUE_TYPE, event.valueType().getKey());
 
-        if (event.valueType().equals(ValueType.CHOICE)) {
-            JsonArray eventValueChoices = new JsonArray();
-            for (String valueChoice : event.valueChoices()) {
-                eventValueChoices.add(valueChoice);
+        String desiredTPType = GenericHelper.getTouchPortalType(reference, eventElement);
+
+        if (desiredTPType.equals(EventHelper.VALUE_TYPE)) {
+            if (event.valueChoices().length > 0) {
+                jsonEvent.addProperty(EventHelper.VALUE_TYPE, StateHelper.TYPE_CHOICE);
+                JsonArray eventValueChoices = new JsonArray();
+                for (String valueChoice : event.valueChoices()) {
+                    eventValueChoices.add(valueChoice);
+                }
+                jsonEvent.add(EventHelper.VALUE_CHOICES, eventValueChoices);
+            } else {
+                jsonEvent.addProperty(EventHelper.VALUE_TYPE, StateHelper.TYPE_TEXT);
             }
-            jsonEvent.add(EventHelper.VALUE_CHOICES, eventValueChoices);
         }
 
         return Pair.create(jsonEvent, eventTypeSpecBuilder);
