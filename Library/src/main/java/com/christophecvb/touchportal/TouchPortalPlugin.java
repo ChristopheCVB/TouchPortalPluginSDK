@@ -27,19 +27,17 @@ import com.christophecvb.touchportal.model.deserializer.TPMessageDeserializer;
 import com.google.gson.*;
 import okhttp3.*;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.*;
@@ -136,9 +134,17 @@ public abstract class TouchPortalPlugin {
      */
     private final HashMap<String, Boolean> heldActionsStates = new HashMap<>();
     /**
+     * Map containing image urls and their base64 representation
+     */
+    private final HashMap<String, String> base64Images = new HashMap<>();
+    /**
      * Executor Service for callbacks
      */
     private final ExecutorService callbacksExecutor;
+    /**
+     * Registered {@link TPInvokable}s
+     */
+    private final HashMap<String, Class<? extends TPInvokable>> registeredInvokables = new HashMap<>();
 
     /**
      * Internal Gson Serializer/Deserializer
@@ -184,7 +190,7 @@ public abstract class TouchPortalPlugin {
                         TPMessageDeserializer tpMessageDeserializer = new TPMessageDeserializer();
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_CLOSE_PLUGIN, TPClosePluginMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_INFO, TPInfoMessage.class);
-                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_LIST_CHANGE, TPListChangeMessage.class);
+                        tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_LIST_CHANGED, TPListChangedMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_BROADCAST, TPBroadcastMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_SETTINGS, TPSettingsMessage.class);
                         tpMessageDeserializer.registerTPMessageType(ReceivedMessageHelper.TYPE_ACTION, TPActionMessage.class);
@@ -224,21 +230,40 @@ public abstract class TouchPortalPlugin {
                         this.updateSettingFields(this.tpInfoMessage.settings);
 
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onInfo(this.tpInfoMessage);
+                            this.callbacksExecutor.submit(() -> {
+                                this.touchPortalPluginListener.onInfo(this.tpInfoMessage);
+                            });
                         }
                         break;
 
-                    case ReceivedMessageHelper.TYPE_LIST_CHANGE:
-                        TPListChangeMessage listChangeMessage = (TPListChangeMessage) tpMessage;
+                    case ReceivedMessageHelper.TYPE_LIST_CHANGED:
+                        TPListChangedMessage tpListChangedMessage = (TPListChangedMessage) tpMessage;
+                        if (this.registeredInvokables.containsKey(tpListChangedMessage.actionId)) {
+                            Class<? extends TPInvokable> invokableClass = this.registeredInvokables.get(tpListChangedMessage.actionId);
+                            try {
+                                TPInvokable tpInvokable = this.instantiateTPInvokable(invokableClass);
+
+                                this.callbacksExecutor.submit(() -> {
+                                    tpInvokable.onListChanged(tpListChangedMessage);
+                                });
+                            }
+                            catch (ReflectiveOperationException e) {
+                                TouchPortalPlugin.LOGGER.log(Level.WARNING, "Invokable could not be created or its onListChanged could not be invoked", e);
+                            }
+                        }
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onListChanged(listChangeMessage);
+                            this.callbacksExecutor.submit(() -> {
+                                this.touchPortalPluginListener.onListChanged(tpListChangedMessage);
+                            });
                         }
                         break;
 
                     case ReceivedMessageHelper.TYPE_BROADCAST:
                         TPBroadcastMessage tpBroadcastMessage = (TPBroadcastMessage) tpMessage;
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onBroadcast(tpBroadcastMessage);
+                            this.callbacksExecutor.submit(() -> {
+                                this.touchPortalPluginListener.onBroadcast(tpBroadcastMessage);
+                            });
                         }
                         break;
 
@@ -248,14 +273,18 @@ public abstract class TouchPortalPlugin {
                         this.updateSettingFields(tpSettingsMessage.settings);
 
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onSettings(tpSettingsMessage);
+                            this.callbacksExecutor.submit(() -> {
+                                this.touchPortalPluginListener.onSettings(tpSettingsMessage);
+                            });
                         }
                         break;
 
                     case ReceivedMessageHelper.TYPE_NOTIFICATION_OPTION_CLICKED:
                         TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage = (TPNotificationOptionClickedMessage) tpMessage;
                         if (this.touchPortalPluginListener != null) {
-                            this.touchPortalPluginListener.onNotificationOptionClicked(tpNotificationOptionClickedMessage);
+                            this.callbacksExecutor.submit(() -> {
+                                this.touchPortalPluginListener.onNotificationOptionClicked(tpNotificationOptionClickedMessage);
+                            });
                         }
                         break;
 
@@ -287,7 +316,9 @@ public abstract class TouchPortalPlugin {
                             }
                             if (!called) {
                                 if (this.touchPortalPluginListener != null) {
-                                    this.touchPortalPluginListener.onReceived(jsonMessage);
+                                    this.callbacksExecutor.submit(() -> {
+                                        this.touchPortalPluginListener.onReceived(jsonMessage);
+                                    });
                                 }
                             }
                         }
@@ -295,6 +326,13 @@ public abstract class TouchPortalPlugin {
                 }
             }
         }
+    }
+
+    private TPInvokable instantiateTPInvokable(Class<? extends TPInvokable> invokableClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        Class<? extends TouchPortalPlugin> typedTouchPortalPlugin = (Class<? extends TouchPortalPlugin>) ((ParameterizedType) invokableClass.getGenericSuperclass()).getActualTypeArguments()[0];
+        Constructor<? extends TPInvokable> constructor = invokableClass.getConstructor(typedTouchPortalPlugin);
+        TPInvokable tpInvokable = constructor.newInstance(this);
+        return tpInvokable;
     }
 
     private void updateSettingFields(HashMap<String, String> settings) {
@@ -316,105 +354,194 @@ public abstract class TouchPortalPlugin {
     }
 
     private boolean onActionReceived(TPActionMessage tpActionMessage, JsonObject jsonAction, Boolean held) {
-        boolean called = false;
+        boolean invoked = false;
         if (tpActionMessage.actionId != null && !tpActionMessage.actionId.isEmpty()) {
-            Method[] pluginActionMethods = Arrays.stream(this.pluginClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Action.class)).toArray(Method[]::new);
-            for (Method method : pluginActionMethods) {
-                String methodActionId = ActionHelper.getActionId(this.pluginClass, method);
-                if (tpActionMessage.actionId.equals(methodActionId)) {
-                    try {
-                        Parameter[] parameters = method.getParameters();
-                        Object[] arguments = new Object[parameters.length];
-                        for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
-                            Parameter parameter = parameters[parameterIndex];
-                            if (parameter.isAnnotationPresent(Data.class)) {
-                                arguments[parameterIndex] = tpActionMessage.getTypedDataValue(this.pluginClass, method, parameter);
-                            }
-                            else if (parameter.getType().isAssignableFrom(JsonObject.class)) {
-                                arguments[parameterIndex] = jsonAction;
-                            }
-                            else if (parameter.getType().isAssignableFrom(TPActionMessage.class)) {
-                                arguments[parameterIndex] = tpActionMessage;
-                            }
-                            if (arguments[parameterIndex] == null) {
-                                throw new MethodDataParameterException(method, parameter);
+            if (this.registeredInvokables.containsKey(tpActionMessage.actionId)) {
+                Class<? extends TPInvokable> invokableClass = this.registeredInvokables.get(tpActionMessage.actionId);
+                try {
+                    TPInvokable tpInvokable = this.instantiateTPInvokable(invokableClass);
+
+                    for (Field declaredField : invokableClass.getDeclaredFields()) {
+                        if (declaredField.isAnnotationPresent(Data.class)) {
+                            declaredField.setAccessible(true);
+                            Object fieldValue = tpActionMessage.getTypedDataValue(this.pluginClass, declaredField);
+                            declaredField.set(tpInvokable, fieldValue);
+                        }
+                        else if (declaredField.getType().isAssignableFrom(JsonObject.class)) {
+                            declaredField.setAccessible(true);
+                            declaredField.set(tpInvokable, jsonAction);
+                        }
+                        else if (declaredField.getType().isAssignableFrom(TPActionMessage.class)) {
+                            declaredField.setAccessible(true);
+                            declaredField.set(tpInvokable, tpActionMessage);
+                        }
+                    }
+
+                    this.heldActionsStates.put(tpActionMessage.actionId, held);
+                    this.callbacksExecutor.submit(() -> {
+                        try {
+                            tpInvokable.onInvoke();
+                        }
+                        catch (Exception e) {
+                            TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Action could not be invoked", e);
+                        }
+                        finally {
+                            if (held == null || !held) {
+                                this.heldActionsStates.remove(tpActionMessage.actionId);
                             }
                         }
-                        this.heldActionsStates.put(tpActionMessage.actionId, held);
-                        this.callbacksExecutor.submit(() -> {
-                            try {
-                                method.setAccessible(true);
-                                method.invoke(this, arguments);
-                            }
-                            catch (Exception e) {
-                                TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Action method could not be invoked", e);
-                            }
-                            finally {
-                                if (held == null || !held) {
-                                    this.heldActionsStates.remove(tpActionMessage.actionId);
+                    });
+
+                    invoked = true;
+                }
+                catch (ReflectiveOperationException e) {
+                    TouchPortalPlugin.LOGGER.log(Level.WARNING, "Action could not be instanced", e);
+                }
+            }
+            else {
+                Method[] pluginActionMethods = Arrays.stream(this.pluginClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Action.class)).toArray(Method[]::new);
+                for (Method method : pluginActionMethods) {
+                    String methodActionId = ActionHelper.getActionId(this.pluginClass, method);
+                    if (tpActionMessage.actionId.equals(methodActionId)) {
+                        try {
+                            Parameter[] parameters = method.getParameters();
+                            Object[] arguments = new Object[parameters.length];
+                            for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
+                                Parameter parameter = parameters[parameterIndex];
+                                if (parameter.isAnnotationPresent(Data.class)) {
+                                    arguments[parameterIndex] = tpActionMessage.getTypedDataValue(this.pluginClass, method, parameter);
+                                }
+                                else if (parameter.getType().isAssignableFrom(JsonObject.class)) {
+                                    arguments[parameterIndex] = jsonAction;
+                                }
+                                else if (parameter.getType().isAssignableFrom(TPActionMessage.class)) {
+                                    arguments[parameterIndex] = tpActionMessage;
+                                }
+                                if (arguments[parameterIndex] == null) {
+                                    throw new MethodDataParameterException(method, parameter);
                                 }
                             }
-                        });
-                        called = true;
+                            this.heldActionsStates.put(tpActionMessage.actionId, held);
+                            this.callbacksExecutor.submit(() -> {
+                                try {
+                                    method.setAccessible(true);
+                                    method.invoke(this, arguments);
+                                }
+                                catch (Exception e) {
+                                    TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Action method could not be invoked", e);
+                                }
+                                finally {
+                                    if (held == null || !held) {
+                                        this.heldActionsStates.remove(tpActionMessage.actionId);
+                                    }
+                                }
+                            });
+                            invoked = true;
+                        }
+                        catch (MethodDataParameterException e) {
+                            TouchPortalPlugin.LOGGER.log(Level.WARNING, "Action method data parameters could not be retrieved", e);
+                        }
+                        break;
                     }
-                    catch (MethodDataParameterException e) {
-                        TouchPortalPlugin.LOGGER.log(Level.WARNING, e.getMessage(), e);
-                    }
-                    break;
                 }
             }
         }
-        return called;
+        return invoked;
     }
 
-    private boolean onConnectorChangeReceived(TPConnectorChangeMessage tpConnectorChangeMessage, JsonObject jsonAction) {
-        boolean called = false;
+    private boolean onConnectorChangeReceived(TPConnectorChangeMessage tpConnectorChangeMessage, JsonObject jsonConnectorChange) {
+        boolean invoked = false;
         if (tpConnectorChangeMessage.connectorId != null && !tpConnectorChangeMessage.connectorId.isEmpty()) {
-            Method[] pluginConnectorMethods = Arrays.stream(this.pluginClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Connector.class)).toArray(Method[]::new);
-            for (Method method : pluginConnectorMethods) {
-                String methodConnectorId = ConnectorHelper.getConnectorId(this.pluginClass, method);
-                if (tpConnectorChangeMessage.connectorId.equals(methodConnectorId)) {
-                    try {
-                        Parameter[] parameters = method.getParameters();
-                        Object[] arguments = new Object[parameters.length];
-                        for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
-                            Parameter parameter = parameters[parameterIndex];
-                            if (parameter.isAnnotationPresent(Data.class)) {
-                                arguments[parameterIndex] = tpConnectorChangeMessage.getTypedDataValue(this.pluginClass, method, parameter);
-                            }
-                            else if (parameter.isAnnotationPresent(ConnectorValue.class)) {
-                                arguments[parameterIndex] = tpConnectorChangeMessage.value;
-                            }
-                            else if (parameter.getType().isAssignableFrom(JsonObject.class)) {
-                                arguments[parameterIndex] = jsonAction;
-                            }
-                            else if (parameter.getType().isAssignableFrom(TPConnectorChangeMessage.class)) {
-                                arguments[parameterIndex] = tpConnectorChangeMessage;
-                            }
-                            if (arguments[parameterIndex] == null) {
-                                throw new MethodDataParameterException(method, parameter);
-                            }
+            if (this.registeredInvokables.containsKey(tpConnectorChangeMessage.connectorId)) {
+                Class<? extends TPInvokable> invokableClass = this.registeredInvokables.get(tpConnectorChangeMessage.connectorId);
+                try {
+                    TPInvokable tpInvokable = this.instantiateTPInvokable(invokableClass);
+
+                    for (Field declaredField : invokableClass.getDeclaredFields()) {
+                        if (declaredField.isAnnotationPresent(Data.class)) {
+                            declaredField.setAccessible(true);
+                            Object fieldValue = tpConnectorChangeMessage.getTypedDataValue(this.pluginClass, declaredField);
+                            declaredField.set(tpInvokable, fieldValue);
                         }
-                        this.currentConnectorValues.put(tpConnectorChangeMessage.getConstructedId(), tpConnectorChangeMessage.value);
-                        this.callbacksExecutor.submit(() -> {
-                            try {
-                                method.setAccessible(true);
-                                method.invoke(this, arguments);
-                            }
-                            catch (Exception e) {
-                                TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Connector method could not be invoked", e);
-                            }
-                        });
-                        called = true;
+                        else if (declaredField.isAnnotationPresent(ConnectorValue.class)) {
+                            declaredField.setAccessible(true);
+                            declaredField.set(tpInvokable, tpConnectorChangeMessage.value);
+                        }
+                        else if (declaredField.getType().isAssignableFrom(JsonObject.class)) {
+                            declaredField.setAccessible(true);
+                            declaredField.set(tpInvokable, jsonConnectorChange);
+                        }
+                        else if (declaredField.getType().isAssignableFrom(TPConnectorChangeMessage.class)) {
+                            declaredField.setAccessible(true);
+                            declaredField.set(tpInvokable, tpConnectorChangeMessage);
+                        }
                     }
-                    catch (MethodDataParameterException e) {
-                        TouchPortalPlugin.LOGGER.log(Level.WARNING, e.getMessage(), e);
+
+                    this.currentConnectorValues.put(tpConnectorChangeMessage.getConstructedId(), tpConnectorChangeMessage.value);
+                    this.callbacksExecutor.submit(() -> {
+                        try {
+                            tpInvokable.onInvoke();
+                        }
+                        catch (Exception e) {
+                            TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Connector could not be invoked", e);
+                        }
+                    });
+
+                    invoked = true;
+                }
+                catch (ReflectiveOperationException e) {
+                    TouchPortalPlugin.LOGGER.log(Level.WARNING, "Connector could not be created or invoked", e);
+                }
+            }
+            else {
+                Method[] pluginConnectorMethods = Arrays.stream(this.pluginClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Connector.class)).toArray(Method[]::new);
+                for (Method method : pluginConnectorMethods) {
+                    String methodConnectorId = ConnectorHelper.getConnectorId(this.pluginClass, method);
+                    if (tpConnectorChangeMessage.connectorId.equals(methodConnectorId)) {
+                        try {
+                            Parameter[] parameters = method.getParameters();
+                            Object[] arguments = new Object[parameters.length];
+                            for (int parameterIndex = 0; parameterIndex < parameters.length; parameterIndex++) {
+                                Parameter parameter = parameters[parameterIndex];
+                                if (parameter.isAnnotationPresent(Data.class)) {
+                                    arguments[parameterIndex] = tpConnectorChangeMessage.getTypedDataValue(this.pluginClass, method, parameter);
+                                }
+                                else if (parameter.isAnnotationPresent(ConnectorValue.class)) {
+                                    arguments[parameterIndex] = tpConnectorChangeMessage.value;
+                                }
+                                else if (parameter.getType().isAssignableFrom(JsonObject.class)) {
+                                    arguments[parameterIndex] = jsonConnectorChange;
+                                }
+                                else if (parameter.getType().isAssignableFrom(TPConnectorChangeMessage.class)) {
+                                    arguments[parameterIndex] = tpConnectorChangeMessage;
+                                }
+                                if (arguments[parameterIndex] == null) {
+                                    throw new MethodDataParameterException(method, parameter);
+                                }
+                            }
+
+                            this.currentConnectorValues.put(tpConnectorChangeMessage.getConstructedId(), tpConnectorChangeMessage.value);
+                            this.callbacksExecutor.submit(() -> {
+                                try {
+                                    method.setAccessible(true);
+                                    method.invoke(this, arguments);
+                                }
+                                catch (Exception e) {
+                                    TouchPortalPlugin.LOGGER.log(Level.SEVERE, "Connector method could not be invoked", e);
+                                }
+                            });
+
+                            invoked = true;
+                        }
+                        catch (MethodDataParameterException e) {
+                            TouchPortalPlugin.LOGGER.log(Level.WARNING, e.getMessage(), e);
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }
-        return called;
+        return invoked;
     }
 
     /**
@@ -431,6 +558,16 @@ public abstract class TouchPortalPlugin {
         TouchPortalPlugin.LOGGER.log(Level.INFO, "Pairing Message Sent");
 
         return paired;
+    }
+
+    /**
+     * Register a {@link TPAction} or {@link TPConnector}
+     *
+     * @param invokableId       String
+     * @param invokableClass    Class&lt;{@link TPInvokable}&gt;
+     */
+    protected void registerInvokable(String invokableId, Class<? extends TPInvokable> invokableClass) {
+        this.registeredInvokables.put(invokableId, invokableClass);
     }
 
     /**
@@ -767,6 +904,7 @@ public abstract class TouchPortalPlugin {
                 createStateMessage.addProperty(SentMessageHelper.ID, stateId);
                 createStateMessage.addProperty(SentMessageHelper.DESCRIPTION, description);
                 createStateMessage.addProperty(SentMessageHelper.DEFAULT_VALUE, valueStr);
+                createStateMessage.addProperty(SentMessageHelper.FORCE_UPDATE, true);
                 if (parentGroup == null || parentGroup.isEmpty()) {
                     classLoop:
                     for (Class<?> subClass : this.pluginClass.getDeclaredClasses()) {
@@ -907,6 +1045,36 @@ public abstract class TouchPortalPlugin {
 
             sent = this.send(showNotificationMessage);
             TouchPortalPlugin.LOGGER.info("Show Notification [" + notificationId + "] Sent [" + sent + "]");
+        }
+
+        return sent;
+    }
+
+    /**
+     * Send a Trigger Event message to the Touch Portal Plugin System
+     *
+     * @param eventId String
+     * @param states  Map&lt;String, Object&gt; Key value pair of state id and value
+     * @return Boolean sent
+     */
+    public boolean sendTriggerEvent(String eventId, Map<String, Object> states) {
+        boolean sent = false;
+        if (eventId != null && !eventId.isEmpty()) {
+            JsonObject triggerEventMessage = new JsonObject();
+            triggerEventMessage.addProperty(SentMessageHelper.TYPE, SentMessageHelper.TYPE_TRIGGER_EVENT);
+            triggerEventMessage.addProperty(SentMessageHelper.EVENT_ID, eventId);
+
+            if (states != null && !states.isEmpty()) {
+                JsonObject jsonStates = new JsonObject();
+
+                states.forEach((id, value) -> {
+                    jsonStates.addProperty(id, String.valueOf(value));
+                });
+                triggerEventMessage.add(SentMessageHelper.STATES, jsonStates);
+            }
+
+            sent = this.send(triggerEventMessage);
+            TouchPortalPlugin.LOGGER.info("Trigger Event [" + eventId + "] Sent [" + sent + "]");
         }
 
         return sent;
@@ -1198,6 +1366,41 @@ public abstract class TouchPortalPlugin {
     }
 
     /**
+     * Convert an image url to a base64 representation
+     *
+     * @param imageUrl String
+     * @return String base64Image
+     */
+    public String getBase64ImageFromUrl(String imageUrl) {
+        String base64Image = "";
+        if (this.base64Images.containsKey(imageUrl)) {
+            base64Image = this.base64Images.get(imageUrl);
+        }
+        else {
+            ByteArrayOutputStream byteArrayOutputStream = null;
+            try {
+                BufferedImage bufferedImage = ImageIO.read(new URL(imageUrl));
+
+                ImageIO.write(bufferedImage, "jpg", byteArrayOutputStream = new ByteArrayOutputStream());
+                base64Image = Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+                this.base64Images.put(imageUrl, base64Image);
+            }
+            catch (Exception exception) {
+                LOGGER.warning(exception.getMessage() + " for Image URL: " + imageUrl);
+            }
+            finally {
+                if (byteArrayOutputStream != null) {
+                    try {
+                        byteArrayOutputStream.close();
+                    }
+                    catch (IOException ignored) {}
+                }
+            }
+        }
+        return base64Image;
+    }
+
+    /**
      * Interface Definition for Callbacks
      */
     public interface TouchPortalPluginListener {
@@ -1225,9 +1428,9 @@ public abstract class TouchPortalPlugin {
         /**
          * Called when a List Change Message is received
          *
-         * @param tpListChangeMessage TPListChangeMessage
+         * @param tpListChangedMessage TPListChangeMessage
          */
-        void onListChanged(TPListChangeMessage tpListChangeMessage);
+        void onListChanged(TPListChangedMessage tpListChangedMessage);
 
         /**
          * Called when a Broadcast Message is received
@@ -1268,7 +1471,7 @@ public abstract class TouchPortalPlugin {
     /**
      * Custom ConsoleHandler
      */
-    private static class CustomConsoleHandler extends ConsoleHandler {
+    public static class CustomConsoleHandler extends ConsoleHandler {
         public CustomConsoleHandler() {
             super();
             setFormatter(new SimpleFormatter() {
@@ -1278,7 +1481,7 @@ public abstract class TouchPortalPlugin {
                 public synchronized String format(LogRecord lr) {
                     String[] path =  lr.getSourceClassName().split("\\.");
                     return String.format(format,
-                            lr.getLevel().getLocalizedName(),
+                            lr.getLevel().getName(),
                             path[path.length - 1] + "." + lr.getSourceMethodName(),
                             lr.getMessage()
                     );

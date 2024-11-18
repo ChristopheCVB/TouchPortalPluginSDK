@@ -20,19 +20,27 @@
 
 package com.christophecvb.touchportal.samplejava;
 
+import com.christophecvb.touchportal.TouchPortalPlugin;
 import com.christophecvb.touchportal.annotations.*;
 import com.christophecvb.touchportal.helpers.PluginHelper;
 import com.christophecvb.touchportal.helpers.ReceivedMessageHelper;
-import com.christophecvb.touchportal.TouchPortalPlugin;
 import com.christophecvb.touchportal.model.*;
+import com.christophecvb.touchportal.samplejava.invokable.action.ExampleClassAction;
+import com.christophecvb.touchportal.samplejava.invokable.connector.ExampleClassConnector;
 import com.google.gson.JsonObject;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@SuppressWarnings("unused")
-@Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "Touch Portal Plugin Example")
+@Plugin(
+        version = BuildConfig.VERSION_CODE,
+        colorDark = "#203060",
+        colorLight = "#4070F0",
+        name = BuildConfig.NAME,
+        parentCategory = ParentCategory.CONTENT
+)
 public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
     /**
      * Logger
@@ -71,14 +79,18 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
     /**
      * Setting of type text definition example
      */
-    @Setting(name = "IP", defaultValue = "localhost", maxLength = 15)
+    @Setting(name = "IP", defaultValue = "localhost", maxLength = 15, tooltip = @Setting.Tooltip(
+            title = "IP address",
+            body = "ip address to connect to",
+            docUrl = "https://example.com"
+    ))
     private String ipSetting;
 
     /**
      * Setting of type number definition example
      */
     @Setting(name = "Update Delay", defaultValue = "10", minValue = 10, maxValue = 30)
-    private int updateDelaySetting;
+    private int updateDelaySetting = 10;
 
     /**
      * Setting of type String and is read only definition example
@@ -98,20 +110,29 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
             if (PluginHelper.COMMAND_START.equals(args[0])) {
                 // Initialize the Plugin
                 TouchPortalSampleJavaPlugin touchPortalSampleJavaPlugin = new TouchPortalSampleJavaPlugin();
+
+                // Register Invokable
+                touchPortalSampleJavaPlugin.registerInvokable(TouchPortalSampleJavaPluginConstants.BaseCategory.Actions.ExampleClassAction.ID, ExampleClassAction.class);
+                touchPortalSampleJavaPlugin.registerInvokable(TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ExampleClassConnector.ID, ExampleClassConnector.class);
+
                 // Load a properties File
                 touchPortalSampleJavaPlugin.loadProperties("plugin.config");
+
                 // Get a property
                 TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, touchPortalSampleJavaPlugin.getProperty("samplekey"));
+
                 // Set a property
                 touchPortalSampleJavaPlugin.setProperty("samplekey", "Value set from Plugin");
+
                 // Store the properties
                 touchPortalSampleJavaPlugin.storeProperties();
+
                 // Initiate the connection with the Touch Portal Plugin System
                 boolean connectedPairedAndListening = touchPortalSampleJavaPlugin.connectThenPairAndListen(touchPortalSampleJavaPlugin);
 
                 if (connectedPairedAndListening) {
                     // Update a State with the ID from the Generated Constants Class
-                    boolean stateUpdated = touchPortalSampleJavaPlugin.sendStateUpdate(TouchPortalSampleJavaPluginConstants.BaseCategory.States.CustomStateWithEvent.ID, "2");
+                    touchPortalSampleJavaPlugin.sendStateUpdate(TouchPortalSampleJavaPluginConstants.BaseCategory.States.CustomStateWithEvent.ID, "2");
 
                     // Create a new State
                     touchPortalSampleJavaPlugin.sendCreateState("BaseCategory", "createdState1", "Created State 01", System.currentTimeMillis() + "1");
@@ -136,8 +157,13 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
                     touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.ID, TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 90, null);
                     try {
                         Thread.sleep(1000);
-                    } catch (InterruptedException ignored) {}
+                    } catch (InterruptedException ignored) {
+                    }
                     touchPortalSampleJavaPlugin.sendConnectorUpdate(TouchPortalSampleJavaPluginConstants.ID, TouchPortalSampleJavaPluginConstants.BaseCategory.Connectors.ConnectorSimple.ID, 50, null);
+
+                    HashMap<String, Object> states = new HashMap<>();
+                    states.put(TouchPortalSampleJavaPluginConstants.BaseCategory.States.CustomStateWithEvent.ID, "Value");
+                    touchPortalSampleJavaPlugin.sendTriggerEvent(TouchPortalSampleJavaPluginConstants.BaseCategory.Events.CustomStateWithEvent.ID, states);
                 }
             }
         }
@@ -147,6 +173,8 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
      * Action example with no parameter
      */
     @Action(description = "Long Description of Action Simple", format = "Do a simple action", categoryId = "BaseCategory")
+    @ActionTranslation(language = Language.FRENCH, description = "Description longue de Action Simple", format = "Exécute une action simple", prefix = "Mon préfixe", name = "Action Simple")
+    @ActionTranslation(language = Language.PORTUGUESE, description = "Descrição longa da Acção Simples", format = "Realiza uma acção simples", prefix = "Meu prefixo", name = "Acção Simples")
     private void actionSimple() {
         TouchPortalSampleJavaPlugin.LOGGER.log(Level.INFO, "Action actionSimple received");
     }
@@ -298,7 +326,7 @@ public class TouchPortalSampleJavaPlugin extends TouchPortalPlugin implements To
     }
 
     @Override
-    public void onListChanged(TPListChangeMessage tpListChangeMessage) {
+    public void onListChanged(TPListChangedMessage tpListChangedMessage) {
     }
 
     @Override

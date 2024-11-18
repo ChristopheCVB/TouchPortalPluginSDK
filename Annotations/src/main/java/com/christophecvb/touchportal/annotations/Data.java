@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
  * @see <a href="https://www.touch-portal.com/sdk/index.php?section=action-data">TP Documentation: Action Data</a>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.FIELD})
 public @interface Data {
     /**
      * Data id

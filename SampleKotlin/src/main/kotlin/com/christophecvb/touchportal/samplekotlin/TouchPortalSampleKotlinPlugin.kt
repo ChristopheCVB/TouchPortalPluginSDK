@@ -20,25 +20,27 @@
 
 package com.christophecvb.touchportal.samplekotlin
 
-import com.christophecvb.touchportal.annotations.Action
-import com.christophecvb.touchportal.annotations.Category
-import com.christophecvb.touchportal.annotations.Plugin
 import com.christophecvb.touchportal.helpers.PluginHelper
 import com.christophecvb.touchportal.TouchPortalPlugin
-import com.christophecvb.touchportal.annotations.Data
+import com.christophecvb.touchportal.annotations.*
 import com.christophecvb.touchportal.model.*
 import com.google.gson.JsonObject
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.system.exitProcess
 
-@Suppress("unused")
-@Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#556677", colorLight = "#112233")
+@Plugin(
+    name = BuildConfig.NAME,
+    version = BuildConfig.VERSION_CODE,
+    colorDark = "#556677",
+    colorLight = "#112233",
+    parentCategory = ParentCategory.MISC
+)
 class TouchPortalSampleKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPlugin(parallelizeActions), TouchPortalPlugin.TouchPortalPluginListener {
 
     companion object {
         /**
-         * Logger
+         * Logger used within the plugin
          */
         private val LOGGER = Logger.getLogger(TouchPortalPlugin::class.java.name)
 
@@ -51,7 +53,7 @@ class TouchPortalSampleKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPl
 
                     // Initiate the connection with the Touch Portal Plugin System
                     val connectedPairedAndListening = touchPortalSampleKotlinPlugin.connectThenPairAndListen(touchPortalSampleKotlinPlugin)
-                    @Suppress("ControlFlowWithEmptyBody")
+
                     if (connectedPairedAndListening) {
                         // Let's go!
                         LOGGER.log(Level.INFO, "Plugin with ID[${TouchPortalSampleKotlinPluginConstants.ID}] Connected and Paired!")
@@ -61,7 +63,6 @@ class TouchPortalSampleKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPl
         }
     }
 
-    @Suppress("unused")
     enum class Categories {
         @Category(imagePath = "images/icon-24.png")
         BaseCategory
@@ -82,7 +83,7 @@ class TouchPortalSampleKotlinPlugin(parallelizeActions: Boolean) : TouchPortalPl
     }
 
     override fun onReceived(jsonMessage: JsonObject) {}
-    override fun onListChanged(tpListChangeMessage: TPListChangeMessage) {}
+    override fun onListChanged(tpListChangedMessage: TPListChangedMessage) {}
     override fun onInfo(tpInfoMessage: TPInfoMessage) {}
     override fun onBroadcast(tpBroadcastMessage: TPBroadcastMessage) {}
     override fun onSettings(tpSettingsMessage: TPSettingsMessage) {}

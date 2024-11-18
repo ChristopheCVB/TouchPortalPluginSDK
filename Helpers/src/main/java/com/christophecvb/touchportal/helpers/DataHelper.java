@@ -23,6 +23,7 @@ package com.christophecvb.touchportal.helpers;
 import com.christophecvb.touchportal.annotations.*;
 
 import javax.lang.model.element.Element;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
@@ -143,6 +144,45 @@ public class DataHelper {
                 }
                 else if (method.isAnnotationPresent(Connector.class)) {
                     dataId = DataHelper._getDataId(ConnectorHelper.getConnectorId(pluginClass, method), data.id().isEmpty() ? methodParameter.getName() : data.id());
+                }
+            }
+        }
+
+        return dataId;
+    }
+
+    /**
+     * Get the generated Data Id
+     *
+     * @param pluginClass     Class
+     * @param field           Field
+     * @return String dataId
+     */
+    public static String getDataId(Class<?> pluginClass, Field field) {
+        String dataId = "";
+
+        if (field.isAnnotationPresent(Data.class)) {
+            Data data = field.getAnnotation(Data.class);
+            if (!data.stateId().isEmpty()) {
+                String categoryId = null;
+                if (field.getDeclaringClass().isAnnotationPresent(Action.class)) {
+                    Action action = field.getDeclaringClass().getAnnotation(Action.class);
+                    categoryId = action.categoryId();
+                }
+                else if (field.getDeclaringClass().isAnnotationPresent(Connector.class)) {
+                    Connector connector = field.getDeclaringClass().getAnnotation(Connector.class);
+                    categoryId = connector.categoryId();
+                }
+                if (categoryId != null) {
+                    dataId = StateHelper.getStateId(pluginClass, categoryId, data.stateId());
+                }
+            }
+            else {
+                if (field.getDeclaringClass().isAnnotationPresent(Action.class)) {
+                    dataId = DataHelper._getDataId(ActionHelper.getActionId(pluginClass, field), data.id().isEmpty() ? field.getName() : data.id());
+                }
+                else if (field.getDeclaringClass().isAnnotationPresent(Connector.class)) {
+                    dataId = DataHelper._getDataId(ConnectorHelper.getConnectorId(pluginClass, field), data.id().isEmpty() ? field.getName() : data.id());
                 }
             }
         }

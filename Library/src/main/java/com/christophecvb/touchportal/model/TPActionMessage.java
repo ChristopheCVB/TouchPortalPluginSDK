@@ -23,6 +23,7 @@ package com.christophecvb.touchportal.model;
 import com.christophecvb.touchportal.helpers.DataHelper;
 import com.christophecvb.touchportal.helpers.ReceivedMessageHelper;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -39,6 +40,10 @@ public class TPActionMessage extends TPMessage {
 
     public Object getTypedDataValue(Class<?> pluginClass, Method actionMethod, Parameter actionMethodParameter) {
         return this.getTypedDataValue(actionMethodParameter.getParameterizedType().getTypeName(), DataHelper.getDataId(pluginClass, actionMethod, actionMethodParameter));
+    }
+
+    public Object getTypedDataValue(Class<?> pluginClass, Field actionField) {
+        return this.getTypedDataValue(actionField.getType().getTypeName(), DataHelper.getDataId(pluginClass, actionField));
     }
 
     public Object getTypedDataValue(String actionDataType, String actionDataId) {

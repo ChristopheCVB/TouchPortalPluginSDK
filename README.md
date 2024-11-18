@@ -18,26 +18,24 @@ Once you have cloned this project, you can run the `gradlew javaDoc` and browse 
 
 ## Releases
 
-Latest is 8.0.0
-
-Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases)
+Go to [releases](https://github.com/ChristopheCVB/TouchPortalPluginSDK/releases) to check which is the latest
 
 ### Maven Central
 
-Latest version is `8.0.0`
-
-Prior versions were not published to Maven Central
+Versions before `7.0.0` were not published to Maven Central
 
 #### Gradle
 
 ```groovy
 plugins {
-  id 'com.christophecvb.touchportal.plugin-packager' version '8.0.0'
+  id 'com.christophecvb.touchportal.plugin-packager' version 'X.Y.Z'
 }
 
+tpPlugin.mainClassSimpleName = 'MyTouchPortalPlugin'
+
 dependencies {
-  implementation 'com.christophecvb.touchportal:plugin-sdk:8.0.0'
-  annotationProcessor 'com.christophecvb.touchportal:plugin-sdk-annotations-processor:8.0.0'
+  implementation 'com.christophecvb.touchportal:plugin-sdk:X.Y.Z'
+  annotationProcessor 'com.christophecvb.touchportal:plugin-sdk-annotations-processor:X.Y.Z'
 }
 ```
 
@@ -93,7 +91,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
     /**
      * Called when a List Change Message is received
      */
-    public void onListChanged(TPListChangeMessage tpListChangeMessage) { }
+    public void onListChanged(TPListChangeMessage tpListChangedMessage) { }
 
     /**
      * Called when a Broadcast Message is received
@@ -105,16 +103,15 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
      */
     public void onSettings(TPSettingsMessage tpSettingsMessage) { }
 
-  /**
-   * Called when a Notification Option Clicked Message is received
-   */
-  public void onNotificationOptionClicked(TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage) {}
+    /**
+     * Called when a Notification Option Clicked Message is received
+     */
+    public void onNotificationOptionClicked(TPNotificationOptionClickedMessage tpNotificationOptionClickedMessage) { }
 }
 ```
 
 ## Development and Interaction
-
-- The SDK will automatically callback your action methods if they only contain `@Data` annotated parameters
+The SDK will automatically invoke your action methods if they contain only `@Data` annotated parameters
 
 ```java
 public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
@@ -127,14 +124,14 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
      */
     @Action(description = "Long Description of Dummy Action with Data Text", format = "Set text to {$text$}", categoryId = "BaseCategory")
     private void actionWithText(@Data String text) {
-        TouchPortalSamplePlugin.LOGGER.log(Level.INFO, "Action actionWithText received: " + text);
+      MyTouchPortalPlugin.LOGGER.log(Level.INFO, "Action actionWithText received: " + text);
     }
     
     // ...
 }
 ```
 
-- Otherwise, call your actions manually in the `onReceived(JsonObject jsonMessage)` method
+Otherwise, call your actions manually in the `onReceived(JsonObject jsonMessage)` method
 
 ```java
 public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
@@ -159,7 +156,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
 }
 ```
 
-- Don't forget to initialize all your services once you receive the onInfo event. The TPInfoMessage will also contain the initial values of your settings.
+Don't forget to initialize all your services once you receive the onInfo event. The TPInfoMessage will also contain the initial values of your settings.
 
 ```java
 public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
@@ -167,7 +164,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
   
     public void onInfo(TPInfoMessage tpInfoMessage) {
         // TPInfoMessage will contain the initial settings stored by TP
-        // -> Note that your annotated Settings fields will be up to date at this point
+        // -> Note that your annotated Settings fields will be up-to-date at this point
       
         // continue plugin initialization
     }
@@ -176,7 +173,7 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
 }
 ```
 
-- Finally, send messages back to TouchPortal when you want to update your states
+Finally, send messages back to TouchPortal when you want to update your states
 
 ```java
 public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPortalPlugin.TouchPortalPluginListener {
@@ -196,16 +193,24 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin implements TouchPorta
 }
 ```
 
-## Use Annotations to describe your plugin and package it
+## Use Annotations to describe your plugin
 
-- The provided Annotations help you in the automatic generation of the `entry.tp` file (necessary for packaging and deployment of your plugin)
-- Current supported annotations include: Plugin, Category, Action, Data, State, Event and Setting
-- More examples can be found in the sample modules
+The provided Annotations help you in the automatic generation of the `entry.tp` file (necessary for packaging and deployment of your plugin)
+
+Current supported annotations include: Plugin, Category, Action, Data, State, Event and Setting 
+
+More examples can be found in the sample modules
 
 ```java
 // ...
 
-@Plugin(version = BuildConfig.VERSION_CODE, colorDark = "#203060", colorLight = "#4070F0", name = "My Touch Portal Plugin")
+@Plugin(
+        name = "My Touch Portal Plugin",
+        version = BuildConfig.VERSION_CODE,
+        colorDark = "#203060",
+        colorLight = "#4070F0",
+        parentCategory = ParentCategory.MISC
+)
 public class MyTouchPortalPlugin extends TouchPortalPlugin {
     //...
 
@@ -214,7 +219,11 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
      *
      * @param text String
      */
-    @Action(description = "Long Description of Dummy Action with Data", format = "Set text to {$text$}", categoryId = "BaseCategory")
+    @Action(
+            description = "Long Description of Dummy Action with Data",
+            format = "Set text to {$text$}",
+            categoryId = "BaseCategory"
+    )
     private void dummyWithData(@Data String text) {
         LOGGER.log(Level.Info, "Action dummyWithData received: " + text);
     }
@@ -240,13 +249,16 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
 
 ## Prepackaging
 
-- Add the Plugin icon and extra resources into the `src/main/resources/` directory of your module
+Add the Plugin icon and extra resources into the `src/main/resources/` directory of your module
 
-## Build
+## Clean, Build and Package
 
-- Use the common `gradlew clean` task to clean your build directories.
-- Use the common `gradlew build` task to build your project with the Annotations. 
-- Use the `gradlew packagePlugin` task to pack your plugin into a `.tpp` file. Output files will be in your module `build/plugin` directory.
+- Clean Project
+  - `gradlew clean`
+- Build Project
+  - `gradlew build` 
+- Package Project
+  - `gradlew packagePlugin` task to pack your plugin into a `.tpp` file. Output files will be in your module's `build/plugin` directory.
 
 ## Debugging tips
 
@@ -261,8 +273,4 @@ public class MyTouchPortalPlugin extends TouchPortalPlugin {
     - Main Class: `your.package.YourTouchPortalPlugin`
     - Arguments: `start`
     - Working Directory: `YourModule/build/plugin/YourTouchPortalPlugin`
-[![Touch Portal Plugin SDK Gradle Application Configuration](https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/resources/TP%20Plugin%20SDK%20Gradle%20Application%20Configuration.png)](#debugging-tips)
-
-## ROADMAP
-
-The roadmap can be found [here](https://github.com/ChristopheCVB/TouchPortalPluginSDK/projects/1)
+![Touch Portal Plugin SDK Gradle Application Configuration](https://raw.githubusercontent.com/ChristopheCVB/TouchPortalPluginSDK/master/resources/TP%20Plugin%20SDK%20Gradle%20Application%20Configuration.png)

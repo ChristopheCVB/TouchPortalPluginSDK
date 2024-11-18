@@ -1,13 +1,12 @@
 plugins {
-    id 'groovy-gradle-plugin'
-    id 'com.gradle.plugin-publish' version '0.15.0'
-    id 'maven-publish'
+    id 'com.gradle.plugin-publish' version '1.0.0'
     id 'signing'
+    id 'groovy-gradle-plugin'
 }
 
 group 'com.christophecvb.touchportal'
 def localArchiveBaseName = 'plugin-packager'
-version versionName
+version isRelease ? versionName : versionName.replace('-SNAPSHOT', '-' + System.currentTimeSeconds())
 
 pluginBundle {
     website = 'https://github.com/ChristopheCVB/TouchPortalPluginSDK'
@@ -68,7 +67,7 @@ publishing {
 
     repositories {
         maven {
-            url = version.endsWith('SNAPSHOT') ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/' : 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            url = version.contains('-') ? 'https://s01.oss.sonatype.org/content/repositories/snapshots/' : 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
             credentials {
                 username = envOrPropOrEmpty('OSSRH_USERNAME')
                 password = envOrPropOrEmpty('OSSRH_PASSWORD')
