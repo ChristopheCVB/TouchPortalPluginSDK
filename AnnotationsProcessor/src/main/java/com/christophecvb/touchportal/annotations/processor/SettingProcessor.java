@@ -34,6 +34,22 @@ public class SettingProcessor {
         jsonSetting.addProperty(SettingHelper.TYPE, desiredTPType);
         jsonSetting.addProperty(SettingHelper.DEFAULT, setting.defaultValue());
         jsonSetting.addProperty(SettingHelper.IS_READ_ONLY, setting.isReadOnly());
+
+        if (!setting.tooltip().body().isEmpty()) {
+            JsonObject tooltip = new JsonObject();
+
+            tooltip.addProperty(SettingHelper.Tooltip.BODY, setting.tooltip().body());
+
+            if (!setting.tooltip().title().isEmpty()) {
+                tooltip.addProperty(SettingHelper.Tooltip.TITLE, setting.tooltip().title());
+            }
+            if (!setting.tooltip().docUrl().isEmpty()) {
+                tooltip.addProperty(SettingHelper.Tooltip.DOC_URL, setting.tooltip().docUrl());
+            }
+
+            jsonSetting.add(SettingHelper.TOOLTIP, tooltip);
+        }
+
         switch (desiredTPType) {
             case SettingHelper.TYPE_TEXT:
                 if (setting.maxLength() > 0) {

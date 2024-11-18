@@ -37,7 +37,12 @@ public class ConnectorProcessor {
         TypeSpec.Builder connectorTypeSpecBuilder = SpecUtils.createConnectorTypeSpecBuilder(pluginElement, categoryElement, category, connectorElement, connector);
 
         JsonObject jsonConnector = new JsonObject();
-        jsonConnector.addProperty(ConnectorHelper.ID, ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connectorElement, connector));
+        if (!connector.subCategoryId().isEmpty()){
+            jsonConnector.addProperty(ConnectorHelper.ID, ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connectorElement, connector));
+            jsonConnector.addProperty(ConnectorHelper.SUB_CATEGORY_ID, ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connector.subCategoryId(), connectorElement, connector));
+        } else {
+            jsonConnector.addProperty(ConnectorHelper.ID, ConnectorHelper.getConnectorId(pluginElement, categoryElement, category, connectorElement, connector));
+        }
         jsonConnector.addProperty(ConnectorHelper.NAME, ConnectorHelper.getConnectorName(connectorElement, connector));
         jsonConnector.addProperty(ConnectorHelper.FORMAT, connector.format());
 

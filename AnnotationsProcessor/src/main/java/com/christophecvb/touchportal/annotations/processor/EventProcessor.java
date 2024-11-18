@@ -6,6 +6,7 @@ import com.christophecvb.touchportal.annotations.processor.utils.SpecUtils;
 import com.christophecvb.touchportal.helpers.EventHelper;
 import com.christophecvb.touchportal.helpers.GenericHelper;
 import com.christophecvb.touchportal.helpers.StateHelper;
+import com.christophecvb.touchportal.helpers.SubCategoryHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.squareup.javapoet.TypeSpec;
@@ -43,7 +44,12 @@ public class EventProcessor {
         TypeSpec.Builder eventTypeSpecBuilder = SpecUtils.createEventTypeSpecBuilder(pluginElement, categoryElement, category, eventElement, event);
 
         JsonObject jsonEvent = new JsonObject();
-        jsonEvent.addProperty(EventHelper.ID, EventHelper.getEventId(pluginElement, categoryElement, category, eventElement, event));
+        if (!event.subCategoryId().isEmpty()) {
+            jsonEvent.addProperty(EventHelper.ID, EventHelper.getEventId(pluginElement, categoryElement, category, event.subCategoryId(), eventElement, event));
+            jsonEvent.addProperty(EventHelper.SUB_CATEGORY_ID, SubCategoryHelper.getSubCategoryId(pluginElement, categoryElement, category, event.subCategoryId()));
+        } else {
+            jsonEvent.addProperty(EventHelper.ID, EventHelper.getEventId(pluginElement, categoryElement, category, eventElement, event));
+        }
         jsonEvent.addProperty(EventHelper.TYPE, EventHelper.TYPE_COMMUNICATE);
         jsonEvent.addProperty(EventHelper.NAME, EventHelper.getEventName(eventElement, event));
         jsonEvent.addProperty(EventHelper.FORMAT, event.format());
